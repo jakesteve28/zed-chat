@@ -13,6 +13,8 @@ import { UseGuards } from '@nestjs/common';
 import { ChatGuard } from './chat.auth-guard';
 import { Request, Response } from "express"
 import { MessageService } from 'src/messages/message.service';
+import { Conversation } from 'src/conversations/conversation.entity';
+import { User } from 'src/users/user.entity';
 
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
@@ -39,6 +41,7 @@ export class ChatGateway  {
     @SubscribeMessage('connect')
     async handleConnect(@ConnectedSocket() client: Socket){
         client.emit('connect', { connected: true })
+
     }
 
     @UseGuards(ChatGuard)

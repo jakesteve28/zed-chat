@@ -1,5 +1,5 @@
-import React, { useRef } from 'react'
-import { Button, Container, Row, Dropdown } from 'react-bootstrap'
+import React, { useEffect, useRef } from 'react'
+import { Button, Container, Row, Dropdown, Col } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,6 +17,7 @@ import {
 } from '../account/accountSettingsSlice'
 import {
   addConversation,
+  selectConversations,
   setCurrentConversation
 } from '../currentConversation/conversationsSlice'
 import { useSelector } from 'react-redux'
@@ -24,6 +25,8 @@ import { useDispatch } from 'react-redux'
 import { FormControl } from 'react-bootstrap'
 import { useState } from 'react'
 import { selectToken } from '../auth/authSlice';
+import { selectSent, selectReceived, acceptedInvites, addSentInvite, addAcceptedInvite, addReceivedInvite } from './inviteSlice';
+import io from 'socket.io-client'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,6 +59,10 @@ const useStyles = makeStyles((theme) => ({
       const reqBody = {
         tagName: `${tagName}`
       };
+      const sentInvites = useSelector(selectSent)
+      const _acceptedInvites = useSelector(acceptedInvites)
+      const receivedInvites = useSelector(selectReceived)
+
       const createConversation = async () => {
         const res = await fetch("http://localhost:3002/api/conversation/create",
           {
@@ -126,6 +133,27 @@ const useStyles = makeStyles((theme) => ({
               Start Chat
             </Button>
             </Row>
+            <Row>
+              <Col>
+                {sentInvites.map((el) => {
+                  return (
+                    <Container>{JSON.stringify(el)}</Container>
+                  )
+                })}
+              </Col>
+              <Col>
+                {receivedInvites.map((el) => {
+                  return (
+                    <Container>{JSON.stringify(el)}</Container>
+                  )
+                })}
+                {_acceptedInvites.map((el) => {
+                  return (
+                    <Container>{JSON.stringify(el)}</Container>
+                  )
+                })}
+              </Col>
+            </Row>
           </Container>
           
         </div>
@@ -133,7 +161,20 @@ const useStyles = makeStyles((theme) => ({
     },
   );
 
+let socket 
+
 export default function TopBar(){
+    const token = useSelector(selectToken);
+    const socketOptions = {
+        transportOptions: {
+            polling: {
+                extraHeaders: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        }
+    }
+    socket = io('http://localhost:42020/invite-server', socketOptions)
     const inputEl = useRef(null);
     const [modalShow, setModalShow] = React.useState(false);
     const size = useWindowSize()
@@ -141,6 +182,82 @@ export default function TopBar(){
     const account = useSelector(selectAccount);
     const dispatch = useDispatch();
     const screenSmall = size.width < 768;
+    const sentInvites = useSelector(selectSent)
+    const receivedInvites = useSelector(selectReceived)
+    const _acceptedInvites = useSelector(acceptedInvites)
+    const conversations = useSelector(selectConversations)
+
+    useEffect(async () => {
+      if(token){
+        const sentInvitesRes = await fetch(`http://localhost:3002/api/invite/sent/${account.id}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        })
+        const sentInvites = await sentInvitesRes.json()
+        if(sentInvites && Array.isArray(sentInvites)){
+          console.log(sentInvites)
+          for(let invite of sentInvites){
+            dispatch(addSentInvite(invite))
+          }
+        }
+        const receivedInvitesRes = await fetch(`http://localhost:3002/api/invite/user/${account.id}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        })
+        const receivedInvites = await receivedInvitesRes.json()
+        if(receivedInvites && Array.isArray(receivedInvites)){
+          for(let invite of receivedInvites){
+            console.log(receivedInvites)
+            if(invite.accepted === true)
+              dispatch(addAcceptedInvite(invite))
+            else  
+              dispatch(addReceivedInvite(invite))
+          }
+        }
+      } 
+    }, [token])
+    useEffect(() => {
+      socket.on('convInvite', (msg) => {
+        try {
+          const inv = JSON.parse(msg)
+          console.log(inv)
+          if(inv.invite.recipientId === account.id){
+            if(conversations){
+              if(0 === conversations.filter(el => el.id === inv.invite.conversationId).length){
+                 dispatch(addReceivedInvite(inv.invite))
+              }
+            }
+          } 
+        } catch(err) {
+          console.log("Receive Invite Error" + err)
+        }
+      })
+      socket.on('accepted', (msg) => {
+
+      })
+      
+      return () => {
+        if(socket){
+          socket.off('convInvite')
+          socket.off('accepted')
+        }
+      }
+    }, [])
+    
+    const sendInvite = () => {
+      socket.emit('sendInvite', JSON.stringify({
+
+      }))
+    }
+    const sendAcceptInvite = () => {
+      socket.emit('acceptInvite', JSON.stringify({
+
+      }))
+    }
     return (
       <>
         <CssBaseline>
