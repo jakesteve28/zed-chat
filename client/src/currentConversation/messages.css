@@ -1,0 +1,34 @@
+.list-item {
+    margin-top: auto;
+}
+.menu-container { 
+    margin-top: auto;
+    border : 1px solid black;
+    margin-right: 270px;
+    background: white;
+    display: flex;
+    align-items: flex-end;
+    position: fixed;
+    overflow:auto !important;
+    width: 95%;
+    height: 70%;
+}
+.ul {
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.li:first-child {
+    margin-top: auto !important;
+}
+.li {
+    height:50px;
+    width: 100%;
+    text-align: center;
+    justify-content:center;
+    flex-direction: column-reverse;
+}

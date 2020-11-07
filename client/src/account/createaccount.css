@@ -1,0 +1,25 @@
+.form-control::-webkit-input-placeholder {
+    color: #D4D4D4;
+    opacity: "0.55";
+    margin-left: 10px;
+}
+.form-control:-moz-placeholder {
+    color: #D4D4D4;
+    opacity: 0.8;  
+    margin-left: 10px;
+}
+.form-control::-moz-placeholder {
+    color: #D4D4D4;
+    opacity: 0.8;  
+    margin-left: 10px;
+}
+.form-control::placeholder {
+    color: #D4D4D4; 
+    opacity: 0.8; 
+    margin-left: 10px;
+}
+.form-control:-ms-input-placeholder {
+    color: #D4D4D4; 
+    margin-left: 10px;
+    opacity: 0.8; 
+}

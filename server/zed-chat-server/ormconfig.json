@@ -1,0 +1,10 @@
+{
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "zed-server",
+    "password": "hiddeninzed",
+    "database": "zed-chat",
+    "entities": ["dist/**/*.entity{.ts,.js}"],
+    "synchronize": true
+  }
