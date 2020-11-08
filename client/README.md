@@ -1,6 +1,6 @@
 ## Zed Chat
 
-This repository contains code for the server and client of Zed Chat, an application
+This repository contains code for the client of Zed Chat, an application
 built for real-time messaging in private chats. 
 
-Server built in nest.js, front end built in react/redux, real time using socket.io
+Server was built using React/Redux, Bootstrap, Material UI, and socket.io
