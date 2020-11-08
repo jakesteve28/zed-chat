@@ -27,26 +27,19 @@ export class ConversationService {
     }
     async create(user: string): Promise<Conversation> {
         const conversation = new Conversation();
-        console.log(user, conversation)
         const __user = await this.userService.findByTagName(user)
-        console.log(await this.conversationRepository.count({ where: {
-            conversationName: `Conversation with @${__user.tagName}`}
-        }))
-        if(await this.conversationRepository.count({ where: {
-            conversationName: `Conversation with @${__user.tagName}`}
-        }) > 1){
-            throw `Conversation with @${__user.tagName} already exists`
-        }
-        conversation.conversationName = `Conversation with @${__user.tagName}`
+        conversation.conversationName = `Empty Conversation`
         conversation.users = [] 
         conversation.users.push(__user)
-        const _conversation = await this.conversationRepository.save(conversation);
-        const _user = await this.userService.addConversation(__user.id, conversation.id);
-        if(_user.conversations.filter((conv) => conv.id === _conversation.id).length < 1)
-            throw `User: ${_user.id} conversations[] unsuccessfully updated`
-        if(_conversation.users.filter((user) => user.id === _user.id).length < 1)
-            throw `Conversation: ${_conversation.id} users[] unsuccessfully updated`
-        return this.conversationRepository.save(conversation);
+       // const _conversation = await this.conversationRepository.save(conversation);
+        //const _user = await this.userService.addConversation(__user.id, conversation.id);
+        //if(_user.conversations.filter((conv) => conv.id === _conversation.id).length < 1)
+         //   throw `User: ${_user.id} conversations[] unsuccessfully updated`
+        //if(_conversation.users.filter((user) => user.id === _user.id).length < 1)
+        //    throw `Conversation: ${_conversation.id} users[] unsuccessfully updated`
+        const conv = await this.conversationRepository.save(conversation);
+        conv.conversationName = `Chat with @${__user.tagName}`
+        return this.conversationRepository.save(conv)
     }
     async remove(id: string): Promise<string> {
         await this.conversationRepository.delete(id);
@@ -56,7 +49,9 @@ export class ConversationService {
         const conversation = await this.conversationRepository.findOne(conversationId, { relations: ["users", "messages"] });
         const user = await this.userService.findByTagName(userTagName);
         conversation.users = [...conversation.users, user];
-        conversation.conversationName = `@${userTagName}`
+        let str = ``
+        for(let user of conversation.users) str += `@${user.tagName} `
+        conversation.conversationName = `Chat with ${str}`
         return this.conversationRepository.save(conversation);
     }
     async removeUser(conversationId: string, userTagName: string): Promise<Conversation>{
@@ -67,6 +62,9 @@ export class ConversationService {
         conversation.users = conversation.users.filter((element) => {
             return element.tagName != userTagName
         });
+        let str = ``
+        for(let user of conversation.users) str += `@${user.tagName} `
+        conversation.conversationName = `Chat with ${str}`
         return this.conversationRepository.save(conversation);
     }
     async getUsers(conversationId: string): Promise<User[]> {

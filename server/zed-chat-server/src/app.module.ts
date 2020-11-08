@@ -14,7 +14,7 @@ import { MessageModule } from './messages/message.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
-  }), UserModule, AuthModule, ConversationModule, ChatModule, InviteModule, MessageModule, InviteModule],
+  }), UserModule, AuthModule, ConversationModule, ChatModule, InviteModule, MessageModule],
   controllers: [AppController],
   providers: [AppService]
 })

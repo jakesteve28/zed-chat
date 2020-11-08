@@ -16,6 +16,7 @@ import { MessageModule } from 'src/messages/message.module';
         MessageModule
     ],
     providers: [ChatGateway],
+    exports: [ChatGateway]
 })
 export class ChatModule {}
   

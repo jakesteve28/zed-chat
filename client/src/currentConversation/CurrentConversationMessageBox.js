@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react' 
 import { Row, Col, InputGroup, FormControl, Button } from 'react-bootstrap';
-import { SendRounded, TrendingUpTwoTone } from '@material-ui/icons';
+import { SendRounded } from '@material-ui/icons';
 import io from 'socket.io-client'
 import {
     selectCurrentConversation,
     addMessage,
-    setRead,
     setTyping
 } from './conversationsSlice';
 
@@ -22,8 +21,6 @@ import { useDispatch, useSelector } from 'react-redux'
 let _socket 
 let searchTimeout
 
-export { _socket as socket }
-
 export default function CurrentConversationMessageBox(props){
     const [message, setMessage] = useState("")
     const account = useSelector(selectAccount)
@@ -32,8 +29,24 @@ export default function CurrentConversationMessageBox(props){
     const dispatch = useDispatch()
     const formRef = useRef(null)
     const [typingTimeout, setTypingTimeout] = useState(null)
+    const sendMessage = async () => {
+        if(_socket){
+           _socket.emit('chatToServer', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, message: `${message}` }));
+        }
+            else {
+                console.log("No Conversation to send message to")
+            }
+        }
+    const sendTyping = (isTyping) => {
+        if(_socket && account && currentConversation){
+            _socket.emit('typing', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, typing: isTyping }));
+        }
+        else {
+            console.log("No Conversation to send typing to")
+        }
+    }
     useEffect(() => {
-        if(currentConversation && currentConversation.id){
+        if(currentConversation && currentConversation.id && token && account){
             const socketOptions = {
                 transportOptions: {
                     polling: {
@@ -84,7 +97,7 @@ export default function CurrentConversationMessageBox(props){
                 })
             if(_socket && formRef && currentConversation && account){
                 formRef.current.onkeypress = () => { 
-                    if (searchTimeout != undefined) clearTimeout(searchTimeout);
+                    if (searchTimeout !== undefined) clearTimeout(searchTimeout);
                     searchTimeout = setTimeout(() => {
                         console.log("typing done")
                         setTypingTimeout(false)
@@ -99,8 +112,6 @@ export default function CurrentConversationMessageBox(props){
                 if(_socket){
                     if(currentConversation && currentConversation.id)
                         _socket.emit("leaveRoom", { room: currentConversation.id });
-                    if(formRef && formRef.current)
-                    formRef.current.onkeypress = null;
                     _socket.off('chatToClient')
                     _socket.off('connect')
                     _socket.off('joinedRoom')
@@ -110,26 +121,9 @@ export default function CurrentConversationMessageBox(props){
                 }     
             }
         } else {
-            console.log("Socket error, conversation not defined");
+            console.log("Socket not setup: no current conversation");
         }
-    }, [((currentConversation) ? currentConversation.id : 0)]);
-
-    const sendMessage = async () => {
-            if(_socket){
-               _socket.emit('chatToServer', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, message: `${message}` }));
-            }
-        else {
-            console.log("No Conversation to send message to")
-        }
-    }
-    const sendTyping = (isTyping) => {
-        if(_socket && account && currentConversation){
-            _socket.emit('typing', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, typing: isTyping }));
-        }
-        else {
-            console.log("No Conversation to send typing to")
-        }
-    }
+    }, [currentConversation]);
     return ( 
         <Row className="w-100 text-center" style={{ position: "fixed", bottom: 0, left: 50 }}>
             <Col md="3"></Col>

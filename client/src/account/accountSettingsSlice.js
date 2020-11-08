@@ -12,6 +12,15 @@ export const accountSlice = createSlice({
     id: ""
   },
   reducers: {
+    clearAccount: (state, action) => {
+      state.firstName = "";
+      state.lastName = "";
+      state.email = "";
+      state.tagName = "";
+      state.loggedIn = false;
+      state.contacts = [];
+      state.id = "";
+    },
     setFirstName: (state, action) => {
         state.firstName = action.payload
     },
@@ -39,7 +48,7 @@ export const accountSlice = createSlice({
   },
 });
 
-export const { setId, setFirstName, setLastName, setEmail, setTagName, login, logout } = accountSlice.actions;
+export const { clearAccount, setId, setFirstName, setLastName, setEmail, setTagName, login, logout } = accountSlice.actions;
 
 // // The function below is called a thunk and allows us to perform async logic. It
 // // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This

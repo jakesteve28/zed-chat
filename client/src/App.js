@@ -17,13 +17,7 @@ import {
 } from './account/accountSettingsSlice'
 import GuardedRoute from './login/loginGuard'
 import Settings from './account/Settings'
-import Contacts from './account/Contacts'
 import useWindowSize from './sidebar/windowSize'
-
-//const height = window.innerHeight
-const width = window.innerWidth
-
-//const drawerWidth = width / 6;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -105,7 +99,6 @@ function CreateAcc(){
 }
 
 function Home(){
-  const classes = useStyles();
   const size = useWindowSize();
   return (
     <Container fluid className="w-100" style={{ backgroundColor: "#191919",    height: size.height, minHeight: size.height}}>
@@ -147,34 +140,18 @@ function SettingScr(){
     )
 }
 
-function ContactsScr(){
-  const classes = useStyles();
-  return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <TopBar></TopBar>
-      <Sidebar></Sidebar>
-      <main className={classes.content}>
-          <Contacts></Contacts>
-      </main>
-    </div>
-    )
-}
-
 function App() {
-  const classes = useStyles();
   const auth = useSelector(selectAccount)
   return (
     <Router>
       <Switch>
-      <Route path="/login" component={Login}></Route>
-      <Route path="/forgotPassword" component={Fgpw}></Route>
-      <Route path="/createAccount" component={CreateAcc}></Route>
-      <GuardedRoute path="/contacts" component={ContactsScr} auth={auth.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/home" component={Home} auth={auth.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/conversations" component={Conversations} auth={auth.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/settings" component={SettingScr} auth={auth.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/" component={Home} auth={auth.loggedIn}></GuardedRoute>
+        <Route path="/login" component={Login}></Route>
+        <Route path="/forgotPassword" component={Fgpw}></Route>
+        <Route path="/createAccount" component={CreateAcc}></Route>
+        <GuardedRoute path="/home" component={Home} auth={auth.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/conversations" component={Conversations} auth={auth.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/settings" component={SettingScr} auth={auth.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/" component={Home} auth={auth.loggedIn}></GuardedRoute>
       </Switch>
     </Router>
   );

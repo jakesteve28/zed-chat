@@ -41,10 +41,10 @@ export class InviteService {
         const recipient = await this.userService.findOne(recipientId);
         const conversation = await this.conversationService.findOne(conversationId);
         if(conversation.users.filter(user => user.id === recipient.id).length > 0)
-            throw "Cannot create invite, recipient already belongs to conversation";
+            console.log("Cannot create invite, recipient already belongs to conversation");
         if(conversation.users.filter(user => user.id === sender.id).length < 1){
             console.log(conversation.users)
-            throw "Cannot create invite, sender does not belong to conversation";
+            console.log("Cannot create invite, sender does not belong to conversation");
         }
         else {
             const invite = new Invite();

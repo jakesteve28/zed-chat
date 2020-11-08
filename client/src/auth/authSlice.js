@@ -12,11 +12,15 @@ export const authSlice = createSlice({
     },
     setToken: (state, action) => {
         state.token = action.payload;
+    },
+    clearAuth: (state, action) => {
+      state.username = ""
+      state.token = ""
     }
   }
 });
 
-export const { setUserName, setToken } = authSlice.actions;
+export const { clearAuth, setUserName, setToken } = authSlice.actions;
 
 export const selectUserName = state => state.auth.username;
 export const selectToken = state => state.auth.token;

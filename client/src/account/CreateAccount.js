@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Navbar, Nav, Modal, Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap'
+import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap'
 import './createaccount.css'
 import { Redirect } from 'react-router-dom'
 

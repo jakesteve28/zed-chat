@@ -8,6 +8,11 @@ export const inviteSlice = createSlice({
     acceptedInvites: []
   },
   reducers: {
+    clearInvites: (state, action) => {
+        state.sentInvites = []
+        state.receivedInvites = []
+        state.acceptedInvites = []
+    },
     addSentInvite: (state, action) => {
         state.sentInvites.push(action.payload)
     },
@@ -15,10 +20,10 @@ export const inviteSlice = createSlice({
         state.receivedInvites.push(action.payload)
     },
     removeSentInvite: (state, action) => {
-        state.sentInvites.filter(el => el.id === action.payload)
+        state.sentInvites = state.sentInvites.filter(el => el.id !== action.payload)
     },
     removeReceivedInvite: (state, action) => {
-        state.receivedInvites.filter(el => el.id === action.payload)
+        state.receivedInvites = state.receivedInvites.filter(el => el.id !== action.payload)
     },
     addAcceptedInvite: (state, action) => {
         state.acceptedInvites.push(action.payload)
@@ -26,7 +31,7 @@ export const inviteSlice = createSlice({
   },
 });
 
-export const { addSentInvite, addReceivedInvite, removeSentInvite, removeReceivedInvite, addAcceptedInvite } = inviteSlice.actions;
+export const { clearInvites, addSentInvite, addReceivedInvite, removeSentInvite, removeReceivedInvite, addAcceptedInvite } = inviteSlice.actions;
 
 // // The function below is called a thunk and allows us to perform async logic. It
 // // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This

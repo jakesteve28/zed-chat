@@ -14,7 +14,7 @@ export class ConversationController {
     } catch(error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: "Conversation Find One Error"
+        error: "Conversation Find One Error" + error
       }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }

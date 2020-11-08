@@ -12,17 +12,17 @@ export class InviteController {
     async getInvite(@Param('id') id): Promise<Invite> {
         return this.inviteService.getInvite(id);
     }
-    @Get('user/:id')
+    @Get('/user/:id')
     @UseGuards(JwtAuthGuard)
     async getByUser(@Param('id') id): Promise<Invite[]> {
         return this.inviteService.getInvitesByUser(id);
     }
-    @Get('sent/:id')
+    @Get('/sent/:id')
     @UseGuards(JwtAuthGuard)
     async getSent(@Param('id') id): Promise<Invite[]> {
         return this.inviteService.getSentInvitesByUser(id);
     }
-    @Get('conversation/:id')
+    @Get('/conversation/:id')
     @UseGuards(JwtAuthGuard)
     async getByConversation(@Param('id') id): Promise<Invite[]> {
         return this.inviteService.getConversationInvites(id);

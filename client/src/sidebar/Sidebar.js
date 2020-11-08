@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,13 +8,8 @@ import ListItem from '@material-ui/core/ListItem';
 import { Container, Row, Col } from 'react-bootstrap'
 import "./sidebar.css"
 import { useDispatch, useSelector } from 'react-redux';
-import { selectConversations, setCurrentConversation } from '../currentConversation/conversationsSlice'
-
-const height = window.innerHeight
-const width = window.innerWidth
-
-const drawerWidth = width / 4;
-
+import { selectConversations, selectCurrentConversation, setCurrentConversation } from '../currentConversation/conversationsSlice'
+import { setView } from '../currentConversation/conversationsSlice'
 const useStyles = makeStyles((theme) => ({
     animate_in: {
         width: 0,
@@ -71,11 +66,31 @@ export default function Sidebar(){
     const classes = useStyles();
     const sidebar = size.width < 768
     const conversations = useSelector(selectConversations)
+    const currentConversation = useSelector(selectCurrentConversation)
+    const [_convs, setConvs] = useState([])
     const dispatch = useDispatch()
     const cl = (el) => {
-        console.log(el)
-        const actions = dispatch(setCurrentConversation(el))
+        if(!el.pending){
+            console.log(el)
+            dispatch(setView(false))
+            dispatch(setCurrentConversation(el))
+        } else {
+            dispatch(setView(true))
+        }
     }
+
+    useEffect(() => {
+        setConvs(conversations)
+    }, [conversations])
+
+    useEffect(() => {
+        const clone = JSON.parse(JSON.stringify(conversations))
+        const conversation = clone.filter(el => el.id === currentConversation.id)[0]
+        if(conversation)
+            conversation.messages = [...currentConversation.messages]
+        setConvs(clone)
+    }, [currentConversation])
+
     return (
         <Drawer
             className={sidebar ? classes.animate_out : classes.animate_out}
@@ -88,8 +103,11 @@ export default function Sidebar(){
             <Toolbar />
             <div className={classes.drawerContainer}>
                 <List style={{ opacity: 0.8 }}>
-                    {conversations.map((el) => 
-                        {return (<ListItem onClick={() => cl(el)} style={{ borderBottom: "2px solid #505050"}} className={classes.listItem} selected={false} button key={`text + ${Math.random()}`}>
+                    {_convs.map((el) => {
+                        if(el.pending){
+                            return ""
+                        }
+                        return (<ListItem onClick={() => cl(el)} style={{ borderBottom: "2px solid #505050"}} className={classes.listItem} selected={false} button key={`text + ${Math.random()}`}>
                             <Container>
                                 <Row className="pb-4 mt-3">
                                     <Col lg="12">

@@ -1,51 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react' 
-import { Row, Col, Container, Button, Spinner } from 'react-bootstrap'
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import { typing } from './Message.Util';
-import { makeStyles } from '@material-ui/core';
+import { Row, Col, Container, Spinner } from 'react-bootstrap'
 import useWindowSize from '../sidebar/windowSize'
 import { 
-    selectConversations,
-    addConversation,
-    removeConversation,
-    setCurrentConversation,
     selectCurrentConversation
 } from './conversationsSlice'
 import {
-    selectToken
-} from '../auth/authSlice'
-import {
     selectAccount
 } from '../account/accountSettingsSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import './messages.css'
-
-const useStyles = makeStyles(theme => ({
-    root: {
-      display: "flex",
-      flexWrap: "wrap",
-      width: "100%"
-    },
-    formControl: {
-      margin: theme.spacing(1),
-      width: "100%"
-    },
-    selectEmpty: {
-      marginTop: theme.spacing(2)
-    },
-    
-  }));
 
 
 export default function CurrentConversationMessagesListView(props){
     const [ isTyping, setIsTyping] = useState(false)
     const [messages, setMessages] = useState([])
-    const [conversation, setConversation] = useState(false)
-    const [sorted, setSorted] = useState(false)
     let defaultView = props.defaultView
-    const token = useSelector(selectToken)
     let currentConversation = useSelector(selectCurrentConversation);
     const account = useSelector(selectAccount)
     const size = useWindowSize()

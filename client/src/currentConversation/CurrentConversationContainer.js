@@ -1,34 +1,32 @@
-import React, { useState, useEffect } from 'react'
-import { Container, Row } from 'react-bootstrap'
+import React from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
 import CurrentConversationMessageBox from './CurrentConversationMessageBox';
 import CurrentConversationMessagesListView from './CurrentConversationMessagesListView';
-import { useSelector,useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import {
-    addMessage,
-    selectConversations,
-    selectCurrentConversation
+    selectView
   } from './conversationsSlice';
 import useWindowSize from '../sidebar/windowSize'
-import io from 'socket.io-client'
-import { selectAccount } from '../account/accountSettingsSlice';
-import { selectToken } from '../auth/authSlice';
 
 export default function CurrentConversationContainer(){
-    const conversations = useSelector(selectConversations)
-    const currentConversation = useSelector(selectCurrentConversation)
     const size = useWindowSize();
-    const account = useSelector(selectAccount)
-    const token = useSelector(selectToken)
-    const [socketConnected, setSocketConnected] = useState(false)
-    let [socket, setSocket] = useState({})
-    const dispatch = useDispatch()
+    const defaultView = useSelector(selectView)
     return (
+        (defaultView) ?
+        <Container className="" style={{ minHeight: size.height, height: size.height}} fluid>
+            <Row>
+                <Col xs="12" className="text-center text-muted">
+                    <h1>Select a conversation</h1>
+                </Col>
+            </Row>
+        </Container>
+        :
         <Container className="" style={{ minHeight: size.height, height: size.height}} fluid>
             <Row style={{ minHeight: size.height, height: size.height}}>
                 <CurrentConversationMessagesListView style={{ minHeight: size.height, height: size.height}}></CurrentConversationMessagesListView>
             </Row>
             <Row>
-                <CurrentConversationMessageBox socket={socket}></CurrentConversationMessageBox>
+                <CurrentConversationMessageBox></CurrentConversationMessageBox>
             </Row>    
         </Container>
     )
