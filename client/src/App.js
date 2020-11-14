@@ -100,6 +100,7 @@ function CreateAcc(){
 
 function Home(){
   const size = useWindowSize();
+  const classes = useStyles();
   return (
     <Container fluid className="w-100" style={{ backgroundColor: "#191919",    height: size.height, minHeight: size.height}}>
     <CssBaseline />

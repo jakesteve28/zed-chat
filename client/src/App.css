@@ -7,12 +7,6 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -28,11 +22,22 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+::-webkit-scrollbar {
+  width: '1.2em'  !important;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 15px rgba(0,0,0,0.0)  !important;
+  border-radius: 10px  !important;
+  background-color: rgba(0,0,0,.1)  !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color:rgba(125,125,125,.1) !important; 
+  border-radius: 10px  !important;
+  height: 30px  !important;
+  max-height: 30px  !important;
+}
+::-webkit-scrollbar-track-piece {
+  height: 30px  !important;
 }

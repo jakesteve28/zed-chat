@@ -1,4 +1,5 @@
 import { Conversation } from 'src/conversations/conversation.entity';
+import { FriendRequest } from 'src/friendRequest/friendRequest.entity';
 import { Message } from 'src/messages/message.entity';
 import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany, CreateDateColumn } from 'typeorm';
 
@@ -38,4 +39,11 @@ export class User {
 
   @OneToMany(type => Message, message => message.user)
   messages: Message[]
+
+  @ManyToMany(type => User, user => user.friends)
+  @JoinTable()
+  friends: User[];
+
+  @OneToMany(type => FriendRequest, friendRequest => friendRequest.sender)
+  friendRequests: FriendRequest[]
 }

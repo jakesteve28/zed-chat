@@ -37,7 +37,7 @@ function ForgotPassword(){
           <Container fluid>
             <Row className="p-2" style={{backgroundColor: "#191919"}}>
               <Col className="text-center mr-5 mb-2">
-                <Button onClick={submit} size="lg" className="rounded-pill" variant="outline-success">Send Link to Reset Password</Button>
+                <Button onClick={submit} size="lg" className="rounded-pill" style={{ opacity: 0.67 }} variant="outline-success">Send Link to Reset Password</Button>
               </Col>
             </Row>
           </Container>

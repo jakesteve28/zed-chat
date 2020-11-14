@@ -17,6 +17,8 @@ export class MessageService {
     async create(createMessageDto: CreateMessageDto): Promise<Message> {
         const message = new Message();
         const user = await this.userService.findOne(createMessageDto.userId);
+        user.conversations = [];
+        user.password = undefined;
         const conversation = await this.conversationService.findOne(createMessageDto.conversationId);
         message.body = createMessageDto.body;
         message.user = user;

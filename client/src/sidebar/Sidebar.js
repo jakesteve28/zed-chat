@@ -86,7 +86,7 @@ export default function Sidebar(){
     useEffect(() => {
         const clone = JSON.parse(JSON.stringify(conversations))
         const conversation = clone.filter(el => el.id === currentConversation.id)[0]
-        if(conversation)
+        if(conversation && Array.isArray(conversation.messages) && Array.isArray(currentConversation.messages) )
             conversation.messages = [...currentConversation.messages]
         setConvs(clone)
     }, [currentConversation])

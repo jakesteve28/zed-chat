@@ -40,19 +40,24 @@ export class InviteService {
         const sender = await this.userService.findOne(userId);
         const recipient = await this.userService.findOne(recipientId);
         const conversation = await this.conversationService.findOne(conversationId);
-        if(conversation.users.filter(user => user.id === recipient.id).length > 0)
-            console.log("Cannot create invite, recipient already belongs to conversation");
+        if(!sender || !recipient) {
+            throw "Cannot create invite, sender or recipient does not exist";
+            return null;
+        }
+        if(conversation.users.filter(user => user.id === recipient.id).length > 0){
+            throw "Cannot create invite, recipient already belongs to conversation";
+            return null;
+        }
         if(conversation.users.filter(user => user.id === sender.id).length < 1){
             console.log(conversation.users)
-            console.log("Cannot create invite, sender does not belong to conversation");
+            throw "Cannot create invite, sender does not belong to conversation";
+            return null;
         }
-        else {
-            const invite = new Invite();
-            invite.conversationId = conversation.id;
-            invite.recipientId = recipient.id;
-            invite.senderId = sender.id
-            return this.inviteRepository.save(invite);
-        }
+        const invite = new Invite();
+        invite.conversationId = conversation.id;
+        invite.recipientId = recipient.id;
+        invite.senderId = sender.id
+        return this.inviteRepository.save(invite);
     }
     async acceptInvite(inviteId: string): Promise<Invite> {
         const invite = await this.inviteRepository.findOne(inviteId);

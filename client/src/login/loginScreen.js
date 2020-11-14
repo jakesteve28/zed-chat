@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap'
 import { Redirect, Link } from 'react-router-dom'
-
+import regex from '../regex';
 import './loginscreen.css'
 
 import {
@@ -10,8 +10,7 @@ import {
 } from '../auth/authSlice';
 
 import {
-  addConversation,
-  setCurrentConversation
+  addConversation
 } from '../currentConversation/conversationsSlice'
 
 import {
@@ -29,6 +28,7 @@ import {
   addAcceptedInvite,
   addReceivedInvite
 } from '../topbar/inviteSlice'
+import { addFriend, addFriendRequest } from '../account/friendsSlice';
 
 function LoginScreen() {
     async function getAuthToken(userName, password){
@@ -45,17 +45,18 @@ function LoginScreen() {
     console.log(body)
     if(body.statusCode === 401 || body.statusCode === 400){
         setErrorMsg("Wrong Username/Password")
+        setError(true)
         return;
     }
     if(body.statusCode === 500){
         setErrorMsg("Server Error")
+        setError(true)
         return;
     }
     const bdy = body
     if(bdy.access_token && bdy.id){
       const authToken = bdy.access_token;
       const id = bdy.id;
-      //console.log("Logged in with Auth Token ", authToken, id)
       return { authToken, id }
     } else {
       console.log(bdy)
@@ -70,21 +71,35 @@ function LoginScreen() {
       const bodyAcc = await account.json();
       if(bodyAcc.statusCode === 401){
             setErrorMsg("Wrong Username/Password")
+            setError(true)
             return;
       }
       if(bodyAcc.statusCode === 500){
             setErrorMsg("Wrong Username/Password")
+            setError(true)
             return;
       }
       return bodyAcc
   }
   const [userName, _setUserName] = useState("");
   const [password, _setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("")
+  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState(false)
   const dispatch = useDispatch()
   const account = useSelector(selectAccount)
   const submit = async () => {
-  try {
+    setError(false)
+    try {
+      if(regex.tagName.test(userName) == false){
+        setErrorMsg("Tag name must be 8-24 characters")
+        setError(true)
+        return;
+      }
+      if(regex.password.test(password) == false){
+        setErrorMsg("Password must be 8-32 characters")
+        setError(true)
+        return;
+      }
     const { id, authToken } = await getAuthToken(userName, password)
     const bodyAcc = await getAccount(id, authToken)
     dispatch(setToken(`${authToken}`))
@@ -97,7 +112,44 @@ function LoginScreen() {
       dispatch(addConversation({conversation: conv}))
       return conv
     })
-    dispatch(setCurrentConversation(bodyAcc.conversations[0]))
+    const friends = []
+    bodyAcc.friends.map(friend => {
+      dispatch(addFriend(friend))
+      friends.push(friend)
+      return friend
+    })
+    console.log("Friends: ", friends)
+    bodyAcc.friendRequests.map(friendReq => {
+      dispatch(addFriendRequest(friendReq))
+    })
+    const friendRequestsRes = await fetch(`http://localhost:3002/api/users/invites/${id}`, {
+      headers: {
+        "Authorization": `Bearer ${authToken}`,
+        "Content-Type": "application/json"
+      }
+    })
+    if(friendRequestsRes.status !== 200){
+      throw Error("Error fetching sent invites from user")
+    }
+    const friendRequests = await friendRequestsRes.json()
+    const requests = []
+    const sent = []
+    if(friendRequests){   
+      for(let request of friendRequests){
+        if(request.recipientId === bodyAcc.id){   
+          requests.push(request)
+          dispatch(addFriendRequest(request))
+        } else if(request.sender.id === bodyAcc.id) {
+          sent.push(request)
+        }
+      }
+    } else {
+      console.log("Error fetching received friend requests")
+    }
+    console.log("Received Friend Requests: ", requests)
+    console.log("Sent Friend Requests: ", sent)
+   // console.log("Friend Requests: ", bodyAcc.friendRequests, "Received: ", receivedFriendRequests)
+   // dispatch(setCurrentConversation(bodyAcc.conversations[0]))
     dispatch(login())
     const sentInvitesRes = await fetch(`http://localhost:3002/api/invite/sent/${id}`, {
       headers: {
@@ -132,28 +184,10 @@ function LoginScreen() {
       }
     }
     console.log("Successfully logged in, account fetched")
-  } catch(err) {
-    console.log("Error: " + err)
+    } catch(err) {
+      console.log("Error: " + err)
+    }
   }
-  }
-    /*
-      Fetch all the remaining information
-      (Account settings/profile, Conversations+Messages)
-      with the auth token, make a refresh cookie (?) and store JWT 
-      in a keystore or something
-
-      Set Up the live socket, open the conversations list view
-
-      (Conversation chosen == socket's next room)
-    */
-    
-   // dispatch(setUserName(userName))
-  
-  // <Modal.Dialog className="mt-5 p-2 border border-0" style={{backgroundColor: "#191919", padding: "-5px"}}>
-  // <Modal.Header style={{backgroundColor: "#191919", marginBottom: "-10px"}}>
-  //   <Modal.Title className="text-primary" style={{margin: "auto"}}>Welcome to Zed Chat!</Modal.Title>
-  // </Modal.Header>
-
   return (
     (!account.loggedIn) ?
     <Container className="h-100 w-100 text-center" fluid  style={{ backgroundColor: "#191919",  margin: "auto"}}>
@@ -184,7 +218,7 @@ function LoginScreen() {
     </Row>
       <Row>
         <Col className="text-center">
-          <span className="text-danger" style={{ opacity: 0.7 }}>{errorMsg}</span>
+          <span className="text-danger text-center lead font-italic" style={{ opacity: 0.67 }}>{(error) ? errorMsg : ""}</span>
         </Col>
       </Row>
       <Row>
@@ -194,7 +228,7 @@ function LoginScreen() {
           <Col xs="6">
             <Button style={{ color: "white", opacity: 0.87}} variant=""><Link style={{ textDecoration: 'none', color: "white" }} to="/forgotPassword">Forgot&nbsp;Password?</Link></Button>
             <Button style={{ marginRight: 30, color: "white", opacity: 0.87}} variant=""><Link style={{ textDecoration: 'none', color: "white" }} to="/createAccount">Create&nbsp;Account</Link></Button>
-            <Button onClick={submit} style={{ opacity: 0.87 }} size="lg" className="rounded-pill" variant="outline-success">Login</Button>
+            <Button onClick={submit} style={{ opacity: 0.67 }} size="lg" className="rounded-pill" variant="outline-success">Login</Button>
             </Col>
           <Col xs="3" className="text-left mr-5 mb-2">
           </Col>

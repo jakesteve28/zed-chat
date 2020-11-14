@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { User } from './user.entity'
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FriendRequest } from 'src/friendRequest/friendRequest.entity';
 
 @Controller('users')
 export class UserController {
@@ -19,6 +20,19 @@ export class UserController {
       }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
+@Get('/invites/:id')
+@UseGuards(JwtAuthGuard)
+async getUserRecInvites(@Param('id') id): Promise<FriendRequest[]> {
+  try {
+    return this.userService.getFriendRequests(id);
+  } catch(error) {
+    throw new HttpException({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      error: "User Find One Error"
+    }, HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+}
+
   @Get()
   @UseGuards(JwtAuthGuard)
   getAllUsers(): Promise<User[]> {

@@ -21,6 +21,12 @@ export default function CurrentConversationMessagesListView(props){
     const size = useWindowSize()
     const colRef = useRef()
     if(!currentConversation) currentConversation = {}
+    let rowHeight = size.height - (size.height / 8);
+    if(isNaN(rowHeight)){
+        rowHeight = window.innerHeight - (window.innerHeight / 8)
+    }
+    if(colRef && colRef.current)
+            colRef.current.scrollTop = colRef.current.scrollHeight
     useEffect(() => {
         if(currentConversation && currentConversation.messages){
             const msgs = [...currentConversation.messages]
@@ -29,30 +35,24 @@ export default function CurrentConversationMessagesListView(props){
                 }
             ))
         }
+        if(colRef && colRef.current)
+            colRef.current.scrollTop = colRef.current.scrollHeight
     }, [currentConversation.messages])
     useEffect(() => {
         if(colRef && colRef.current)
             colRef.current.scrollTop = colRef.current.scrollHeight
-    }, [])
-    useEffect(() => {
-        if(colRef && colRef.current)
-            colRef.current.scrollTop = colRef.current.scrollHeight
-    }, [currentConversation.messages])
+    }, [messages])
     useEffect(() => {
         if(currentConversation && currentConversation.typing !== undefined){
             setIsTyping(currentConversation.typing)
         }
     }, [currentConversation.typing])
-    let rowHeight = size.height - (size.height / 8);
-    if(isNaN(rowHeight)){
-        rowHeight = window.innerHeight - (window.innerHeight / 8)
-    }
     return (
         (defaultView) ? 
             <Row>
             <Col xs='3'></Col>
                 <Col className="mt-5 lead" style={{ opacity: 0.87, color: "#404040" }}>
-                    Click a conversation
+                    <span style={{ marginTop: 'auto' }}>Click a conversation</span>
                 </Col>
                 <Col  xs='3'></Col>
             </Row>
@@ -62,7 +62,7 @@ export default function CurrentConversationMessagesListView(props){
             <Col xs={(size.width > 768 ? "9" : "12")} className="h-100">
                 <Container fluid className="h-100">
                     <Row style={{ height: rowHeight}}>
-                        <Col ref={colRef} className="ul" sm={(size.width < 768) ? "10" : "8"} style={{ paddingTop: 75, bottom: 75, height: rowHeight, backgroundColor: "#191919", overflow: "auto", position: "fixed",}}>
+                        <Col ref={colRef} className="ul" sm={(size.width < 768) ? "10" : "8"} style={{ paddingTop: 75, bottom: 75, height: rowHeight - 10, backgroundColor: "#191919", overflow: "auto", position: "fixed",}}>
                             {messages.map((message) => {
                                 const dateNow = Date.now()
                                 const date = Date.parse(message.createdAt)
@@ -92,14 +92,13 @@ export default function CurrentConversationMessagesListView(props){
                                     }
                                 }
                                 const minsAgo = ((dateNow - date) / 1000 ) / 60;
-        //                        console.log(dateMeta, stdDate, stdDate.getTime())
                                 return (message.user.id === account.id) ? (
                                     <Container key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto" }} fluid>
                                         <Row className="mt-1 mb-1">
                                             <Col xs="3" className="text-center">
                                             </Col>
                                             <Col xs="9" className="text-right">
-                                                <div className="rounded-pill p-3 m-1 text-white" style={{ display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#3266a8"}}>{message.body}</div>
+                                                <div className="pl-3 pr-3 p-2 m-1 text-white text-left" style={{borderRadius: "18px", display:"inline-block", backgroundColor: "#3266a8", maxWidth: "240px", wordWrap: "break-word"}}><span style={{ maxWidth: "240px" }}>{message.body}</span></div>
                                             </Col>
                                         </Row>
                                     </Container>
@@ -107,7 +106,7 @@ export default function CurrentConversationMessagesListView(props){
                                     (<Container key={Math.random()}  className="li mt-2 mb-3" fluid>
                                          <Row className="mt-1 mb-1">
                                             <Col xs="8" className="text-left">
-                                                <div className="rounded-pill p-3 m-1 text-white" style={{ display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#686868"}}>{message.body}</div>
+                                                <div className="pl-3 pr-3 p-2 m-1 text-white text-left" style={{borderRadius: "18px", display:"inline-block", backgroundColor: "#404040", maxWidth: "240px", wordWrap: "break-word" }}><span style={{ maxWidth: "240px"}}>{message.body}</span></div>
                                             </Col>
                                             <Col xs="3" className="text-center">
                                             </Col>
@@ -129,7 +128,7 @@ export default function CurrentConversationMessagesListView(props){
                                 <Container  key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto" }} fluid>
                                     <Row className="mt-1 mb-1">
                                     <Col xs="9" className="text-left">
-                                        <div className="rounded-pill p-3 m-1 text-white" style={{ display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#686868"}}><Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />
+                                        <div className="rounded-top rounded-bottom p-3 m-1 text-white" style={{ display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#686868"}}><Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />
                                         </div>
                                     </Col>
                                     <Col xs="3" className="text-center">

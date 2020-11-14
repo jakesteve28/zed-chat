@@ -61,12 +61,15 @@ export class ChatGateway  {
         if(msg.room){
             if(user){
                 const message = await this.messageService.create({ body: msg.message, userId: user.id, conversationId: msg.room})
-                if(message)
+                if(message){
                     this.wss.to(msg.room).emit('delivered', { message: message });
+                    //console.log("Message delivered and message emitted: " + JSON.stringify(message) )
+                }
                 else 
                     this.wss.to(msg.room).emit('messageFail', { fail: true })
             }
         } else {
+            console.log("Room does not exist for message " + msg.room )
             return undefined
         }
     }
@@ -102,15 +105,39 @@ export class ChatGateway  {
 
     @UseGuards(ChatGuard)
     @SubscribeMessage('joinRoom')
-    handleRoomJoin(@ConnectedSocket() client: Socket, @MessageBody() room: string ) {
-        client.join(room);
-        this.wss.to(room).emit('joinedRoom', {  room: room  });
+    async handleRoomJoin(@ConnectedSocket() client: Socket, @MessageBody() room: string ) {
+        try {
+            const msg = JSON.parse(room)
+            if(msg.room && msg.user){
+                const user = await this.userService.findOne(msg.user);
+                const convs = user.conversations;
+                if(convs.filter(cv => cv.id === msg.room).length < 1) throw "User not invited to conversation";
+                if(!user) throw "User does not exist";
+                client.join(msg.room);
+                this.wss.to(msg.room).emit('joinedRoom', {  room: msg.room  }); 
+            }
+        } catch(err) {
+            const id = client.id;
+            this.wss.to(client.id).emit("error", { msg: err})
+        }
     }
     
     @UseGuards(ChatGuard)
     @SubscribeMessage('leaveRoom')
-    handleRoomLeave(@ConnectedSocket() client: Socket, @MessageBody() room: string ) {
-        client.leave(room);
-        this.wss.to(room).emit('leftRoom', {  room: room  });
+    async handleRoomLeave(@ConnectedSocket() client: Socket, @MessageBody() room: string ) {
+        try {
+            const msg = JSON.parse(room)
+            if(msg.room && msg.user){
+                const user = await this.userService.findOne(msg.user);
+                const convs = user.conversations;
+                if(convs.filter(cv => cv.id === msg.room).length < 1) throw "User not invited to conversation";
+                if(!user) throw "User does not exist";
+                client.leave(msg.room);
+                this.wss.to(msg.room).emit('leftRoom', {  room: msg.room  }); 
+            }
+        } catch(err) {
+            const id = client.id;
+            this.wss.to(client.id).emit("error", { msg: err})
+        }
     }
 }

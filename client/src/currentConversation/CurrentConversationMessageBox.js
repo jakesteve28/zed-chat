@@ -30,8 +30,10 @@ export default function CurrentConversationMessageBox(props){
     const formRef = useRef(null)
     const [typingTimeout, setTypingTimeout] = useState(null)
     const sendMessage = async () => {
+        console.log("Send message ", message)
         if(_socket){
            _socket.emit('chatToServer', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, message: `${message}` }));
+            formRef.current.value = ""
         }
             else {
                 console.log("No Conversation to send message to")
@@ -58,7 +60,7 @@ export default function CurrentConversationMessageBox(props){
             }
             _socket = io('http://localhost:42020/zed-chat-rooms', socketOptions)
             if(_socket && currentConversation && currentConversation.id){
-                _socket.emit('joinRoom', currentConversation.id);
+                _socket.emit('joinRoom', JSON.stringify({ room: currentConversation.id, user: account.id }));
                 _socket.on('chatToClient', (msg) => {
                     if(msg.message.id && msg.message.body && msg.message.createdAt){
                         dispatch(addMessage({ message: msg.message, conversation: currentConversation }));
@@ -74,13 +76,15 @@ export default function CurrentConversationMessageBox(props){
                     console.log('left room: ' + room);
                 });
                 _socket.on('delivered', (msg) => {
+                    console.log("Handle message delivered")
                     if(msg.message.id && msg.message.body && msg.message.createdAt){
                         console.log("Message delivered: ", msg)
                         dispatch(addMessage({ message: msg.message, conversation: msg.message.conversation }));
                     }
                 })
                 _socket.on('typing', (msg) => {
-                    console.log(msg)
+                    console.log("Handle typing")
+                    //console.log(msg)
                     if(currentConversation.id === msg.conv){
                         if(msg.user && msg.typing === true){
                             if(msg.user.id !== account.id){     
@@ -95,6 +99,9 @@ export default function CurrentConversationMessageBox(props){
                         }  
                     }
                 })
+                _socket.on("error", (msg) => {
+                    console.log("Handle error: ", msg)
+                })
             if(_socket && formRef && currentConversation && account){
                 formRef.current.onkeypress = () => { 
                     if (searchTimeout !== undefined) clearTimeout(searchTimeout);
@@ -107,23 +114,23 @@ export default function CurrentConversationMessageBox(props){
             }
         } else {
                 console.log("Socket error, cannot receive or send messages");
-            }
-            return () => {
-                if(_socket){
-                    if(currentConversation && currentConversation.id)
-                        _socket.emit("leaveRoom", { room: currentConversation.id });
-                    _socket.off('chatToClient')
-                    _socket.off('connect')
-                    _socket.off('joinedRoom')
-                    _socket.off('leftRoom')
-                    _socket.off('delivered')
-                    _socket.off('readMessage')
-                }     
-            }
+            }          
         } else {
             console.log("Socket not setup: no current conversation");
         }
-    }, [currentConversation]);
+        return () => {
+            if(_socket){
+                if(currentConversation && currentConversation.id)
+                    _socket.emit("leaveRoom", { room: currentConversation.id, user: account.id });
+                _socket.off('chatToClient')
+                _socket.off('connect')
+                _socket.off('joinedRoom')
+                _socket.off('leftRoom')
+                _socket.off('delivered')
+                _socket.off('readMessage')
+            }     
+        }
+    }, [currentConversation.id]);
     return ( 
         <Row className="w-100 text-center" style={{ position: "fixed", bottom: 0, left: 50 }}>
             <Col md="3"></Col>
