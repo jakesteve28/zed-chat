@@ -27,7 +27,7 @@ const preflightCheck = (req: Request, res: Response) => {
 }
 
 
-@WebSocketGateway(parseInt(process.env.PORT) || 80, { namespace: "zed-chat-rooms", handlePreflightRequest: preflightCheck })
+@WebSocketGateway(3002, { namespace: "zed-chat-rooms", handlePreflightRequest: preflightCheck })
 export class ChatGateway  {
     constructor(
                 private userService: UserService,

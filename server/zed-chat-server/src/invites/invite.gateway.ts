@@ -27,7 +27,7 @@ const preflightCheck = (req: Request, res: Response) => {
     res.end();
 }
 
-@WebSocketGateway(parseInt(process.env.PORT) || 80, { namespace: "invite-server", handlePreflightRequest: preflightCheck })
+@WebSocketGateway(3002, { namespace: "invite-server", handlePreflightRequest: preflightCheck })
 export class InviteGateway  {
     constructor(
                 private userService: UserService,
