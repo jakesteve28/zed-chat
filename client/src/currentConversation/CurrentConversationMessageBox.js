@@ -58,7 +58,7 @@ export default function CurrentConversationMessageBox(props){
                     }
                 }
             }
-            _socket = io('http://localhost:42020/zed-chat-rooms', socketOptions)
+            _socket = io('https://zed-chat-server.herokuapp.com/zed-chat-rooms', socketOptions)
             if(_socket && currentConversation && currentConversation.id){
                 _socket.emit('joinRoom', JSON.stringify({ room: currentConversation.id, user: account.id }));
                 _socket.on('chatToClient', (msg) => {

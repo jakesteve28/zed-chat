@@ -12,7 +12,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getUser(@Param('id') id): Promise<User> {
     try {
-      return this.userService.findOne(id);
+      const user = await this.userService.findOne(id);
+      user.password = undefined; 
+      return user;
     } catch(error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -55,7 +57,9 @@ async getUserRecInvites(@Param('id') id): Promise<FriendRequest[]> {
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     try {
-       return this.userService.create(createUserDto);
+       const user = await this.userService.create(createUserDto);
+       user.password = undefined;
+       return user;
     } catch(error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,

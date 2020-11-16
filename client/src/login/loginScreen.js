@@ -36,7 +36,7 @@ function LoginScreen() {
       tagName: `${userName}`,
       password: `${password}`
     }
-    const res = await fetch("http://localhost:3002/api/auth/login", {
+    const res = await fetch("https://zed-chat-server.herokuapp.com/api/auth/login", {
       body: JSON.stringify(bd),
       headers: { "content-type": "application/json" },
       method: "POST"
@@ -63,7 +63,7 @@ function LoginScreen() {
     }
   }
   async function getAccount(id, authToken){
-      const account = await fetch(`http://localhost:3002/api/users/${id}`, {
+      const account = await fetch(`https://zed-chat-server.herokuapp.com/api/users/${id}`, {
         headers: {
           "Authorization": `Bearer ${authToken}`
         }
@@ -122,7 +122,7 @@ function LoginScreen() {
     bodyAcc.friendRequests.map(friendReq => {
       dispatch(addFriendRequest(friendReq))
     })
-    const friendRequestsRes = await fetch(`http://localhost:3002/api/users/invites/${id}`, {
+    const friendRequestsRes = await fetch(`https://zed-chat-server.herokuapp.com/api/users/invites/${id}`, {
       headers: {
         "Authorization": `Bearer ${authToken}`,
         "Content-Type": "application/json"
@@ -151,7 +151,7 @@ function LoginScreen() {
    // console.log("Friend Requests: ", bodyAcc.friendRequests, "Received: ", receivedFriendRequests)
    // dispatch(setCurrentConversation(bodyAcc.conversations[0]))
     dispatch(login())
-    const sentInvitesRes = await fetch(`http://localhost:3002/api/invite/sent/${id}`, {
+    const sentInvitesRes = await fetch(`https://zed-chat-server.herokuapp.com/api/invite/sent/${id}`, {
       headers: {
         "Authorization": `Bearer ${authToken}`,
         "Content-Type": "application/json"
@@ -167,7 +167,7 @@ function LoginScreen() {
         dispatch(addSentInvite(invite))
       }
     }
-    const receivedInvitesRes = await fetch(`http://localhost:3002/api/invite/user/${id}`, {
+    const receivedInvitesRes = await fetch(`https://zed-chat-server.herokuapp.com/api/invite/user/${id}`, {
       headers: {
         "Authorization": `Bearer ${authToken}`,
         "Content-Type": "application/json"

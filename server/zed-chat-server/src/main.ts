@@ -12,6 +12,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
   app.useStaticAssets(join(__dirname, '..', 'static'));
-  await app.listen(3002);
+  await app.listen(process.env.PORT || 5000);
 }
 bootstrap();

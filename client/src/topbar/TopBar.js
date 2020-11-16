@@ -124,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
               setErrorMsg("Friend does not exist")
           } else {
             if(token){
-              const res = await fetch("http://localhost:3002/api/conversation/create",
+              const res = await fetch("https://zed-chat-server.herokuapp.com/api/conversation/create",
                 {
                   method: "POST",
                   body: JSON.stringify(reqBody),
@@ -271,7 +271,7 @@ export default function TopBar(){
             }
         }
       if(account.loggedIn === true){
-        socket = io('http://localhost:42020/invite-server', socketOptions)
+        socket = io('https://zed-chat-server.herokuapp.com/invite-server', socketOptions)
           socket.on('connect', () => {
             console.log("Connected to invite socket")
           });

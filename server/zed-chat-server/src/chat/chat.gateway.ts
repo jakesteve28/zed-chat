@@ -19,7 +19,7 @@ import { User } from 'src/users/user.entity';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": req.headers.origin,
+        "Access-Control-Allow-Origin": "http://localhost:3000",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
@@ -27,7 +27,7 @@ const preflightCheck = (req: Request, res: Response) => {
 }
 
 
-@WebSocketGateway(42020, { namespace: "zed-chat-rooms", handlePreflightRequest: preflightCheck })
+@WebSocketGateway(parseInt(process.env.PORT) || 80, { namespace: "zed-chat-rooms", handlePreflightRequest: preflightCheck })
 export class ChatGateway  {
     constructor(
                 private userService: UserService,

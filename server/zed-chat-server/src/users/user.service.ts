@@ -35,8 +35,9 @@ export class UserService {
   options(): any {
       return { availableMethods : ["GET", "POST", "DELETE", "OPTIONS"]}
   }
-  findByTagName(tagName: string): Promise<User> {
-    return this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends", "friendRequests"]});
+  async findByTagName(tagName: string): Promise<User> {
+    const user = await  this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends", "friendRequests"]});
+    return user;
   }
   async create(createUserDto: CreateUserDto): Promise<User> {
       let hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -50,16 +51,20 @@ export class UserService {
       user.friendRequests = []
       user.friends = []
       createUserDto.password = undefined;
-      return this.usersRepository.save(user);
+      const us = await this.usersRepository.save(user);
+      us.password = undefined
+      return us
   }
   async addConversation(userId: string, conversationId: string): Promise<User> {
     const user = await this.usersRepository.findOne(userId, { relations: ["conversations"]});
     const conversation = await this.conversationService.findOne(conversationId);
     user.conversations.push(conversation);
+    //user.password = undefined
     return user
   }
   async getFriendRequests(userId: string): Promise<FriendRequest[]> {
     const user = await this.usersRepository.findOne(userId, { relations: ["friendRequests"]});
+    //user.password = undefined
     const received = await this.friendRequestService.getFriendRequestsReceivedByUser(userId);
     console.log("User sent: ", user.friendRequests)
     console.log("User received: ", received)
@@ -70,6 +75,7 @@ export class UserService {
   }
   async getFriends(userId: string): Promise<User[]> {
     const user = await this.usersRepository.findOne(userId, { relations: ["friends"]});
+    //user.password = undefined
     if(user && user.friends){
       return user.friends
     } else console.log("Cannot find user or friends for user ")
@@ -77,7 +83,9 @@ export class UserService {
   }
   async addFriends(userId: string, friendId: string): Promise<[User, User]> {
     const user = await this.usersRepository.findOne(userId, { relations: ["friends"]});
+    //user.password = undefined
     const newFriend = await this.usersRepository.findOne(friendId, { relations: ["friends"]});
+    newFriend.password = undefined
     if(user && user.friends && newFriend && newFriend.friends){
       if(user.friends.filter(fr => fr.id === newFriend.id).length > 0){
         console.log("Cannot add friend to user, already exists in user's friend's list")

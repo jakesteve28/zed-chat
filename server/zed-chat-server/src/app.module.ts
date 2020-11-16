@@ -11,7 +11,6 @@ import { ChatModule } from './chat/chat.module';
 import { InviteModule } from './invites/invite.module';
 import { User } from './users/user.entity';
 import { MessageModule } from './messages/message.module';
-
 @Module({
   imports: [TypeOrmModule.forRoot({
   }), UserModule, AuthModule, ConversationModule, ChatModule, InviteModule, MessageModule],
