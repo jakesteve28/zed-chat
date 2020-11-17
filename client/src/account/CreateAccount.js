@@ -69,7 +69,7 @@ function CreateAccount(){
             session: 0,
             tagName: tagName
         }
-        const res = await fetch("https://zed-chat-server.herokuapp.com/api/users/", {
+        const res = await fetch("http://44.242.86.79/api/users/", {
             method: "POST",
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify(bd)

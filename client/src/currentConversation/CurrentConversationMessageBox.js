@@ -47,8 +47,9 @@ export default function CurrentConversationMessageBox(props){
             console.log("No Conversation to send typing to")
         }
     }
+
     useEffect(() => {
-        if(currentConversation && currentConversation.id && token && account){
+        if(token){
             const socketOptions = {
                 transportOptions: {
                     polling: {
@@ -58,7 +59,24 @@ export default function CurrentConversationMessageBox(props){
                     }
                 }
             }
-            _socket = io('https://zed-chat-server.herokuapp.com/zed-chat-rooms', socketOptions)
+            _socket = io('http://44.242.86.79:3002/zed-chat-rooms', socketOptions)
+        }
+    }, [])
+
+    useEffect(() => {
+        if(currentConversation && currentConversation.id && token && account){
+            if(!_socket){
+                const socketOptions = {
+                    transportOptions: {
+                        polling: {
+                            extraHeaders: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        }
+                    }
+                }
+                _socket = io('http://44.242.86.79:3002/zed-chat-rooms', socketOptions)
+            }
             if(_socket && currentConversation && currentConversation.id){
                 _socket.emit('joinRoom', JSON.stringify({ room: currentConversation.id, user: account.id }));
                 _socket.on('chatToClient', (msg) => {

@@ -4,7 +4,7 @@ export const conversationsSlice = createSlice({
   name: 'conversations',
   initialState: {
     conversations: [],
-    currentConversation: { joined: false, typing: false },
+    currentConversation: { joined: false, typing: false, id: 0 },
     defaultView: true
   },
   reducers: {
