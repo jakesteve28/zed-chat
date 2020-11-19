@@ -59,7 +59,7 @@ export default function CurrentConversationMessageBox(props){
                     }
                 }
             }
-            _socket = io('http://44.242.86.79:3002/zed-chat-rooms', socketOptions)
+            _socket = io('http://localhost:3002/zed-chat-rooms', socketOptions)
         }
     }, [])
 
@@ -75,7 +75,7 @@ export default function CurrentConversationMessageBox(props){
                         }
                     }
                 }
-                _socket = io('http://44.242.86.79:3002/zed-chat-rooms', socketOptions)
+                _socket = io('http://localhost:3002/zed-chat-rooms', socketOptions)
             }
             if(_socket && currentConversation && currentConversation.id){
                 _socket.emit('joinRoom', JSON.stringify({ room: currentConversation.id, user: account.id }));
