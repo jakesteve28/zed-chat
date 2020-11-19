@@ -19,7 +19,7 @@ import { User } from 'src/users/user.entity';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Origin": "http://44.242.86.79:5000",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
