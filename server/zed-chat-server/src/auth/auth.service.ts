@@ -1,11 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UserService } from '../users/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
+export interface jwtPayload {
+   username: string,
+   sub: string 
+}
+
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private jwtService: JwtService) {}
+  constructor(
+      @Inject(forwardRef(() => UserService)) 
+      private userService: UserService, 
+      private jwtService: JwtService
+    ) 
+  {}
   async validateUser(tagName: string, pass: string): Promise<any> {
     try 
     {
@@ -28,7 +38,7 @@ export class AuthService {
 }
   }
   async login(user: any){
-      const payload = { username: user.tagName, sub: user.id }
+      const payload: jwtPayload = { username: user.tagName, sub: user.id }
       return {
           access_token: this.jwtService.sign(payload),
           id: user.id

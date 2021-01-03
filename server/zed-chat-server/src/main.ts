@@ -18,6 +18,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
   app.useStaticAssets(join(__dirname, '..', 'static'));
-  await app.listen(3000);
+  const port = parseInt(process.env.PORT || `3000`);
+  await app.listen(port);
+  console.log("Server successfully started on port " + port);
 }
 bootstrap();

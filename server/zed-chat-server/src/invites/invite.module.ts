@@ -1,6 +1,5 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InviteGateway } from './invite.gateway';
 import { ConversationModule } from '../conversations/conversation.module';
 import { UserModule } from '../users/user.module';
 import { InviteController } from './invite.controller';
@@ -8,7 +7,7 @@ import { Invite } from './invite.entity';
 import { InviteService } from './invite.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '../auth/constants';
-import { FriendRequestModule } from 'src/friendRequest/friendRequest.module';
+import { FriendRequestModule } from '../friendRequest/friendRequest.module';
 
 @Module({
   imports: [JwtModule.register({
@@ -17,6 +16,7 @@ import { FriendRequestModule } from 'src/friendRequest/friendRequest.module';
   }),
   UserModule, ConversationModule, FriendRequestModule, TypeOrmModule.forFeature([Invite])],
   controllers: [InviteController],
-  providers: [InviteService, InviteGateway]
+  providers: [InviteService],
+  exports: [InviteService]
 })
 export class InviteModule {}

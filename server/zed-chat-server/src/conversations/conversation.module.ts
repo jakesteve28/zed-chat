@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConversationService } from './conversation.service';
 import { ConversationController } from './conversation.controller';
 import { Conversation } from './conversation.entity';
-import { UserModule } from 'src/users/user.module';
+import { UserModule } from '../users/user.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Conversation]), forwardRef(() => UserModule)],

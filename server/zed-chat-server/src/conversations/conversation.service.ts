@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Conversation } from './conversation.entity';
 import { UserService } from '../users/user.service';
-import { Message } from 'src/messages/message.entity';
-import { User } from 'src/users/user.entity';
+import { Message } from '../messages/message.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class ConversationService {
@@ -40,6 +40,11 @@ export class ConversationService {
         const conv = await this.conversationRepository.save(conversation);
         conv.conversationName = `Chat with @${__user.tagName}`
         return this.conversationRepository.save(conv)
+    }
+    async markAccepted(convId: string): Promise<Conversation> {
+        const conv = await this.conversationRepository.findOne(convId);
+        conv.pending = false;
+        return this.conversationRepository.save(conv);
     }
     async remove(id: string): Promise<string> {
         await this.conversationRepository.delete(id);

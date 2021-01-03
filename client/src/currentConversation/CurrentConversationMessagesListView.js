@@ -43,6 +43,9 @@ export default function CurrentConversationMessagesListView(props){
             colRef.current.scrollTop = colRef.current.scrollHeight
     }, [messages])
     useEffect(() => {
+        if(colRef && colRef.current)
+            colRef.current.scrollTop = colRef.current.scrollHeight - 75
+
         if(currentConversation && currentConversation.typing !== undefined){
             setIsTyping(currentConversation.typing)
         }
@@ -127,8 +130,9 @@ export default function CurrentConversationMessagesListView(props){
                                 (isTyping) ? (
                                 <Container  key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto" }} fluid>
                                     <Row className="mt-1 mb-1">
+                                    <Col xs="1"></Col>
                                     <Col xs="9" className="text-left">
-                                        <div className="rounded-top rounded-bottom p-3 m-1 text-white" style={{ display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#686868"}}><Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />
+                                        <div className="p-2 m-1 text-white" style={{ borderRadius: "18px", display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#404040"}}><Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />
                                         </div>
                                     </Col>
                                     <Col xs="3" className="text-center">
@@ -136,7 +140,7 @@ export default function CurrentConversationMessagesListView(props){
                                     </Row>
                                     <Row className="" style={{ marginTop: -10 }}>
                                             <Col xs="9" className="text-left pl-4">
-                                                <span className="font-italic text-left text-muted">Test Name is typing</span>
+                                                <span className="font-italic text-left text-muted"></span>
                                             </Col>
                                             <Col xs="3" className="text-center">
                                             </Col>

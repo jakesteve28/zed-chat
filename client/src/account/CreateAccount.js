@@ -21,32 +21,32 @@ function CreateAccount(){
             setErrorMsg("Passwords don't match")
             return false
         }
-        if(regex.firstName.test(fName) == false){
+        if(regex.firstName.test(fName) === false){
             setError(true)
             setErrorMsg("First Name must be 1-32 characters and start with a capital letter")
             return false
         }
-        if(regex.lastName.test(lName) == false){
+        if(regex.lastName.test(lName) === false){
             setError(true)
             setErrorMsg("Last Name must be 1-32 characters and start with a capital letter")
             return false
         }
-        if(regex.tagName.test(tagName) == false){
+        if(regex.tagName.test(tagName) === false){
             setError(true)
             setErrorMsg("Tag name must be 8-24 characters")
             return false
         }
-        if(regex.email.test(email) == false){
+        if(regex.email.test(email) === false){
             setError(true)
             setErrorMsg("Invalid Email")
             return false
         }
-        if(regex.password.test(pw1) == false){
+        if(regex.password.test(pw1) === false){
             setError(true)
             setErrorMsg("Password must be 8-32 characters")
             return false
         }
-        if(regex.password.test(pw2) == false){
+        if(regex.password.test(pw2) === false){
             setError(true)
             setErrorMsg("Password must be 8-32 characters")
             return false

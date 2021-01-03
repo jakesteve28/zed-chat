@@ -1,8 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationService } from 'src/conversations/conversation.service';
-import { User } from 'src/users/user.entity';
-import { UserService } from 'src/users/user.service';
+import { UserService } from '../users/user.service';
 import { Repository } from 'typeorm';
 import { FriendRequest } from './friendRequest.entity';
 
@@ -10,7 +8,7 @@ import { FriendRequest } from './friendRequest.entity';
 export class FriendRequestService {
     constructor(
                 @Inject(forwardRef(() => UserService))
-                private userService: UserService,
+                private userService: UserService,       
                 @InjectRepository(FriendRequest)
                 private readonly friendRequestRepository: Repository<FriendRequest>
         ) {}
@@ -46,14 +44,19 @@ export class FriendRequestService {
         const friendRequest =  await this.friendRequestRepository.findOne(id, { relations: ["sender"]}); 
         const newFriend = await this.userService.findOne(friendRequest.recipientId)
         if(friendRequest.sender.id && newFriend.id){
-            const [_sender, _newFriend] = await this.userService.addFriends(friendRequest.sender.id, newFriend.id);
-            if(_sender && _newFriend && _sender.friends && _newFriend.friends){
-                friendRequest.accepted = true 
-                const _friendRequest = await this.friendRequestRepository.save(friendRequest)
-                if(_friendRequest){
-                    console.log(_friendRequest)
-                    return _friendRequest
+            try {
+                const [_sender, _newFriend] = await this.userService.addFriends(friendRequest.sender.id, newFriend.id);
+                if(_sender && _newFriend && _sender.friends && _newFriend.friends){
+                    friendRequest.accepted = true 
+                    const _friendRequest = await this.friendRequestRepository.save(friendRequest)
+                    if(_friendRequest){
+                        console.log(_friendRequest)
+                        return _friendRequest
+                    }
                 }
+            }  catch(err) {
+                console.log("Cannot accept friend request and add friends", err)
+                return null;
             }
         } else {
             console.log("Cannot accept friend request and add friends")

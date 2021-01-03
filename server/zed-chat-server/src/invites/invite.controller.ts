@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateInviteDto } from './dto/create-invite.dto';
 import { Invite } from './invite.entity';
 import { InviteService } from './invite.service';

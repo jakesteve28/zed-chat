@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { jwtConstants } from 'src/auth/constants';
+import { jwtConstants } from '../auth/constants';
 import { UserModule } from '../users/user.module';
 import { FriendRequest } from './friendRequest.entity';
 import { FriendRequestService } from './friendRequest.service';
@@ -12,7 +12,8 @@ import { FriendRequestService } from './friendRequest.service';
     secret: jwtConstants.secret,
     signOptions: {expiresIn: '24h'}
   }), 
-    forwardRef(() => UserModule), TypeOrmModule.forFeature([FriendRequest])],
+  forwardRef(() => UserModule),
+  TypeOrmModule.forFeature([FriendRequest])],
   providers: [FriendRequestService],
   exports: [FriendRequestService]
 })

@@ -9,7 +9,6 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import './topbar.css'
-
 import useWindowSize from '../sidebar/windowSize';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Badge } from '@material-ui/core'
@@ -28,15 +27,13 @@ import {
   clearConversations,
   removeConversation,
   setView,
-  selectView
+  selectView,
+  selectShowConvList,
+  setShowConvList
 } from '../currentConversation/conversationsSlice'
 import {
   selectFriends,
   selectFriendRequests,
-  addFriend,
-  removeFriend,
-  addFriendRequest,
-  removeFriendRequest,
   clearFriends
 } from '../account/friendsSlice'
 import { useSelector } from 'react-redux'
@@ -44,11 +41,12 @@ import { useDispatch } from 'react-redux'
 import { FormControl } from 'react-bootstrap'
 import { useState } from 'react'
 import { selectToken, clearAuth } from '../auth/authSlice';
-import { selectReceived, acceptedInvites, removeReceivedInvite, addAcceptedInvite, addReceivedInvite, clearInvites } from './inviteSlice';
-import io from 'socket.io-client'
+import { selectReceived, acceptedInvites, removeReceivedInvite, addAcceptedInvite, clearInvites } from './inviteSlice';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import regex from '../regex'
-let socket
+
+import {notificationSocket} from '../socket/notificationSocket'
+
 const useStyles = makeStyles((theme) => ({
     root: {
       display: 'flex',
@@ -87,30 +85,30 @@ const useStyles = makeStyles((theme) => ({
       const account = useSelector(selectAccount);
 
       useEffect(() => {
-        if(socket) {
-          socket.on('error', (msg) => {
+        if(notificationSocket) {
+          notificationSocket.on('error', (msg) => {
             console.log("error", msg)
             setError(true)
             setErrorMsg(`${msg.msg}`)
           })
         }
-      }, [socket])
+      }, [notificationSocket])
 
       const sendInvite = (convId) => {
         setError(false)
         setErrorMsg('')
-        if(regex.tagName.test(value) == false){
-            console.log("Error send accept invite", account, socket)
+        if(regex.tagName.test(value) === false){
+            console.log("Error send accept invite", account, notificationSocket)
             setErrorMsg("Invalid Tag Name")
             setError(true)
             return
         }
-        if(account && socket){
-          socket.emit('sendInvite', JSON.stringify({
+        if(account && notificationSocket){
+          notificationSocket.emit('sendInvite', JSON.stringify({
             sender: account, userId: value, conversationId: convId
           }))
         } else {
-          console.log("Error send invite", account, socket)
+          console.log("Error send invite", account, notificationSocket)
         }
       }
       
@@ -119,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
         setErrorMsg('')
         if(friends) {
           if(friends.filter(fr => fr.tagName === `${value}`).length < 1){
-              console.log("Error send conversation request", account, socket) 
+              console.log("Error send conversation request", account, notificationSocket) 
               setError(true)
               setErrorMsg("Friend does not exist")
           } else {
@@ -143,7 +141,7 @@ const useStyles = makeStyles((theme) => ({
           }
         }
         } else {
-              console.log("Error send conversation request", account, socket) 
+              console.log("Error send conversation request", account, notificationSocket) 
               setError(true)
               setErrorMsg("Friend's list does not exist")
         }
@@ -152,25 +150,25 @@ const useStyles = makeStyles((theme) => ({
       const sendFriendRequest = async () => {
         if(token){
           setError(false)
-          if(regex.tagName.test(friendTag) == false){
+          if(regex.tagName.test(friendTag) === false){
               console.log("Error send friend request")
               setErrorMsg("Invalid Tag Name")
               setError(true)
               return
           }
-          if(account && socket){
+          if(account && notificationSocket){
             if(account.tagName === friendTag){
               console.log("Cannot send friend request to self", account.tagName, friendTag) 
               setError(true)
               setErrorMsg("Cannot send friend request to self")
             } else {
-              socket.emit('sendFriendRequest', JSON.stringify({
+              notificationSocket.emit('sendFriendRequest', JSON.stringify({
                 senderId: account.id,
                 recipientId: friendTag
               }))
             }
           } else {
-            console.log("Error send friend request", account, socket) 
+            console.log("Error send friend request", account, notificationSocket) 
             setError(true)
             setErrorMsg("Connection error")
           }
@@ -257,117 +255,9 @@ export default function TopBar(){
     const conversations = useSelector(selectConversations)
     const currentConversation = useSelector(selectCurrentConversation)
     const view = useSelector(selectView)
-    const friendRequests = useSelector(selectFriendRequests)
+    const friendRequests = useSelector(selectFriendRequests);
     const friends = useSelector(selectFriends)
-
-    useEffect(() => {
-      const socketOptions = {
-        transportOptions: {
-            polling: {
-                extraHeaders: {
-                    Authorization: `Bearer ${token}`
-                    }
-                }
-            }
-        }
-      if(account.loggedIn === true){
-        socket = io('http://localhost:3002/invite-server', socketOptions)
-          socket.on('connect', () => {
-            console.log("Connected to invite socket")
-          });
-          socket.on('convInvite', (msg) => {
-            try {
-              if(msg.invite.recipientId === account.id && msg.conv){
-                console.log(msg.conv)
-                console.log("Conv invite for user " + msg.invite.recipientId)
-                if(conversations){
-                  if(0 === conversations.filter(el => el.id === msg.invite.conversationId).length){
-                    msg.conv.pending = true
-                    dispatch(addConversation({ conversation: msg.conv }))
-                    msg.invite.sender = msg.user
-                    console.log(msg)
-                    dispatch(addReceivedInvite(msg.invite))
-                    console.log("Received invite: " + msg.invite)
-                  }
-                }
-              } 
-            } catch(err) {
-              console.log("Receive Invite Error" + err)
-            }
-          });
-          socket.on('accepted', (msg) => {
-              if(msg.conv && msg.invite && msg.invite.senderId === account.id){
-                console.log("Conv invite accepted by user " + msg.invite.recipientId)
-                dispatch(removeConversation({ id: msg.conv.id }))
-                dispatch(addConversation({ conversation: msg.conv }))
-              }
-          });       
-          socket.on('friendRequestSent', (msg) => {
-              if(msg && msg.friendRequest){
-                if(msg.friendRequest.recipientId === account.id){
-                  console.log("Friend request received from user " + JSON.stringify(msg))
-                  dispatch(addFriendRequest(msg.friendRequest))
-                }
-                if(msg.friendRequest.sender.id === account.id){
-                  console.log("Friend request delivered to user " + JSON.stringify(msg))
-                  dispatch(addFriendRequest(msg.friendRequest))
-                }      
-              }
-          });
-          socket.on('friendRequestDeclined', (msg) => {
-            if(msg && msg.friendRequest){
-              if(msg.friendRequest.recipientId === account.id){ 
-                console.log("Friend request decline delivered")  
-                dispatch(removeFriendRequest(msg.friendRequest.id))
-              }
-              if(msg.friendRequest.sender.id === account.id){
-                console.log("Friend request declined")
-                dispatch(removeFriendRequest(msg.friendRequest.id))
-              }    
-            }
-          });
-          socket.on('friendAdded', (msg) => {
-            if(msg && msg.friendRequest){
-              console.log(msg)
-              if(msg.friendRequest.recipientId === account.id){ 
-                const sender = msg.friendRequest.sender
-                console.log("Friend Added", sender)   
-                dispatch(addFriend(sender))
-                dispatch(removeFriendRequest(msg.friendRequest.id))
-              }
-              if(msg.friendRequest.sender.id && msg.friendRequest.sender.id === account.id){
-                const acceptor = msg.acceptor
-                console.log("Friend added", acceptor)
-                dispatch(addFriend(acceptor))
-                dispatch(removeFriendRequest(msg.friendRequest.id))
-              }    
-            }
-          });
-          socket.on('friendRemoved', (msg) => {
-            if(msg && msg.exFriend1 && msg.exFriend2){
-               if(account.id === msg.exFriend1.id) {
-                  dispatch(removeFriend(msg.exFriend2.id))
-                  console.log("Friend removed", msg.exFriend2)
-               }
-               if(account.id === msg.exFriend2.id) {
-                  dispatch(removeFriend(msg.exFriend1.id))
-                  console.log("Friend removed", msg.exFriend1)
-               }
-            }
-          });
-          return () => {
-            if(socket){
-              socket.off('convInvite')
-              socket.off('accepted')
-              socket.off('friendRequestSent')
-              socket.off('friendRequestDeclined')
-              socket.off('friendAdded')
-              socket.off('friendRemoved')
-            }
-          }
-        }
-    }, [])
-
+    const showConv = useSelector(selectShowConvList)
     const logoutAccount = () => {
       dispatch(logout())
       dispatch(clearAccount())
@@ -379,27 +269,15 @@ export default function TopBar(){
     }
 
     const sendAccept = (inviteId, userId, conversationId) => {
-      if(socket){
-        socket.emit("acceptInvite", JSON.stringify({ inviteId: inviteId, userId: userId, conversationId: conversationId }))
+      if(notificationSocket){
+        console.log("Accepting invite", { inviteId: inviteId, userId: userId, conversationId: conversationId }, receivedInvites);
+        notificationSocket.emit("acceptInvite", JSON.stringify({ inviteId: inviteId, userId: userId, conversationId: conversationId }))
       }
-      const invite = receivedInvites.filter(inv => inv.id === inviteId)[0]
+      const invite = JSON.parse(JSON.stringify(receivedInvites.filter(inv => inv.id === inviteId)[0]));
       if(invite){
-        dispatch(removeReceivedInvite(inviteId))
-        dispatch(addAcceptedInvite(invite))
-        try {
-        const conversation = JSON.parse(JSON.stringify(conversations.filter(conv => conv.id === conversationId)[0]))
-        if(conversation){
-          conversation.users.push(account)
-          conversation.pending = false
-          let str = ``
-          for(let user of conversation.users) str += `@${user.tagName} `
-          conversation.conversationName = `Chat with ${str}`
-        }
-        dispatch(removeConversation(conversationId))
-        dispatch(addConversation({ conversation: conversation }))
-      } catch(err){
-        console.log("Error adding conversation")
-      }
+        dispatch(removeReceivedInvite(inviteId));
+        dispatch(addAcceptedInvite(invite));
+        console.log("Invite accepted");
       }
     }
 
@@ -441,9 +319,9 @@ export default function TopBar(){
 
     const acceptFriendRequest = (id, recipientId) => {
       console.log("Accept Friend Request Clicked", id, recipientId, account.id)
-      if(socket && account){
+      if(notificationSocket && account){
         if(recipientId === account.id){
-          socket.emit("acceptFriendRequest", JSON.stringify({ friendRequestId: id }));
+          notificationSocket.emit("acceptFriendRequest", JSON.stringify({ friendRequestId: id }));
         }
       }
     }
@@ -482,6 +360,10 @@ export default function TopBar(){
         </Col>  
       </Row>
       )
+    }
+
+    function openConversations() {
+      dispatch(setShowConvList(!showConv))
     }
 
     return (
@@ -524,7 +406,7 @@ export default function TopBar(){
                                         return (
                                           <FriendRequest requestId={el.id} recipientId={el.recipientId} sender={el.sender} key={`${el.id}`}></FriendRequest>
                                         )
-                                      }                          
+                                      } else return null;                         
                                     })}
                                     {receivedInvites.map((el) => {
                                       return (
@@ -552,7 +434,7 @@ export default function TopBar(){
                                     return (
                                       <Friend tagName={el.tagName} key={el.id}></Friend>
                                     )
-                                  }                          
+                                  } else return null;                          
                                 })}
                               </Container>
                             </Dropdown.Menu>
@@ -562,9 +444,9 @@ export default function TopBar(){
                       : ""
                     }
                     {
-                        (account.loggedIn && screenSmall) ?
+                        (account.loggedIn && screenSmall && !showConv) ?
                           (
-                            <Button style={{backgroundColor: "#191919", border: "none"}}><ArrowBackIcon></ArrowBackIcon></Button>
+                            <Button style={{backgroundColor: "#191919", border: "none"}} onClick={ () => { openConversations() }}><ArrowBackIcon></ArrowBackIcon></Button>
                           )
                         : ""
                     }        
@@ -572,7 +454,7 @@ export default function TopBar(){
                </Container>
             </Typography>
             <Typography component={'span'} variant="h4" className={classes.title}>
-                <span style={{ opacity: 0.67 }} className="text-white lead">{(currentConversation && currentConversation.conversationName && !view) ? `${currentConversation.conversationName}` : "" }</span>
+                <span style={{ opacity: 0.67 }} className="text-white lead">{(currentConversation && currentConversation.conversationName && !view && !showConv) ? `${currentConversation.conversationName}` : "" }</span>
             </Typography>
             {
               (!account.loggedIn) ? (<Link className="rounded-pill btn btn-outline-primary mr-5 rounded-pill" style={{ opacity: 0.67 }} renderas={Button} to="/login">

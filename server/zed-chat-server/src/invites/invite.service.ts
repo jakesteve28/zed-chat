@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationService } from 'src/conversations/conversation.service';
-import { UserService } from 'src/users/user.service';
+import { ConversationService } from '../conversations/conversation.service';
+import { UserService } from '../users/user.service';
 import { Repository } from 'typeorm';
 import { Invite } from './invite.entity';
 
@@ -51,6 +51,11 @@ export class InviteService {
         if(conversation.users.filter(user => user.id === sender.id).length < 1){
             console.log(conversation.users)
             throw "Cannot create invite, sender does not belong to conversation";
+            return null;
+        }
+        if(sender.friends.filter(friend => friend.id === recipient.id).length < 1){
+            console.log(sender.friends)
+            throw "Cannot create invite, sender is not friends with recipient";
             return null;
         }
         const invite = new Invite();

@@ -1,4 +1,4 @@
-import { Message } from 'src/messages/message.entity';
+import { Message } from '../messages/message.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity'
 
@@ -10,6 +10,12 @@ export class Conversation {
 
   @Column()
     conversationName: string;
+
+  @Column({ default: true })
+    pending: boolean;
+
+  @Column({ default: false })
+    removed: boolean;
 
   @CreateDateColumn()
     createdAt: string;

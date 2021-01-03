@@ -1,9 +1,9 @@
 import { CanActivate, Injectable } from "@nestjs/common";
-import { UserService } from "src/users/user.service";
+import { UserService } from "../../users/user.service";
 import { JwtService } from '@nestjs/jwt'
-import { Conversation } from "src/conversations/conversation.entity";
-import { ConversationService } from "src/conversations/conversation.service";
-import { User } from "src/users/user.entity";
+import { Conversation } from "../../conversations/conversation.entity";
+import { ConversationService } from "../../conversations/conversation.service";
+import { User } from "../../users/user.entity";
 
 @Injectable()
 export class ChatGuard implements CanActivate {

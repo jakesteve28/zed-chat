@@ -1,7 +1,7 @@
-import { Conversation } from 'src/conversations/conversation.entity';
-import { FriendRequest } from 'src/friendRequest/friendRequest.entity';
-import { Message } from 'src/messages/message.entity';
-import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany, CreateDateColumn } from 'typeorm';
+import { Conversation } from '../conversations/conversation.entity';
+import { FriendRequest } from '../friendRequest/friendRequest.entity';
+import { Message } from '../messages/message.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany, CreateDateColumn, OneToOne } from 'typeorm';
 
 @Entity()  
 export class User {
@@ -30,6 +30,15 @@ export class User {
   @Column({ default: false })
   isOnline: boolean;
 
+  @Column()
+  currentConversationId: string;
+
+  @Column({ default: 'disconnected' })
+  chatSocketId: string;
+
+  @Column({ default: 'disconnected' })
+  notificationSocketId: string;
+
   @CreateDateColumn()
   createdAt: string;
   
@@ -46,4 +55,6 @@ export class User {
 
   @OneToMany(type => FriendRequest, friendRequest => friendRequest.sender)
   friendRequests: FriendRequest[]
+
+
 }

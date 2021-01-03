@@ -1,8 +1,8 @@
 import { HttpException, Controller, Get, Post, Param, Body, Delete, Logger, Header, Options, HttpStatus, UseGuards, Request, Put } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { Conversation } from './conversation.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Message } from 'src/messages/message.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Message } from '../messages/message.entity';
 
 @Controller('conversation')
 export class ConversationController {

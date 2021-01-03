@@ -1,154 +1,58 @@
 import React, { useEffect, useState, useRef } from 'react' 
 import { Row, Col, InputGroup, FormControl, Button } from 'react-bootstrap';
 import { SendRounded } from '@material-ui/icons';
-import io from 'socket.io-client'
 import {
-    selectCurrentConversation,
-    addMessage,
-    setTyping
+    selectCurrentConversation
 } from './conversationsSlice';
 
 import {
     selectAccount
 } from '../account/accountSettingsSlice';
 
-import {
-    selectToken
-} from '../auth/authSlice';
+import { useSelector } from 'react-redux'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { chatSocket } from '../socket/chatSocket';
 
-let _socket 
 let searchTimeout
 
 export default function CurrentConversationMessageBox(props){
     const [message, setMessage] = useState("")
     const account = useSelector(selectAccount)
     const currentConversation = useSelector(selectCurrentConversation)
-    const token = useSelector(selectToken)
-    const dispatch = useDispatch()
     const formRef = useRef(null)
     const [typingTimeout, setTypingTimeout] = useState(null)
+
     const sendMessage = async () => {
         console.log("Send message ", message)
-        if(_socket){
-           _socket.emit('chatToServer', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, message: `${message}` }));
-            formRef.current.value = ""
+        if(chatSocket){
+           chatSocket.emit('chatToServer', JSON.stringify({ sender: account.tagName, room: currentConversation.id, message: `${message}` }));
+           formRef.current.value = ""
         }
-            else {
-                console.log("No Conversation to send message to")
-            }
+        else {
+            console.log("No Conversation to send message to")
         }
+    }
     const sendTyping = (isTyping) => {
-        if(_socket && account && currentConversation){
-            _socket.emit('typing', JSON.stringify({ sender: account.tagName, _socket: { id: _socket.id }, room: currentConversation.id, typing: isTyping }));
+        if(chatSocket && account && currentConversation){
+            chatSocket.emit('typing', JSON.stringify({ sender: account.tagName, chatSocket: { id: chatSocket.id }, room: currentConversation.id, typing: isTyping }));
         }
         else {
             console.log("No Conversation to send typing to")
         }
     }
-
     useEffect(() => {
-        if(token){
-            const socketOptions = {
-                transportOptions: {
-                    polling: {
-                        extraHeaders: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                }
+        if(chatSocket && formRef && currentConversation && account){
+            formRef.current.onkeypress = () => { 
+                if (searchTimeout !== undefined) clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    console.log("typing done")
+                    setTypingTimeout(false)
+                    sendTyping(false)
+                }, 1000);
             }
-            _socket = io('http://localhost:3002/zed-chat-rooms', socketOptions)
         }
-    }, [])
+    }, [currentConversation.id])
 
-    useEffect(() => {
-        if(currentConversation && currentConversation.id && token && account){
-            if(!_socket){
-                const socketOptions = {
-                    transportOptions: {
-                        polling: {
-                            extraHeaders: {
-                                Authorization: `Bearer ${token}`
-                            }
-                        }
-                    }
-                }
-                _socket = io('http://localhost:3002/zed-chat-rooms', socketOptions)
-            }
-            if(_socket && currentConversation && currentConversation.id){
-                _socket.emit('joinRoom', JSON.stringify({ room: currentConversation.id, user: account.id }));
-                _socket.on('chatToClient', (msg) => {
-                    if(msg.message.id && msg.message.body && msg.message.createdAt){
-                        dispatch(addMessage({ message: msg.message, conversation: currentConversation }));
-                    }
-                });
-                _socket.on('connect', () => {
-                    console.log('connected');
-                });
-                _socket.on('joinedRoom', (room) => {
-                    console.log('joined room: ' + JSON.stringify(room));
-                });
-                _socket.on('leftRoom', (room) => {
-                    console.log('left room: ' + room);
-                });
-                _socket.on('delivered', (msg) => {
-                    console.log("Handle message delivered")
-                    if(msg.message.id && msg.message.body && msg.message.createdAt){
-                        console.log("Message delivered: ", msg)
-                        dispatch(addMessage({ message: msg.message, conversation: msg.message.conversation }));
-                    }
-                })
-                _socket.on('typing', (msg) => {
-                    console.log("Handle typing")
-                    //console.log(msg)
-                    if(currentConversation.id === msg.conv){
-                        if(msg.user && msg.typing === true){
-                            if(msg.user.id !== account.id){     
-                                    console.log('typing')
-                                    dispatch(setTyping(true))
-                                }
-                            }
-                        if(msg.user && msg.typing === false){
-                            if(msg.user.id !== account.id){
-                                dispatch(setTyping(false))
-                            }
-                        }  
-                    }
-                })
-                _socket.on("error", (msg) => {
-                    console.log("Handle error: ", msg)
-                })
-            if(_socket && formRef && currentConversation && account){
-                formRef.current.onkeypress = () => { 
-                    if (searchTimeout !== undefined) clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        console.log("typing done")
-                        setTypingTimeout(false)
-                        sendTyping(false)
-                    }, 1000);
-                }
-            }
-        } else {
-                console.log("Socket error, cannot receive or send messages");
-            }          
-        } else {
-            console.log("Socket not setup: no current conversation");
-        }
-        return () => {
-            if(_socket){
-                if(currentConversation && currentConversation.id)
-                    _socket.emit("leaveRoom", { room: currentConversation.id, user: account.id });
-                _socket.off('chatToClient')
-                _socket.off('connect')
-                _socket.off('joinedRoom')
-                _socket.off('leftRoom')
-                _socket.off('delivered')
-                _socket.off('readMessage')
-            }     
-        }
-    }, [currentConversation.id]);
     return ( 
         <Row className="w-100 text-center" style={{ position: "fixed", bottom: 0, left: 50 }}>
             <Col md="3"></Col>
@@ -161,8 +65,15 @@ export default function CurrentConversationMessageBox(props){
                     aria-describedby="basic-addon2"
                     className="rounded-pill p-4"
                     ref={formRef}
+                    onKeyPress={
+                        async (e) => {
+                            if(e.key === "Enter") {
+                                await sendMessage()
+                            }
+                        }
+                    }
                     onChange={async (e) => {
-                        if(_socket && !typingTimeout){
+                        if(chatSocket && !typingTimeout){
                             setTypingTimeout(true)
                             sendTyping(true)
                             console.log("typing start")

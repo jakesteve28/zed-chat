@@ -90,12 +90,12 @@ function LoginScreen() {
   const submit = async () => {
     setError(false)
     try {
-      if(regex.tagName.test(userName) == false){
+      if(regex.tagName.test(userName) === false){
         setErrorMsg("Tag name must be 8-24 characters")
         setError(true)
         return;
       }
-      if(regex.password.test(password) == false){
+      if(regex.password.test(password) === false){
         setErrorMsg("Password must be 8-32 characters")
         setError(true)
         return;
@@ -120,7 +120,8 @@ function LoginScreen() {
     })
     console.log("Friends: ", friends)
     bodyAcc.friendRequests.map(friendReq => {
-      dispatch(addFriendRequest(friendReq))
+      dispatch(addFriendRequest(friendReq));
+      return null;
     })
     const friendRequestsRes = await fetch(`http://localhost:3000/api/users/invites/${id}`, {
       headers: {
@@ -190,7 +191,7 @@ function LoginScreen() {
   }
   return (
     (!account.loggedIn) ?
-    <Container className="h-100 w-100 text-center" fluid  style={{ backgroundColor: "#191919",  margin: "auto"}}>
+    <Container className="h-100 w-100 text-center" fluid  style={{ backgroundColor: "#191919",  margin: "auto", marginTop: "150px"}}>
     <Row className="mt-5 mb-4">
       <Col className="text-center mt-5"><h2 className="text-white" style={{ opacity: 0.87 }}>Welcome to Ø Chat!</h2></Col></Row>  
     <Row className="p-3 text-white lead text-center" style={{ backgroundColor: "#191919" }}>

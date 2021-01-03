@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import LoginScreen from './login/loginScreen'
 import CreateAccount from './account/CreateAccount';
@@ -17,8 +17,13 @@ import {
 } from './account/accountSettingsSlice'
 import GuardedRoute from './login/loginGuard'
 import Settings from './account/Settings'
-import useWindowSize from './sidebar/windowSize'
-
+import NotificationSocket from './socket/notificationSocket'
+import ChatSocket from './socket/chatSocket';
+import Splash from './splash/Splash'
+import { useTransition, animated, config } from 'react-spring'
+import { selectShowConvList } from './currentConversation/conversationsSlice'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: "#191919",
@@ -66,7 +71,10 @@ const useStyles = makeStyles((theme) => ({
 
 function Login(){
   const classes = useStyles();
-  return (<div className={classes.root}>
+  const notify = () => toast.info("Hello!\r\n This application uses cookies to authenticate you with the server.", { position: "top-center", hideProgressBar: true, pauseOnHover: true} );
+  useEffect(() => { notify(); } , [] );
+  return (<div className={classes.root} style={{ animation: `fadeIn 1.8s` }}>
+
   <CssBaseline />
   <TopBar></TopBar>
     <main className={classes.content}>
@@ -99,17 +107,30 @@ function CreateAcc(){
 }
 
 function Home(){
-  const size = useWindowSize();
-  const classes = useStyles();
+  const showConvList = useSelector(selectShowConvList)
+
   return (
-    <Container fluid className="w-100" style={{ backgroundColor: "#191919",    height: size.height, minHeight: size.height}}>
-    <CssBaseline />
-      <TopBar></TopBar>
-      <Sidebar></Sidebar>
-      <Container fluid className="w-100" style={{ height: size.height, minHeight: size.height }}>
-          <CurrentConversationContainer style={{ height: size.height, minHeight: size.height }}></CurrentConversationContainer>
+    <div>
+      <NotificationSocket></NotificationSocket>
+      <ChatSocket></ChatSocket>
+      <Container fluid className="w-100 view-height">
+      <CssBaseline />
+        <TopBar></TopBar>
+        { (showConvList) ? (<Sidebar></Sidebar>) :
+          (
+            <>
+              <Sidebar></Sidebar>
+              <Container fluid className="w-100 view-height">
+              
+                <CurrentConversationContainer className="w-100 view-height" ></CurrentConversationContainer>
+              </Container>
+            </>
+         )}
+        <Container fluid className="w-100 view-height">
+            <CurrentConversationContainer></CurrentConversationContainer>
+        </Container>
       </Container>
-    </Container>
+    </div>
     )
 }
 
@@ -141,7 +162,7 @@ function SettingScr(){
     )
 }
 
-function App() {
+function Main(){
   const auth = useSelector(selectAccount)
   return (
     <Router>
@@ -154,8 +175,32 @@ function App() {
         <GuardedRoute path="/settings" component={SettingScr} auth={auth.loggedIn}></GuardedRoute>
         <GuardedRoute path="/" component={Home} auth={auth.loggedIn}></GuardedRoute>
       </Switch>
-    </Router>
-  );
+  </Router>
+  )
+}
+
+
+const pages = [
+  { id: 0, jsx: ({ style }) => <Splash></Splash> },
+  { id: 1, jsx: ({ style }) => <Main></Main> }
+]
+
+
+function App() {
+  const [index, set] = useState(0)
+  const transitions = useTransition(pages[index], item => item.id, {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+    config: config.stiff,
+  })
+  useEffect(() => setTimeout(() => set(state => state += 1), 1000), [])
+  return transitions.map(({ item, props, key }) => (
+    <animated.div key={key} className="bg">
+    <ToastContainer toastClassName="bg-gray-600" />
+      { item.jsx({ style: { ...props, height: "100%" }}) }
+    </animated.div>
+  ))
 }
 
 export default App;
