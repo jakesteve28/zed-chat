@@ -5,6 +5,8 @@ import { UserService } from '../users/user.service';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from './message.entity';
+import { User } from 'src/users/user.entity';
+import { Conversation } from 'src/conversations/conversation.entity';
 
 @Injectable()
 export class MessageService {
@@ -14,13 +16,9 @@ export class MessageService {
         private messageRepository: Repository<Message>){
     }
 
-    async create(createMessageDto: CreateMessageDto): Promise<Message> {
+    async create(createMessageDto: CreateMessageDto, user: User, conversation: Conversation): Promise<Message> {
         const message = new Message();
-        const user = await this.userService.findOne(createMessageDto.userId);
-        user.conversations = [];
-        user.password = undefined;
-        const conversation = await this.conversationService.findOne(createMessageDto.conversationId);
-        message.body = createMessageDto.body;
+        message.body = createMessageDto.body || "";
         message.user = user;
         message.conversation = conversation;
         return this.messageRepository.save(message);

@@ -391,7 +391,7 @@ export default function TopBar(){
                               {
                                 (receivedInvites.length > 1|| friendRequests.length > 1) 
                                 ? 
-                                <Badge color="white" overlap="circle" badgeContent=" " variant="dot">
+                                <Badge color="secondary" overlap="circle" badgeContent=" " variant="dot">
                                   <NotificationsNoneIcon></NotificationsNoneIcon>
                                 </Badge> 
                                 : 

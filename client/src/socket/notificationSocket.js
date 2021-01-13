@@ -24,6 +24,8 @@ import { addReceivedInvite, addSentInvite, selectReceived, selectSent } from '..
 import { toast } from 'react-toastify';
 import { selectHost } from '../store/store';
 
+let notificationSocket = null;
+
 const socketEvents = {
     received: {
         connectSuccess: "connectSuccess",
@@ -343,8 +345,6 @@ const setupEventListeners = (notificationSocket, dispatch, account, friends, req
     });
 }
 
-let notificationSocket;
-
 export default function NotificationSocket(){
     const account = useSelector(selectAccount)
     const token = useSelector(selectToken)
@@ -379,7 +379,7 @@ export default function NotificationSocket(){
             try {
                 console.log("Attemping connection to notifications notificationSocket");
                 notificationSocket = io(`${host}/notifications`, notificationSocketOptions);
-                notificationSocket.emit('refreshClientSocket', JSON.stringify({ userId: account.id }));
+                notificationSocket.emit('refreshNotificationSocket', JSON.stringify({ userId: account.id }));
                 setupEventListeners(notificationSocket, dispatch, account, friends, requests, conversations, sentInvites, receivedInvites);
                 return () => {
                     teardownEventListeners(notificationSocket);

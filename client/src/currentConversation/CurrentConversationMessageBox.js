@@ -25,7 +25,7 @@ export default function CurrentConversationMessageBox(props){
     const sendMessage = async () => {
         console.log("Send message ", message)
         if(chatSocket){
-           chatSocket.emit('chatToServer', JSON.stringify({ sender: account.tagName, room: currentConversation.id, message: `${message}` }));
+           chatSocket.emit('chatToServer', { sender: account.tagName, room: currentConversation.id, body: `${message}` });
            formRef.current.value = ""
         }
         else {

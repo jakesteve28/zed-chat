@@ -17,7 +17,7 @@ import { FriendRequestService } from '../friendRequest/friendRequest.service';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": process.env.PROD_CLIENT_HOST || "http://localhost:3003",
+        "Access-Control-Allow-Origin": "http://localhost:3003", //process.env.PROD_CLIENT_HOST || "http://localhost:3003",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
@@ -65,8 +65,8 @@ export class NotificationsGateway  {
      * @param data { userId: (user's ID) }
      */
     @UseGuards(NotificationGuard)
-    @SubscribeMessage('refreshClientSocket')
-    async handleRefreshClientSocket(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    @SubscribeMessage('refreshNotificationSocket')
+    async handleRefreshNotificationSocket(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
         try {
             const { userId } = JSON.parse(data);
             const socketId = client.id;
@@ -74,14 +74,14 @@ export class NotificationsGateway  {
             if(!user) {
                 throw `Cannot find user with id: ${userId}, error logging in`;
             } else {
-                this.wss.to(user.notificationSocketId).emit("refreshClientSocketSuccess", { clientId: `${client.id}` });
-                console.log(`Success: emmitted "refreshClientSocketSuccess" to User ${user.tagName}`);
+                client.emit("refreshClientSocketSuccess", { clientId: `${client.id}` });
+                console.log(`Success: emitted notification socket "refreshClientSocketSuccess" to User @${user.tagName}`);
             }
         } catch(err) {
             const socketId = client.id;
             console.log(`Error: "refreshClientSocket" event not sent to client ID: ${socketId} notification socket connected request failed`);
-            this.wss.to(socketId).emit('refreshClientSocketError', { msg:  err });
-            console.log(`Success: emmitted "refreshClientSocketError" to client ID ${socketId}`);
+            client.emit('refreshClientSocketError', { msg:  err });
+            console.log(`Success: emitted notification "refreshClientSocketError" to client ID ${socketId}`);
             return false;
         }
     }

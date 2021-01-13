@@ -12,6 +12,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removeConversation, selectConversations, setCurrentConversation, selectShowConvList, setShowConvList  } from '../currentConversation/conversationsSlice';
 import { setView } from '../currentConversation/conversationsSlice';
 import SelectableContext from "react-bootstrap/SelectableContext";
+import { chatSocket } from '../socket/chatSocket';
+import { selectAccount } from '../account/accountSettingsSlice' ;
+
 const useStyles = makeStyles((theme) => ({
     animate_in: {
         width: 0,
@@ -71,19 +74,26 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
+
+
 export default function Sidebar(){
     const size = useWindowSize();
     const classes = useStyles();
-    const sidebar = size.width < 768
-    let conversations = useSelector(selectConversations)
-    const dispatch = useDispatch()
-    const showConvList = useSelector(selectShowConvList) 
+    const sidebar = size.width < 768;
+    let conversations = useSelector(selectConversations);
+    const dispatch = useDispatch();
+    const showConvList = useSelector(selectShowConvList);
+    const account = useSelector(selectAccount);
     const cl = (el) => {
         if(!el.pending){
-            console.log("Setting current conversation...", el)
-            dispatch(setView(false))
-            dispatch(setCurrentConversation(el))
-            dispatch(setShowConvList(false))
+            console.log("Setting current conversation...", el);
+            dispatch(setView(false));
+            dispatch(setCurrentConversation(el));
+            dispatch(setShowConvList(false));
+            // if(chatSocket){
+            //     console.log("Refreshing chat socket id...", el);
+            //     chatSocket.emit('refreshChatSocket', { userId: account.id });
+            // }
         } else {
             return;
         }

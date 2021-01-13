@@ -42,7 +42,7 @@ import { MessageService } from '../messages/message.service';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": process.env.PROD_CLIENT_HOST || "http://localhost:3003",
+        "Access-Control-Allow-Origin": "http://localhost:3003",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
@@ -71,17 +71,9 @@ export class ChatGateway  {
      */
     @UseGuards(ChatGuard)
     @SubscribeMessage('connect')
-    async handleConnect(@ConnectedSocket() client: Socket, @MessageBody() data: string){
-        try {
+    handleConnect(@ConnectedSocket() client: Socket){
             console.log(`New user connected with client socket ID ${client.id}`);
-        } catch(err) {
-            const socketId = client.id;
-            console.log(`Error: "connect" event failure | ${err} |`);
-            this.wss.to(socketId).emit("connectError", { message: `Error connecting to socket.io server` }, () => {
-                console.log(`Success: Emitted "connectError" error event to socket ID: ${socketId}`);
-            });
-            return undefined;
-        }
+            return;
     }
 
     /**
@@ -90,22 +82,24 @@ export class ChatGateway  {
      * @param data { userId: (user's ID) }
      */
     @UseGuards(ChatGuard)
-    @SubscribeMessage('refreshClientSocket')
-    async handleRefreshClientSocket(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    @SubscribeMessage('refresh')
+    async handleRefreshChatSocket(@ConnectedSocket() client: Socket, @MessageBody() data) {
+        console.log("Handle refresh chat socket ID for user");
         try {
-            const { userId } = JSON.parse(data);
+            const { userId } = data;
             const socketId = client.id;
             const user = await this.userService.setChatSocketId(userId, socketId);
             if(!user) {
                 throw `Cannot find user with id: ${userId}, error logging in`;
             } else {
-                this.wss.to(user.notificationSocketId).emit("refreshClientSocketSuccess", { clientId: `${client.id}` });
-                console.log(`Success: emitted "refreshClientSocketSuccess" to User ${user.tagName}`);
+                client.emit("refreshSuccess", { clientId: `${client.id}` });
+                console.log(`Success: emitted chat "refreshClientSocketSuccess" to User ${user.tagName}`);
             }
+            return true;
         } catch(err) {
             const socketId = client.id;
             console.log(`Error: "refreshClientSocket" event not sent to client ID: ${socketId} notification socket connected request failed`);
-            this.wss.to(socketId).emit('refreshClientSocketError', { msg:  err });
+            client.emit('refreshError', { msg: err });
             console.log(`Success: emmitted "refreshClientSocketError" to client ID ${socketId}`);
             return false;
         }
@@ -145,37 +139,36 @@ export class ChatGateway  {
      */
     @UseGuards(ChatGuard)
     @SubscribeMessage('chatToServer')
-    async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data) {
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             const tag = msg.sender
             const user = await this.userService.findByTagName(tag);
-            if(msg.room){
-                if(user){
+            const conversation = await this.conversationService.findOne(msg.room);
+            if(conversation && user){
                     user.password = undefined; 
-                    const message = await this.messageService.create({ body: msg.message, userId: user.id, conversationId: msg.room});
+                    const message = await this.messageService.create(msg, user, conversation);
                     if(message){
-                        console.log("Emitting delivered event to conversation ID " + msg.room);
-                        const conv = await this.conversationService.findOne(msg.room);
+                        console.log("Emitting delivered event to all users of conversation with ID " + msg.room);
+                        const conv = await this.conversationService.findOne(message.conversation.id);
                         for(let user of conv.users){
-                            if(user.chatSocketId !== "disconnected")
+                            if(user.chatSocketId !== "disconnected"){
+                                console.log(`Delivered event sent to user @${user.tagName}`)
                                 this.wss.to(user.chatSocketId).emit('delivered', { message: message, from: user.tagName });
+                            }
                         }
                     }
                     else {
                         const socketId = client.id;
                         console.log(`Error: "delivered" event failed, unsuccessful message creation`);
-                        this.wss.to(socketId).emit('deliveryError', { delivered: false }, () => {
-                            console.log(`Success: emitted "deliveryError" event to socket client ID: ${socketId}`);
-                        });             
+                        this.wss.to(socketId).emit('deliveryError', { delivered: false });             
                     }
-                } else {
-                    throw `Cannot find user with id ${msg.userId}`;
-                }
-            } else {
+            } else if (!user) {
+                throw `Cannot find user with id ${msg.userId}`;
+            } else if (!conversation) {
                 console.log("Error: conversation room does not exist for message " + msg.room )
                 return undefined
-            }
+            } 
         } catch(err) {
             const socketId = client.id;
             console.log(`Error: "chatToServer" event handler failed with error | ${err} | with socket ${socketId}`);
@@ -261,7 +254,13 @@ export class ChatGateway  {
     @SubscribeMessage('listen')
     async handleRoomJoin(@ConnectedSocket() client: Socket, @MessageBody() room: string ) {
         try {
-            const msg = JSON.parse(room);
+            //Hotfix checks for string or object from client
+            let msg;
+            if(typeof room === 'string'){
+                msg = JSON.parse(room);
+            } else if(typeof room === 'object') {
+                msg = room;
+            }
             const socketId = client.id;
             const user = await this.userService.findOne(msg.user);
             if(user){
