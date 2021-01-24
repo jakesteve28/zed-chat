@@ -1,0 +1,69 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-JS-NODENOTIFIER-1035794:
+    - jest > jest-cli > @jest/core > @jest/reporters > node-notifier:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.104Z'
+  SNYK-JS-LODASH-567746:
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > @babel/core > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.104Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.104Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/traverse > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > @babel/types > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+  SNYK-JS-LODASH-590103:
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > @babel/core > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.104Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.104Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/traverse > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > @babel/types > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+  SNYK-JS-LODASH-608086:
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > @babel/core > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.104Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/traverse > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > @babel/types > lodash:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+  SNYK-JS-MINIMIST-559764:
+    - jest > jest-cli > @jest/core > @jest/reporters > @jest/environment > @jest/transform > jest-haste-map > jest-util > mkdirp > minimist:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+  SNYK-JS-Y18N-1021887:
+    - jest > jest-cli > @jest/core > @jest/reporters > jest-runtime > yargs > y18n:
+        reason: I am not utilizing Jest for the client yet
+        expires: '2021-02-19T00:42:19.105Z'
+  SNYK-JS-GLOBPARENT-1016905:
+    - react-dev-utils > fork-ts-checker-webpack-plugin > chokidar > glob-parent:
+        reason: idk man
+        expires: '2021-02-19T00:42:19.105Z'
+    - webpack-dev-server > chokidar > glob-parent:
+        reason: None given
+        expires: '2021-02-19T00:42:19.106Z'
+    - react-dev-utils > globby > fast-glob > glob-parent:
+        reason: None given
+        expires: '2021-02-19T00:42:19.106Z'
+    - webpack > watchpack > watchpack-chokidar2 > chokidar > glob-parent:
+        reason: None given
+        expires: '2021-02-19T00:42:19.106Z'
+patch: {}

@@ -1,25 +1,56 @@
-.form-control::-webkit-input-placeholder {
+.form-control-normal::-webkit-input-placeholder {
     color: #D4D4D4;
     opacity: "0.55";
     margin-left: 10px;
 }
-.form-control:-moz-placeholder {
+.form-control-normal:-moz-placeholder {
     color: #D4D4D4;
     opacity: 0.8;  
     margin-left: 10px;
 }
-.form-control::-moz-placeholder {
+.form-control-normal::-moz-placeholder {
     color: #D4D4D4;
     opacity: 0.8;  
     margin-left: 10px;
 }
-.form-control::placeholder {
+.form-control-normal::placeholder {
     color: #D4D4D4; 
     opacity: 0.8; 
     margin-left: 10px;
 }
-.form-control:-ms-input-placeholder {
+.form-control-normal:-ms-input-placeholder {
     color: #D4D4D4; 
     margin-left: 10px;
     opacity: 0.8; 
+}
+
+.form-control-error::-webkit-input-placeholder {
+    color: #ff2200;
+    margin-left: 10px;
+    font-size: large;
+    font-weight: bold;
+}
+.form-control-error:-moz-placeholder {
+    color: #ff2200;
+    margin-left: 10px;
+    font-size: large;
+    font-weight: bold;
+}
+.form-control-error::-moz-placeholder {
+    color: #ff2200;
+    margin-left: 10px;
+    font-size: large;
+    font-weight: bold;
+}
+.form-control-error::placeholder {
+    color: #ff2200; 
+    margin-left: 10px;
+    font-size: large;
+    font-weight: bold;
+}
+.form-control-error:-ms-input-placeholder {
+    color:#ff2200;
+    margin-left: 10px;
+    font-size: large;
+    font-weight: bold;
 }

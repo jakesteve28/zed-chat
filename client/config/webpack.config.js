@@ -35,7 +35,7 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 // makes for a smoother build process.
 const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
 
-const isExtendingEslintConfig = process.env.EXTEND_ESLINT === 'true';
+const isExtendingEslintConfig = false;//process.env.EXTEND_ESLINT === 'true';
 
 const imageInlineSizeLimit = parseInt(
   process.env.IMAGE_INLINE_SIZE_LIMIT || '10000'
@@ -132,11 +132,12 @@ module.exports = function(webpackEnv) {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
     bail: isEnvProduction,
-    devtool: isEnvProduction
-      ? shouldUseSourceMap
-        ? 'source-map'
-        : false
-      : isEnvDevelopment && 'cheap-module-source-map',
+    devtool: "source-map",
+    // devtool: isEnvProduction
+    //   ? shouldUseSourceMap
+    //     ? 'source-map'
+    //     : false
+    //   : isEnvDevelopment && 'cheap-module-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: [
@@ -326,23 +327,25 @@ module.exports = function(webpackEnv) {
 
         // First, run the linter.
         // It's important to do this before Babel processes the JS.
-        {
-          test: /\.(js|mjs|jsx|ts|tsx)$/,
-          enforce: 'pre',
-          use: [
-            {
-              options: {
-                cache: true,
-                formatter: require.resolve('react-dev-utils/eslintFormatter'),
-                eslintPath: require.resolve('eslint'),
-                resolvePluginsRelativeTo: __dirname,
-                
-              },
-              loader: require.resolve('eslint-loader'),
-            },
-          ],
-          include: paths.appSrc,
-        },
+        // {
+        //   test: /\.(js|mjs|jsx|ts|tsx)$/,
+        //   enforce: 'pre',
+        //   use: [
+        //     {
+        //       options: {
+        //         cache: true,
+        //         formatter: require.resolve('react-dev-utils/eslintFormatter'),
+        //         eslintPath: require.resolve('eslint'),
+        //         resolvePluginsRelativeTo: __dirname,
+        //         rules: {
+        //           "no-unused-vars": "warn"
+        //         }
+        //       },
+        //       loader: require.resolve('eslint-loader'),
+        //     },
+        //   ],
+        //   include: paths.appSrc,
+        // },
         {
           // "oneOf" will traverse all following loaders until one will
           // match the requirements. When no loader matches it will fall

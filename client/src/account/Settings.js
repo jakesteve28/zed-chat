@@ -23,27 +23,6 @@ export default function Settings(){
         <Col xs="2">
         </Col>
         </Row>  
-        <Row className="mt-5">
-            <Col xs="4"></Col>
-            <Col xs='2'  className="lead p-2 text-left text-white" style={{ opacity: 0.87 }}>
-                First Name:
-            </Col>
-            <Col xs='6'  className="lead p-2 text-left text-white" style={{ opacity: 0.87 }}>
-                {account.firstName}
-            </Col>
-            <Col></Col>
-        </Row>
-        <Row>
-            <Col xs="4"></Col>
-            <Col xs='2'  className="lead p-2 text-left text-white" style={{ opacity: 0.87 }}>
-                Last Name:
-            </Col>
-            <Col xs='6'  className="lead p-2 text-left text-white" style={{ opacity: 0.87 }}>
-            {account.lastName}
-            </Col>
-            <Col></Col>
-        </Row>
-        
         <Row>
             <Col xs="4"></Col>
             <Col xs='2'  className="lead p-2 text-left text-white" style={{ opacity: 0.87 }}>

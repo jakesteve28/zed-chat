@@ -8,7 +8,7 @@ export const inviteSlice = createSlice({
     acceptedInvites: []
   },
   reducers: {
-    clearInvites: (state, action) => {
+    clearInvites: (state) => {
         state.sentInvites = []
         state.receivedInvites = []
         state.acceptedInvites = []

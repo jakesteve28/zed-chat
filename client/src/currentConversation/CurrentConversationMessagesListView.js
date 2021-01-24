@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux'
 
 import './messages.css'
 
+const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function CurrentConversationMessagesListView(props){
     const [ isTyping, setIsTyping] = useState(false)
@@ -31,7 +32,7 @@ export default function CurrentConversationMessagesListView(props){
         if(currentConversation && currentConversation.messages){
             const msgs = [...currentConversation.messages]
             setMessages(msgs.sort((a , b) => {
-                return Date.parse(a.createdAt) - Date.parse(b.createdAt)
+                    return Date.parse(a.createdAt) - Date.parse(b.createdAt)
                 }
             ))
         }
@@ -43,9 +44,6 @@ export default function CurrentConversationMessagesListView(props){
             colRef.current.scrollTop = colRef.current.scrollHeight
     }, [messages])
     useEffect(() => {
-        if(colRef && colRef.current)
-            colRef.current.scrollTop = colRef.current.scrollHeight - 75
-
         if(currentConversation && currentConversation.typing !== undefined){
             setIsTyping(currentConversation.typing)
         }
@@ -62,10 +60,10 @@ export default function CurrentConversationMessagesListView(props){
         :
         <Row className="w-100" style={{ marginTop: 75 }}>
             {(size.width > 768 ? <Col xs="3"></Col> : "")}
-            <Col xs={(size.width > 768 ? "9" : "12")} className="h-100">
-                <Container fluid className="h-100">
+            <Col xs={(size.width > 768 ? "9" : "12")}>
+                <Container fluid>
                     <Row style={{ height: rowHeight}}>
-                        <Col ref={colRef} className="ul" sm={(size.width < 768) ? "10" : "8"} style={{ paddingTop: 75, bottom: 75, height: rowHeight - 10, backgroundColor: "#191919", overflow: "auto", position: "fixed",}}>
+                        <Col ref={colRef} className="ul" sm={(size.width < 768) ? "10" : "8"} style={{ bottom: 150, paddingBottom: 50, height: rowHeight - 10, overflow: "auto", position: "fixed" }}>
                             {messages.map((message) => {
                                 const dateNow = Date.now()
                                 const date = Date.parse(message.createdAt)
@@ -83,18 +81,10 @@ export default function CurrentConversationMessagesListView(props){
                                     dateMeta.hour -= 12;
                                 }
                                 if(stdDate.getTime() < (dateNow - 86400000)){
-                                    switch(stdDate.getDay()){
-                                        case 0:  dateMeta.day = "Sunday"; break;
-                                        case 1:  dateMeta.day = "Monday"; break;
-                                        case 2:  dateMeta.day = "Tuesday"; break;
-                                        case 3:  dateMeta.day = "Wednesday"; break;
-                                        case 4:  dateMeta.day = "Thursday"; break;
-                                        case 5:  dateMeta.day = "Friday"; break;
-                                        case 6:  dateMeta.day = "Saturday"; break;
-                                        default :  dateMeta.day = undefined; break;
-                                    }
+                                    dateMeta.day = weekdays[stdDate.getDay()];
                                 }
                                 const minsAgo = ((dateNow - date) / 1000 ) / 60;
+                                
                                 return (message.user.id === account.id) ? (
                                     <Container key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto" }} fluid>
                                         <Row className="mt-1 mb-1">
@@ -126,30 +116,32 @@ export default function CurrentConversationMessagesListView(props){
                                        </Row>
                                     </Container>)
                             })}
-                            {
-                                (isTyping) ? (
-                                <Container  key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto" }} fluid>
-                                    <Row className="mt-1 mb-1">
-                                    <Col xs="1"></Col>
-                                    <Col xs="9" className="text-left">
-                                        <div className="p-2 m-1 text-white" style={{ borderRadius: "18px", display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#404040"}}><Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />
-                                        </div>
-                                    </Col>
-                                    <Col xs="3" className="text-center">
-                                    </Col>
-                                    </Row>
-                                    <Row className="" style={{ marginTop: -10 }}>
-                                            <Col xs="9" className="text-left pl-4">
-                                                <span className="font-italic text-left text-muted"></span>
-                                            </Col>
-                                            <Col xs="3" className="text-center">
-                                            </Col>
-                                    </Row>
-                                </Container>
-                                ) : ""
-                            }
                         </Col>
                     </Row>
+                    {
+                    (isTyping) ? (
+                    <Row>
+                        <Container  key={Math.random()} style={{ position: "fixed", bottom: 135 }} fluid>
+                                <Row className="mt-1 mb-1">
+                                <Col xs="1"></Col>
+                                <Col xs="9" className="text-left">
+                                    <div className="p-2 m-1 text-white" style={{ borderRadius: "18px", display:"inline-block", whiteSpace: "nowrap", backgroundColor: "#404040"}}><Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />&nbsp;<Spinner animation="grow" size="sm" />
+                                    </div>
+                                </Col>
+                                <Col xs="3" className="text-center">
+                                </Col>
+                                </Row>
+                                <Row className="" style={{ marginTop: -10 }}>
+                                        <Col xs="9" className="text-left pl-4">
+                                            <span className="font-italic text-left text-muted"></span>
+                                        </Col>
+                                        <Col xs="3" className="text-center">
+                                        </Col>
+                                </Row>
+                        </Container>
+                    </Row>
+                    ) : ""
+                    }
                 </Container>
             </Col>
         </Row>

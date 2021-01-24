@@ -201,9 +201,9 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage("sendFriendRequest")
-    async handleSendFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleSendFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             let errmsg = '';
             const socketId = client.id;
             if(msg.senderId === msg.recipientId) throw "Cannot send friend requests to self";

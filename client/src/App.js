@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
+import './index.css'
 import LoginScreen from './login/loginScreen'
 import CreateAccount from './account/CreateAccount';
 import { Container } from 'react-bootstrap';
@@ -19,15 +20,18 @@ import GuardedRoute from './login/loginGuard'
 import Settings from './account/Settings'
 import NotificationSocket from './socket/notificationSocket'
 import ChatSocket from './socket/chatSocket';
-import Splash from './splash/Splash'
 import { useTransition, animated, config } from 'react-spring'
 import { selectShowConvList } from './currentConversation/conversationsSlice'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import useWindowSize from './sidebar/windowSize';
+import NewConversation from './newConversation/NewConversation';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: "#191919",
-    height: "100%"
+    height: "100%",
+    minHeight: "100%"
   },
   content: {
     flexGrow: 1,
@@ -39,8 +43,7 @@ const useStyles = makeStyles((theme) => ({
   contentConv: {
     display: 'flex',
     flexDirection: "column",
-    height: "90%",
-    overflow: "auto"
+    height: "90%"
   },
   menuButton: {
     marginRight: theme.spacing(3),
@@ -49,102 +52,138 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   '@global': {
-    '*::-webkit-scrollbar': {
+    '::-webkit-scrollbar': {
       width: '1.2em'
     },
-    '*::-webkit-scrollbar-track': {
+    '::-webkit-scrollbar-track': {
       '-webkit-box-shadow': 'inset 0 0 15px rgba(0,0,0,0.0)',
       borderRadius: '10px',
       backgroundColor: 'rgba(0,0,0,.1)',
     },
-    '*::-webkit-scrollbar-thumb': {
+    '::-webkit-scrollbar-thumb': {
       backgroundColor: 'rgba(125,125,125,.1)',
       borderRadius: '10px',
       height: '30px',
       maxHeight: '30px'
     },
-    '*::-webkit-scrollbar-track-piece': {
+    '::-webkit-scrollbar-track-piece': {
       height: '30px'
   }
   }
 }));
 
 function Login(){
-  const classes = useStyles();
-  const notify = () => toast.info("Hello!\r\n This application uses cookies to authenticate you with the server.", { position: "top-center", hideProgressBar: true, pauseOnHover: true} );
-  useEffect(() => { notify(); } , [] );
-  return (<div className={classes.root} style={{ animation: `fadeIn 1.8s` }}>
-
-  <CssBaseline />
-  <TopBar></TopBar>
-    <main className={classes.content}>
+    return (
+      <Container className="w-100 h-100" 
+        style={{ 
+          backgroundImage: `url("https://oregonwild.org/sites/default/files/featured-imgs/MtHood.JohnEklund.jpg")`, 
+          margin: "auto",
+          backgroundPosition: "center right",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundColor: "#191919"
+        }} 
+        fluid 
+        >
+        <CssBaseline />
+        <TopBar></TopBar>
         <LoginScreen></LoginScreen>
-    </main>
-  </div>)
+      </Container>
+  )
 }
 
 function Fgpw(){
-  const classes = useStyles();
-  return(<div className={classes.root}>
-  <CssBaseline />
-  <TopBar></TopBar>
-  <main className={classes.content}>
-      <ForgotPassword></ForgotPassword>
-  </main></div>
+  return (
+      <Container className="w-100 h-100" 
+        style={{ 
+          backgroundImage: `url("https://oregonwild.org/sites/default/files/featured-imgs/MtHood.JohnEklund.jpg")`, 
+          margin: "auto",
+          backgroundPosition: "center right",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundColor: "#191919"
+        }} 
+        fluid 
+        >
+        <CssBaseline />
+        <TopBar></TopBar>
+        <ForgotPassword></ForgotPassword>
+      </Container>
   )
 }
 
 function CreateAcc(){
-  const classes = useStyles();
   return (
-    <div className={classes.root}>
-    <CssBaseline />
-    <TopBar></TopBar>
-    <main className={classes.content}>
+      <Container className="w-100 h-100" 
+        style={{ 
+          backgroundImage: `url("https://oregonwild.org/sites/default/files/featured-imgs/MtHood.JohnEklund.jpg")`, 
+          margin: "auto",
+          backgroundPosition: "center right",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundColor: "#191919"
+        }} 
+        fluid 
+        >
+        <CssBaseline />
+        <TopBar></TopBar>
         <CreateAccount></CreateAccount>
-    </main></div>
+      </Container>
   )
 }
 
-function Home(){
+function Home(){ 
   const showConvList = useSelector(selectShowConvList)
-
+  const size = useWindowSize();
   return (
-    <div>
+    <div className="w-100 h-100" style={{ backgroundColor: "#191919 "}}>
       <NotificationSocket></NotificationSocket>
       <ChatSocket></ChatSocket>
-      <Container fluid className="w-100 view-height">
-      <CssBaseline />
+      <Container fluid className="w-100 h-100" style={{ 
+        backgroundImage: `url("https://oregonwild.org/sites/default/files/featured-imgs/MtHood.JohnEklund.jpg")`, 
+        margin: "auto",
+        backgroundPosition: "center right",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover"
+      }} 
+      >
+        <CssBaseline />
         <TopBar></TopBar>
         { (showConvList) ? (<Sidebar></Sidebar>) :
           (
             <>
               <Sidebar></Sidebar>
-              <Container fluid className="w-100 view-height">
+              <Container fluid className="w-100">
               
-                <CurrentConversationContainer className="w-100 view-height" ></CurrentConversationContainer>
+                <CurrentConversationContainer className="w-100" ></CurrentConversationContainer>
               </Container>
             </>
-         )}
-        <Container fluid className="w-100 view-height">
-            <CurrentConversationContainer></CurrentConversationContainer>
-        </Container>
+        )}
       </Container>
     </div>
     )
-}
+}   
 
-function Conversations(){
-  const classes = useStyles();
+function NewConv(){
+  const size = useWindowSize();
   return (
-    <Container fluid className={classes.root}>
+    <div className="w-100 h-100">
+      <NotificationSocket></NotificationSocket>
+      <ChatSocket></ChatSocket>
       <CssBaseline />
-      <TopBar></TopBar>
-      <Sidebar></Sidebar>
-      <Container fluid className="w-100">
-          <CurrentConversationContainer></CurrentConversationContainer>
-      </Container>
-    </Container>
+        <TopBar></TopBar>
+        <Sidebar></Sidebar>
+        <Container fluid className="w-100 h-100" style={{ 
+            backgroundImage: `url("https://oregonwild.org/sites/default/files/featured-imgs/MtHood.JohnEklund.jpg")`, 
+            margin: "auto",
+            backgroundPosition: "center right",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            paddingTop: "100px"
+          }} >
+          <NewConversation></NewConversation>
+        </Container>
+    </div>
     )
 }
 
@@ -171,8 +210,8 @@ function Main(){
         <Route path="/forgotPassword" component={Fgpw}></Route>
         <Route path="/createAccount" component={CreateAcc}></Route>
         <GuardedRoute path="/home" component={Home} auth={auth.loggedIn}></GuardedRoute>
-        <GuardedRoute path="/conversations" component={Conversations} auth={auth.loggedIn}></GuardedRoute>
         <GuardedRoute path="/settings" component={SettingScr} auth={auth.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/newConversation" component={NewConv} auth={auth.loggedIn}></GuardedRoute>
         <GuardedRoute path="/" component={Home} auth={auth.loggedIn}></GuardedRoute>
       </Switch>
   </Router>
@@ -181,10 +220,8 @@ function Main(){
 
 
 const pages = [
-  { id: 0, jsx: ({ style }) => <Splash></Splash> },
-  { id: 1, jsx: ({ style }) => <Main></Main> }
+  { displayName:"MainPage", id: 0, jsx: ({ style }) => (<Main></Main>) }
 ]
-
 
 function App() {
   const [index, set] = useState(0)
@@ -194,11 +231,11 @@ function App() {
     leave: { opacity: 0 },
     config: config.stiff,
   })
-  useEffect(() => setTimeout(() => set(state => state += 1), 1000), [])
+  const classes = useStyles();
   return transitions.map(({ item, props, key }) => (
-    <animated.div key={key} className="bg">
+    <animated.div key={key} className="bg" style={{backgroundColor: "#191919"}}>
     <ToastContainer toastClassName="bg-gray-600" />
-      { item.jsx({ style: { ...props, height: "100%" }}) }
+      { item.jsx({ style: { ...props, height: "100%", backgroundColor: "#191919" }, className: classes.root }) }
     </animated.div>
   ))
 }

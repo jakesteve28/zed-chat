@@ -28,6 +28,17 @@ export const options: TypeOrmModuleOptions = {
   entities: [User, Message, Invite, FriendRequest, Conversation]
 }
 
+export const optionsDev: TypeOrmModuleOptions = {
+  type: "mysql",
+  host: "mysql",
+  port: 3306,
+  username: "root",
+  password: "root",
+  database: "zed-chat",
+  synchronize: true,
+  entities: [User, Message, Invite, FriendRequest, Conversation]
+}
+
 @Module({
   imports: [TypeOrmModule.forRoot(options), UserModule, AuthModule, ConversationModule,  InviteModule, MessageModule, ConfigModule.forRoot({
     isGlobal: true,

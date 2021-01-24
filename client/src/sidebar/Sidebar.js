@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removeConversation, selectConversations, setCurrentConversation, selectShowConvList, setShowConvList  } from '../currentConversation/conversationsSlice';
 import { setView } from '../currentConversation/conversationsSlice';
 import SelectableContext from "react-bootstrap/SelectableContext";
-import { chatSocket } from '../socket/chatSocket';
 import { selectAccount } from '../account/accountSettingsSlice' ;
 
 const useStyles = makeStyles((theme) => ({
@@ -24,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
         animationDuration: "1s"
     },
     animate_out: {
-        width: "25%",
+        width: "200px",
         flexShrink: 0,
         animationName: "fadeout",
         animationDuration: "1s"
@@ -51,15 +50,16 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     drawerPaper: {
-        width: "25%",
+        width: "22%",
+        minWidth: "280px",
         backgroundColor: "#222222",
+        opacity: 0.8
       },
       hidePaper: {
         backgroundColor: "#222222",
         width: "0%",
       },
     drawerContainer: {
-      //overflow: 'ellipsis',
       backgroundColor: "#222222",
       color: "white"
     },
@@ -99,9 +99,8 @@ export default function Sidebar(){
         }
     }
     const handleDelete = (convId) => {
-        console.log("Deleting Conversation " + convId)
-
-        dispatch(removeConversation({ id: convId }))
+        console.log("Deleting Conversation " + convId);
+        dispatch(removeConversation({ id: convId }));
     }
     const handleLeave = (convId) => {
         console.log("Leaving Conversation " + convId)
@@ -145,11 +144,11 @@ export default function Sidebar(){
                             return ""
                         }
                         const id = el.id;
-                        return (<ListItem style={{ borderBottom: "2px solid #505050"}} className={classes.listItem} selected={false} button key={`text + ${Math.random()}`}>
+                        return (<ListItem style={{ }} className={classes.listItem} selected={false} button key={`text + ${Math.random()}`}>
                             <Container onClick={() => cl(el)} fluid style={{ minWidth: "195px" }}>
                                 <Row className="pb-4 mt-3" style={{ minWidth: "210px" }}>
                                     <Col lg="12" style={{ minWidth: "200px" }}>
-                                        <Container fluid style={{ minWidth: "200" }}>
+                                        <Container fluid style={{ minWidth: "200px" }}>
                                         <Row className="font-weight-bold text-primary">
                                             <h5>{el ? el.conversationName : ""}</h5>
                                         </Row>

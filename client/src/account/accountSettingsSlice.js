@@ -3,8 +3,6 @@ import { createSlice } from '@reduxjs/toolkit';
 export const accountSlice = createSlice({
   name: 'account',
   initialState: {
-    firstName: "",
-    lastName: "",
     email: "",
     tagName: "",
     loggedIn: false,
@@ -12,20 +10,12 @@ export const accountSlice = createSlice({
     id: ""
   },
   reducers: {
-    clearAccount: (state, action) => {
-      state.firstName = "";
-      state.lastName = "";
+    clearAccount: (state) => {
       state.email = "";
       state.tagName = "";
       state.loggedIn = false;
       state.contacts = [];
       state.id = "";
-    },
-    setFirstName: (state, action) => {
-        state.firstName = action.payload
-    },
-    setLastName: (state, action) => {
-        state.lastName = action.payload
     },
     setEmail: (state, action) => {
         state.email = action.payload
@@ -48,7 +38,7 @@ export const accountSlice = createSlice({
   },
 });
 
-export const { clearAccount, setId, setFirstName, setLastName, setEmail, setTagName, login, logout } = accountSlice.actions;
+export const { clearAccount, setId, setEmail, setTagName, login, logout } = accountSlice.actions;
 
 // // The function below is called a thunk and allows us to perform async logic. It
 // // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -66,8 +56,6 @@ export const { clearAccount, setId, setFirstName, setLastName, setEmail, setTagN
 export const selectAccount = state => {
   return {
     id: state.account.id,
-    firstName: state.account.firstName,
-    lastName: state.account.lastName,
     email: state.account.email,
     tagName: state.account.tagName,
     loggedIn: state.account.loggedIn

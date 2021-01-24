@@ -1,11 +1,25 @@
 version: "3"
-
 services:
+  main: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "3002:3002"
+    depends_on:
+      - mysql
+    links:
+      - mysql:mysql
+    volumes:
+      - .:/app
+      - /app/node_modules 
   mysql:
     image: mysql:5
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: hiddeninzed
       MYSQL_DATABASE: zed-chat
+      MYSQL_PASSWORD: root
     ports:
-      - "3306:3306"
+      - 3306:3306

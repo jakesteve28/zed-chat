@@ -9,7 +9,7 @@ export const conversationsSlice = createSlice({
     showConvList: false
   },
   reducers: {
-    clearConversations: (state, action) => {
+    clearConversations: (state) => {
         state.conversations = [];
         state.currentConversation = { messages: [], joined: false, typing: false };
         state.defaultView = true;

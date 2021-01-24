@@ -7,7 +7,7 @@ export const friendsSlice = createSlice({
     friendRequests: []
   },
   reducers: {
-    clearFriends: (state, action) => {
+    clearFriends: (state) => {
        state.friendRequests = []
        state.friends = []
     },

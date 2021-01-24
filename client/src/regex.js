@@ -4,4 +4,6 @@ export default {
     email: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
     firstName: /^([A-Z]){1}([a-zA-Z]){1,32}$/,
     lastName: /^([A-Z]){1}([a-zA-Z]){1,32}$/,
+    messageBody: /^(.){1,200}$/,
+    conversationName: /^(.){4,64}$/
 };

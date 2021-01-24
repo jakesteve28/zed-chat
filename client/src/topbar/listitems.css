@@ -1,0 +1,19 @@
+.friend-list-item-row {
+    background-color: #222222;
+}
+
+.friend-list-item-row:hover {
+    background-color: #303030;
+}
+
+.hidden-dropdown-friend-list-item {
+    display: none !important;
+}
+
+.friend-list-item-row:hover .hidden-dropdown-friend-list-item {
+    display: inline !important;
+    margin-right: 85%;
+    width: 50px !important;
+}
+
+
