@@ -15,5 +15,34 @@
     margin-right: 85%;
     width: 50px !important;
 }
+.accepted-list-item {
+    background-color: #202020;
+    color: white;
+    padding-top: 15px !important;
+}
+.accepted-list-item:hover {
+    background-color: #303030;
+    cursor:pointer;
+}
+.accepted-list-item:hover > .button-bg {
+    background-color: #303030;
+}
+.accepted-list-item:hover .button-bg {
+    background-color: #303030 !important;
+}
+.accepted-list-item .button-bg {
+    background-color: #202020 !important;
+}
+.friend-request-list-item {
+    background-color: #202020;
+    color: white !important;
+    padding-top: 15px !important;
+}
 
+.friend-request-list-item:hover {
+    background-color: #303030 !important;
+}
 
+.friend-request-list-item:hover .button-bg {
+    background-color: #303030 !important;
+}

@@ -18,7 +18,7 @@ import { notificationSocket } from '../socket/notificationSocket';
 import { Modal } from '@material-ui/core';
 import PasswordModalBody from './SetPWModal';
 import BackgroundModalBody from './SetBGModal';
-
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 const FriendCheckbox = withStyles({
     root: {
         color: "#303030",
@@ -210,15 +210,15 @@ export default function NewConversation(){
     return (
         <div className={(sidebarAlign) ? "sidebar-padding new-conv-container" : "new-conv-container"}>
             <Row className="pb-4 mb-4"  style={{ borderBottom: "1px solid #303030" }}>
-                <Col className="text-center lead" style={{ color: "#EEEEEE", opacity: 0.75 }}>
-                    <h4>Create New Chat</h4>
+                <Col className="text-center" style={{ color: "#EEEEEE", opacity: 0.8 }}>
+                    <QuestionAnswerIcon style={{ height: 40, width: 40}}></QuestionAnswerIcon>
                 </Col>
             </Row>
             <Row className="mt-2 mb-2"  style={{ borderBottom: "1px solid #303030" }}>
                 <Col className="text-center mx-auto friend-search-new-chat">
                     <InputGroup className="mt-2 mx-auto">
                         <FormControl
-                            style={{ textAlign: "center", color: "#3b90ff", minHeight: '50px', border: 'none', backgroundColor: "#191919", }}
+                            style={{ textAlign: "center", fontSize: "19pt", opaciyt: 0.8, color: "#d9534f", minHeight: '50px', border: 'none', backgroundColor: "#191919", }}
                             placeholder="Enter Chat Name"
                             aria-label="Enter Chat Name"
                             aria-describedby="basic-addon1"
@@ -234,12 +234,12 @@ export default function NewConversation(){
                 <Col className="text-center mx-auto">
                     <InputGroup className="mb-3 mt-2 mx-auto">
                         <FormControl
-                            style={{ textAlign: "center", color: "#3b90ff", minHeight: '50px', border: 'none', backgroundColor: "#191919" }}
+                            style={{ textAlign: "center", fontSize: "18pt", color: "#EEEEEE", opacity: 0.8, minHeight: '50px', border: 'none', backgroundColor: "#191919" }}
                             placeholder="Search friend tagnames"
                             aria-label="Search friend tagnames"
                             aria-describedby="basic-addon1"
                             onChange={ e => _setSearchBar(e.target.value) }
-                            className={ (errorSearch) ? "mx-auto lead form-control-red" : "mx-auto lead form-control-custom"}
+                            className={ (errorSearch) ? "mx-auto lead form-control-red font-italic" : "mx-auto lead form-control-custom font-italic"}
                             value={searchBar}
                             autoComplete="new-password"
                             name="searchFriendsNewConv"
@@ -247,7 +247,7 @@ export default function NewConversation(){
                     </InputGroup>
                 </Col>
                 <Col xs="2" className="text-left pr-3">
-                    <Button onClick={() => { filterList() }} variant="dark" style={{ marginTop: "10px", display: "block", backgroundColor: "#191919", border: "none" }}><span className="text-primary text-lg-center"><SearchOutlined style={{ color: "#2499bf", height: 35, width: 35, cursor: "pointer"}}></SearchOutlined></span></Button>
+                    <Button onClick={() => { filterList() }} variant="dark" style={{ marginTop: "10px", display: "block", backgroundColor: "#191919", border: "none" }}><span className="text-primary text-lg-center"><SearchOutlined style={{ color: "#BBBBBB", height: 35, width: 35, cursor: "pointer"}}></SearchOutlined></span></Button>
                 </Col>
             </Row>
             <Row>
@@ -286,31 +286,15 @@ export default function NewConversation(){
 
                         }} onClick={ () => setPasswordOpened(true) }>
                             <Tooltip title="Set Password">
-                                    <EnhancedEncryptionIcon style={{ color: "#2499bf", width: 50, height: 50 }}></EnhancedEncryptionIcon>
+                                    <EnhancedEncryptionIcon style={{ color: "#BBBBBB", width: 50, height: 50 }}></EnhancedEncryptionIcon>
                             </Tooltip>
                         </Button>
                 </Col>
-                <Modal
-                    open={backgroundOpened}
-                    onClose={() => setBackgroundOpened(false)}
-                    aria-labelledby="simple-modal-title"
-                    aria-describedby="simple-modal-description"
-                >
-                    <BackgroundModalBody handleSetBackgroundImage={handleSetBackgroundImage} ></BackgroundModalBody>
-                </Modal>
-                <Col xs="4" className="p-2 mt-3">
-                    <Button variant="dark"  disabled={buttonsDisabled} style={{ backgroundColor: "#191919", border: "none", opacity: (buttonsDisabled) ? 0.5 : 1.0,
-                        
-                    }} onClick={ () => setBackgroundOpened(true) }>
-                    <Tooltip title="Set Background">
-                        <InsertPhotoIcon style={{ color: "#2499bf", width: 50, height: 50 }}></InsertPhotoIcon>
-                    </Tooltip>
-                    </Button>
-                </Col>
+                <Col xs="4"></Col>
                 <Col xs="4" className="mt-3 p-2">
                     <Button className="rounded-pill" disabled={buttonsDisabled} style={{ opacity: (buttonsDisabled) ? 0.5 : 1.0,  border: "none", backgroundColor: "#191919", minWidth: "100px" }} onClick={ () => submit() }>
                         <Tooltip title="Send Chat Invite(s)">
-                            <SendIcon style={{ color: "#2499bf", width: 50, height: 50 }}></SendIcon>
+                            <SendIcon style={{ color: "#BBBBBB", width: 50, height: 50 }}></SendIcon>
                         </Tooltip>
                     </Button>
                 </Col>
@@ -325,3 +309,24 @@ export default function NewConversation(){
             </Row>
         </div>)
 }
+
+//TODO put this into a better place. 
+//i.e. there is a default color that the base picture (pic/default color settable per user) fades into 
+//     Then it is set by the user(s) after they enter the conversation
+// <Modal
+// open={backgroundOpened}
+// onClose={() => setBackgroundOpened(false)}
+// aria-labelledby="simple-modal-title"
+// aria-describedby="simple-modal-description"
+// >
+// <BackgroundModalBody handleSetBackgroundImage={handleSetBackgroundImage} ></BackgroundModalBody>
+// </Modal>
+// <Col xs="4" className="p-2 mt-3">
+// <Button variant="dark"  disabled={buttonsDisabled} style={{ backgroundColor: "#191919", border: "none", opacity: (buttonsDisabled) ? 0.5 : 1.0,
+    
+// }} onClick={ () => setBackgroundOpened(true) }>
+// <Tooltip title="Set Background">
+//     <InsertPhotoIcon style={{ color: "#2499bf", width: 50, height: 50 }}></InsertPhotoIcon>
+// </Tooltip>
+// </Button>
+// </Col>

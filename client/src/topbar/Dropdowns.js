@@ -111,18 +111,18 @@ export function FriendsDropdown(){
     }
 
     return (
-      <Dropdown className="ml-3 p-1" style={{ backgroundColor: "#191919", opacity: 0.8}} >
+      <Dropdown className="ml-3 p-1" style={{ backgroundColor: "#191919", opacity: 0.9}} >
         <Dropdown.Toggle as="button" style={{ border: "none", color: "white", backgroundColor: "#191919" }} className="font-weight-bold rounded-pill ml-2">
             <PeopleAltIcon></PeopleAltIcon>
         </Dropdown.Toggle>
         <Dropdown.Menu style={{ backgroundColor: "#191919 ", minWidth: "325px"}} className="shadow my-dropdown my-dropdown-">
-        <Dropdown.ItemText className="text-center font-weight-bold" style={{ opacity: 0.7 }}></Dropdown.ItemText>
+        <Dropdown.ItemText className="text-center font-weight-bold lead" style={{ opacity: 0.7, color: "#2499bf" }}>Friends</Dropdown.ItemText>
           <Container fluid className="" style={{ maxHeight: "320px", minHeight: "320px", minWidth: "325px"}}>
             <Row className="m-1 mt-2 mb-2">
               <Col xs="10">
                   <InputGroup>
                     <FormControl
-                      style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minWidth: "200px", minHeight: '50px', backgroundColor: "#505050", border: 'none' }}
+                      style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
                       placeholder="Add Friend By Tagname"
                       aria-label="Add Friend By Tagname"
                       aria-describedby="basic-addon1"
@@ -132,14 +132,14 @@ export function FriendsDropdown(){
                 </InputGroup>
               </Col>
               <Col xs="2">
-                <Button variant="dark" className="mr-3 pr-2" style={{ display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => sendFriendRequest() }><span className={(addError) ? "text-danger": ""}><PersonAddIcon></PersonAddIcon></span></Button>
+                <Button variant="dark" className="mr-3 pr-2" style={{ display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => sendFriendRequest() } disabled={(addFriendInput.length > 8)}><PersonAddIcon style={{ height: 30, width: 30, color: "#2499bf" }}></PersonAddIcon></Button>
               </Col>
             </Row> 
             <Row className="m-1 mt-2 mb-2 border-bottom border-dark mb-1 pb-3">
                 <Col xs="10">
                     <InputGroup>
                       <FormControl
-                        style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#505050", border: 'none' }}
+                        style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
                         placeholder="Search Friends..."
                         aria-label="Search Friends..."
                         aria-describedby="basic-addon1"
@@ -149,7 +149,7 @@ export function FriendsDropdown(){
                   </InputGroup>
                 </Col>
                 <Col xs="2">
-                  <Button variant="dark" style={{  display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => searchFriends() }><span className={(searchError) ? "text-danger": ""}><SearchOutlined></SearchOutlined></span></Button>
+                  <Button variant="dark" style={{  display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => searchFriends() }><SearchOutlined style={{ height: 30, width: 30, color: "#2499bf" }}></SearchOutlined></Button>
                 </Col>
               </Row> 
               <Row style={{ maxWidth: "250px", minWidth: "250px", overflowY: "scroll", marginRight: "auto", marginLeft: "15px"}} className="mt-1 pb-1">
@@ -260,15 +260,15 @@ export function NotificationsDropdown(){
             <NotificationsNoneIcon></NotificationsNoneIcon>
           }
         </Dropdown.Toggle>       
-          <Dropdown.Menu style={{ backgroundColor: "#191919 ", minWidth: "300px" }} className="my-dropdown my-dropdown-">
-            <Dropdown.ItemText className="text-center text-white" style={{ opacity: 0.67 }}>Notifications</Dropdown.ItemText>
+          <Dropdown.Menu style={{ backgroundColor: "#191919 ", minWidth: "350px" }} className="my-dropdown my-dropdown-">
+            <Dropdown.ItemText className="text-center font-weight-bold lead p-3 pb-4" style={{ opacity: 0.7, borderBottom: "1px solid #606060"  }}><span style={{ color: "#2499bf" }}>Notifications</span></Dropdown.ItemText>
             <Container fluid style={{ maxHeight: "250px", minHeight: "250px", minWidth: "250px", overflowY: "scroll"}}>
             <Tabs className="tabs-notifications" defaultActiveKey="received" id="uncontrolled-tab-example">
               <Tab className="tab-notifications" eventKey="received" title="Received">
                 {friendRequests.filter(map => map.recipientId === account.id).map((el) => {
                   if(el && el.accepted === false && el.cancelled === false && el.sender.id !== account.id){
                     return (
-                      <FriendRequestListItem requestId={el.id} recipientId={el.recipientId} sender={el.sender} key={`${el.id}`}></FriendRequestListItem>
+                      <FriendRequestListItem requestId={el.id} recipientId={el.recipientId} sender={el.sender} tagName={el.sender.tagName} key={`${el.id}`}></FriendRequestListItem>
                     )
                   } else return null;                         
                 })}

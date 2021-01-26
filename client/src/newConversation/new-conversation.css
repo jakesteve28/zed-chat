@@ -1,7 +1,6 @@
 .friend-new-chat {
     max-width: 325px;
     padding: 20px;
-    opacity: 0.9;
     background-color: #191919;
     border-radius: 5px;
     text-align: left !important;
@@ -15,7 +14,7 @@
     padding-left: 20px;
     font-size: large;
     opacity: 0.87;
-    color: #368af7;
+    color: #EEEEEE;
 }
 
 .friend-list-item-checkbox {
@@ -31,7 +30,7 @@
 .new-conv-container {
     padding: 50px;
     border-radius: 15px;
-    opacity: 0.8;
+    opacity: 0.9;
     text-align: center !important;
     background-color: #191919;
     max-width: 500px;
@@ -53,28 +52,29 @@
 }
 
 .form-control-custom::placeholder {
-    color: #368af7 !important; 
-    font-style: italic;
+    color: #EEEEEE !important; 
+    font-size: 18pt;
+    opacity: 0.6;
 }
 .form-control-custom::-webkit-input-placeholder {
-    color: #368af7 !important; 
-    font-style: italic;
+    color: #EEEEEE !important; 
+    font-size: 24;
 }
 .form-control-custom:-moz-placeholder {
-    color: #368af7 !important; 
-    font-style: italic;
+    color: #EEEEEE !important; 
+    font-size: 24;
 }
 .form-control-custom::-moz-placeholder {
-    color: #368af7 !important; 
-    font-style: italic;
+    color: #EEEEEE !important; 
+    font-size: 24;
 }
 .form-control-custom::placeholder {
-    color: #368af7 !important; 
-    font-style: italic;
+    color: #EEEEEE !important; 
+    font-size: 24;
 }
 .form-control-custom:-ms-input-placeholder {
-    color: #368af7 !important; 
-    font-style: italic;
+    color: #EEEEEE !important; 
+    font-size: 24;
 }
 
 .form-control-custom:focus {
@@ -84,27 +84,27 @@
 
 .form-control-red::placeholder {
     color: #d9534f !important; 
-    font-style: italic;
+    font-size: 24;
 }
 .form-control-red::-webkit-input-placeholder {
     color: #d9534f !important; 
-    font-style: italic;
+    font-size: 24;
 }
 .form-control-red:-moz-placeholder {
     color: #d9534f !important; 
-    font-style: italic;
+    font-size: 24;
 }
 .form-control-red::-moz-placeholder {
     color: #d9534f !important; 
-    font-style: italic;
+    font-size: 24;
 }
 .form-control-red::placeholder {
     color: #d9534f !important; 
-    font-style: italic;
+    font-size: 24;
 }
 .form-control-red:-ms-input-placeholder {
     color: #d9534f !important; 
-    font-style: italic;
+    font-size: 24;
 }
 
 .form-control-red:focus {

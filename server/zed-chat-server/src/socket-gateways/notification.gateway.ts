@@ -280,13 +280,13 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage("acceptFriendRequest")
-    async handleAcceptFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean>{
+    async handleAcceptFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean>{
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             const socketId = client.id;
             const friendRequest = await this.friendRequestService.acceptFriendRequest(msg.friendRequestId);
             const acceptorProfile = await this.userService.findOne(friendRequest.recipientId);
-            const sender = await this.userService.findOne(friendRequest.sender.id);
+            const sender = await this.userService.findByTagName(friendRequest.sender.tagName);
             if(friendRequest){   
                 if(sender.notificationSocketId !== 'disconnected'){
                     this.wss.to(sender.notificationSocketId).emit('friendAdded', { friendRequest: friendRequest, acceptor: acceptorProfile });

@@ -7,6 +7,10 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import './listitems.css';
 import './topbar.css';
 import { notificationSocket } from '../socket/notificationSocket';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import GroupAddOutlinedIcon from '@material-ui/icons/GroupAddOutlined';
+import NotInterestedOutlinedIcon from '@material-ui/icons/NotInterestedOutlined';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export function FriendListItem({ isOnline, tagName  }){
     return (
@@ -23,21 +27,34 @@ export function FriendListItem({ isOnline, tagName  }){
     )
   }
   
-export function FriendRequestListItem({ sender: { tagName }, requestId, recipientId, }){
+export function FriendRequestListItem({ requestId, tagName }){
     const account = useSelector(selectAccount);
-
     const acceptFriendRequest = () => {
-        alert("Accept friend requet callback")
+        if(notificationSocket){
+            console.log("Emitted acceptFriendRequest");
+            notificationSocket.emit("acceptFriendRequest", {
+                friendRequestId: requestId 
+            }, () => {
+                console.log("Successfully emitted accept friend request");
+            });
+        }
     }
-
     return (tagName === account.tagName) ? "" : (
         <Row className="friend-request-list-item p-2">
-            <Col className="text-small text-muted text-center my-auto" style={{ opacity: 0.67 }}>
+            <Col className="text-small text-center my-auto" style={{ opacity: 0.67 }}>
                 Friend request from @{tagName}
             </Col>
             <Col xs="5" className="text-center p-2"  style={{ opacity: 0.67 }}>
-                <Button className="btn-sm mb-1 rounded-pill" style={{ border: "none", color: "#97fa93", backgroundColor: "#191919", opacity: 0.9 }} onClick={() => { acceptFriendRequest() }}>Accept</Button> 
-                <Button className="btn-sm rounded-pill" style={{ border: "none", color: "#bf2700", backgroundColor: "#191919" }} onClick={() => alert("Decline friend request")}>Decline</Button>
+                <Button className="button-bg mb-1 rounded-pill" style={{ border: "none", color: "#97fa93", backgroundColor: "#191919", opacity: 0.9 }} onClick={() => { acceptFriendRequest() }}>
+                    <Tooltip title="Accept">
+                        <GroupAddOutlinedIcon></GroupAddOutlinedIcon>
+                    </Tooltip>
+                </Button> 
+                <Button className="button-bg rounded-pill" style={{ border: "none", color: "#bf2700", backgroundColor: "#191919" }} onClick={() => alert("Decline friend request")}>
+                    <Tooltip title="Decline">
+                        <NotInterestedOutlinedIcon></NotInterestedOutlinedIcon>
+                    </Tooltip>
+                </Button>
             </Col> 
         </Row>
     )
@@ -62,13 +79,21 @@ export function ReceivedInviteListItem({sender, inviteId, convId }){
 export function AcceptedInviteListItem({ convId, sender }){
     const conversations = useSelector(selectConversations)
     const conv = conversations.filter(conv =>  conv.id === convId)[0]
+    //TODO
+    //This right here is the old logic for how I navigated between the current view and the conv
+    //So go thru and replace it all with the new UI redux stuff in uiSlice
+    //onClick={() => { dispatch(setView(false)); dispatch(setCurrentConversation(conv))}
     return (
-        <Row className="p-3 invite-hover">
-            <Col className="text-small text-muted text-center my-auto" style={{ opacity: 0.67 }}>
+        <Row className="p-3 accepted-list-item">
+            <Col className="text-small text-center my-auto" style={{ opacity: 0.67 }}>
                 Chat with {`${sender}`.length > 10 ? `${sender}`.substring(0,7) + "..." : `${sender}`}
             </Col>
             <Col xs="5" className="text-center pr-2"  style={{ opacity: 0.67 }}>
-                <Button className="btn-sm mb-1 rounded-pill"  style={{ border: "none", backgroundColor: "#191919", opacity: 0.9 }} onClick={() => { dispatch(setView(false)); dispatch(setCurrentConversation(conv))}}>Accepted</Button> 
+                <Button className="btn-sm mb-1 rounded-pill button-bg"  style={{ border: "none", backgroundColor: "#191919", opacity: 0.9 }}>
+                    <Tooltip title="Delete">
+                        <DeleteOutlineIcon></DeleteOutlineIcon>
+                    </Tooltip>
+                </Button> 
             </Col>  
         </Row>
     )

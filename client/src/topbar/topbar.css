@@ -3,6 +3,7 @@
     background-color: #191919 !important; 
     border: 1px solid #191919 !important;
     box-shadow: 3px 3px 2px 2px black !important;
+    min-width: 325px;
   }
 
   .my-dropdown > button:hover {
@@ -82,4 +83,10 @@
 }
 .nav-tabs .nav-link {
   color: #999999;
+}
+.tabs-notifications {
+  padding-top: 20px;
+}
+.tabs-notifications:hover {
+  background-color: transparent !important;
 }
