@@ -27,6 +27,7 @@ export class UserService {
       const user = await this.usersRepository.findOne(id, { relations: ["conversations", "friends", "friendRequests"] });
       for(let conv of user.conversations){
         conv.messages = await this.conversationService.getMessages(conv.id);
+        conv.users = await this.conversationService.getUsers(conv.id);
       }
       return user;
   }
@@ -42,6 +43,7 @@ export class UserService {
 
   async findByTagName(tagName: string): Promise<User> {
     const user = await  this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends", "friendRequests"]});
+    
     return user;
   }
 

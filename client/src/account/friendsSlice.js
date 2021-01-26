@@ -12,6 +12,7 @@ export const friendsSlice = createSlice({
        state.friends = []
     },
     addFriend: (state, action) => {
+        if(action.payload.password) delete action.payload.password;
         state.friends = [...state.friends, action.payload]
     },
     removeFriend: (state, action) => {

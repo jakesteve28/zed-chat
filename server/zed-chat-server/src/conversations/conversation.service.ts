@@ -74,6 +74,9 @@ export class ConversationService {
     }
     async getUsers(conversationId: string): Promise<User[]> {
         const conv = await this.conversationRepository.findOne(conversationId, { relations: ["users"]});
+        for(let us of conv.users){
+            delete us.password;
+        }
         return conv.users;
     }
     async getMessages(conversationId: string): Promise<Message[]> {

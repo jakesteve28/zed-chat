@@ -6,6 +6,7 @@ import { selectConversations } from '../currentConversation/conversationsSlice';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import './listitems.css';
 import './topbar.css';
+import { notificationSocket } from '../socket/notificationSocket';
 
 export function FriendListItem({ isOnline, tagName  }){
     return (
@@ -24,13 +25,18 @@ export function FriendListItem({ isOnline, tagName  }){
   
 export function FriendRequestListItem({ sender: { tagName }, requestId, recipientId, }){
     const account = useSelector(selectAccount);
+
+    const acceptFriendRequest = () => {
+        alert("Accept friend requet callback")
+    }
+
     return (tagName === account.tagName) ? "" : (
         <Row className="friend-request-list-item p-2">
             <Col className="text-small text-muted text-center my-auto" style={{ opacity: 0.67 }}>
                 Friend request from @{tagName}
             </Col>
             <Col xs="5" className="text-center p-2"  style={{ opacity: 0.67 }}>
-                <Button className="btn-sm mb-1 rounded-pill" style={{ border: "none", color: "#97fa93", backgroundColor: "#191919", opacity: 0.9 }} onClick={() => { acceptFriendRequest(requestId, recipientId) }}>Accept</Button> 
+                <Button className="btn-sm mb-1 rounded-pill" style={{ border: "none", color: "#97fa93", backgroundColor: "#191919", opacity: 0.9 }} onClick={() => { acceptFriendRequest() }}>Accept</Button> 
                 <Button className="btn-sm rounded-pill" style={{ border: "none", color: "#bf2700", backgroundColor: "#191919" }} onClick={() => alert("Decline friend request")}>Decline</Button>
             </Col> 
         </Row>

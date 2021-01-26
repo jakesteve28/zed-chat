@@ -1,21 +1,37 @@
 .friend-new-chat {
-    max-width: 375px;
+    max-width: 325px;
     padding: 20px;
-    opacity: 0.67;
-    background-color: #404040;
-    border-radius: 15px;
+    opacity: 0.9;
+    background-color: #191919;
+    border-radius: 5px;
     text-align: left !important;
+    margin: 5px;
+    color: #EEEEEE !important;
+    max-height: 75px;
+}
+
+.friend-list-item-tagname {
+    padding: 8px;
+    padding-left: 20px;
+    font-size: large;
+    opacity: 0.87;
+    color: #368af7;
+}
+
+.friend-list-item-checkbox {
+    text-align: left;
+    margin-left: -15px;
 }
 
 .friend-new-chat:hover {
-    background-color: #505050;
+    background-color: #303030;
     cursor: pointer;
 }
 
 .new-conv-container {
     padding: 50px;
-    border-radius: 15;
-    opacity: 0.6;
+    border-radius: 15px;
+    opacity: 0.8;
     text-align: center !important;
     background-color: #191919;
     max-width: 500px;
@@ -29,6 +45,69 @@
 }
 
 .friend-search-new-chat {
-    max-width: 400px;
-    opacity: 0.67;
+    width: 100%;
+    opacity: 1.0;
+    color: turquoise !important; 
+    border-bottom: 1px solid #191919;
+    padding-bottom: 15px;
+}
+
+.form-control-custom::placeholder {
+    color: #368af7 !important; 
+    font-style: italic;
+}
+.form-control-custom::-webkit-input-placeholder {
+    color: #368af7 !important; 
+    font-style: italic;
+}
+.form-control-custom:-moz-placeholder {
+    color: #368af7 !important; 
+    font-style: italic;
+}
+.form-control-custom::-moz-placeholder {
+    color: #368af7 !important; 
+    font-style: italic;
+}
+.form-control-custom::placeholder {
+    color: #368af7 !important; 
+    font-style: italic;
+}
+.form-control-custom:-ms-input-placeholder {
+    color: #368af7 !important; 
+    font-style: italic;
+}
+
+.form-control-custom:focus {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.form-control-red::placeholder {
+    color: #d9534f !important; 
+    font-style: italic;
+}
+.form-control-red::-webkit-input-placeholder {
+    color: #d9534f !important; 
+    font-style: italic;
+}
+.form-control-red:-moz-placeholder {
+    color: #d9534f !important; 
+    font-style: italic;
+}
+.form-control-red::-moz-placeholder {
+    color: #d9534f !important; 
+    font-style: italic;
+}
+.form-control-red::placeholder {
+    color: #d9534f !important; 
+    font-style: italic;
+}
+.form-control-red:-ms-input-placeholder {
+    color: #d9534f !important; 
+    font-style: italic;
+}
+
+.form-control-red:focus {
+    box-shadow: none !important;
+    border: none !important;
 }

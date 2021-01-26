@@ -159,7 +159,7 @@ export function FriendsDropdown(){
                       filteredFriends.map((el) => {
                         if(el && el.tagName){
                           return (
-                            <Row style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
+                            <Row key={el.tagName} style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
                               <FriendListItem key={el.tagName} tagName={el.tagName}></FriendListItem>
                             </Row>
                           )
@@ -169,24 +169,24 @@ export function FriendsDropdown(){
                     friends.map((el) => {
                       if(el && el.tagName){
                         return (
-                            <Row style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
+                            <Row key={el.tagName} style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
                               <FriendListItem key={el.tagName} tagName={el.tagName}></FriendListItem>
                               </Row>
                         )
                       } else return null;                          
                     })
                   }
-                  <Row style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                  <FriendListItem tagName={"asdf1237"} key={"14512qgq25t"} isOnline={true}></FriendListItem>
+                  <Row key="1412qgsacxq25t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
+                  <FriendListItem tagName={"asdf1237"} isOnline={true}></FriendListItem>
                   </Row>
-                  <Row style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                    <FriendListItem tagName={"mock1234"} key={"14512qgq25t"} isOnline={true}></FriendListItem>
+                  <Row key="1412qxfgbsgq25t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
+                    <FriendListItem tagName={"mock1234"} isOnline={true}></FriendListItem>
                   </Row>
-                  <Row style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                    <FriendListItem tagName={"mock3243"} key={"14512qgq25t"} isOnline={true}></FriendListItem>
+                  <Row key="1412qgq606925t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
+                    <FriendListItem tagName={"mock3243"} isOnline={true}></FriendListItem>
                   </Row>
-                  <Row style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                    <FriendListItem tagName={"mock3421"} key={"14512qgq25t"} isOnline={true}></FriendListItem>
+                  <Row key="14122346qgq25t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
+                    <FriendListItem tagName={"mock3421"} isOnline={true}></FriendListItem>
                   </Row>
                 </Col>
               </Row>  
@@ -198,7 +198,7 @@ export function FriendsDropdown(){
             </Row>  
           <Row>
             <ul>
-              {errorMsgs.current.map(el => (<li className="text-danger text-small">{el}</li>))}
+              {errorMsgs.current.map(el => (<li className="text-danger text-small" key={el}>{el}</li>))}
             </ul>
           </Row>
           </Container>

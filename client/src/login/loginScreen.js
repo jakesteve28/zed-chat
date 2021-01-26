@@ -73,7 +73,7 @@ const getFriendRequests = async (id, authToken) => {
       }
     })
     if(friendRequestsRes.status !== 200){
-      throw Error("Error fetching sent invites from user")
+      console.log("Error fetching sent invites from user")
     }
     const friendRequests = await friendRequestsRes.json();
     return friendRequests;
@@ -246,7 +246,7 @@ function LoginScreen() {
                   onChange={ e => _setPassword(e.target.value) }
                 />
               </InputGroup>
-              <Container fluid>   
+              <Container fluid className="border-top border-dark pt-2">   
                 <Row className="mt-3">
                   <Col>               
                     <Button style={{ marginRight: 30, backgroundColor: "#191919", color: "white", opacity: 0.87, border:"none"}} variant="dark" className="mx-auto button-outline-black" onClick={() => document.getElementById("link-create-account").click() }><Link id="link-create-account" style={{ textDecoration: 'none', color: "white" }} to="/createAccount">Create&nbsp;Account</Link></Button>

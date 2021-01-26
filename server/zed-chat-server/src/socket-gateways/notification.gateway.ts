@@ -119,13 +119,13 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage('sendInvite')
-    async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
             const socketId = client.id;
-            const msg = JSON.parse(data);
-            if(msg.sender && msg.userId){
-                if(msg.sender.tagName === msg.userId) throw "User cannot send invite to self"
-                const recipient = await this.userService.findByTagName(msg.userId)
+            const msg = data;
+            if(msg.sender && msg.tagName){
+                if(msg.sender.tagName === msg.tagName) throw "User cannot send invite to self"
+                const recipient = await this.userService.findByTagName(msg.tagName);
                 if(recipient) {
                     const tag = msg.sender
                     const user = await this.userService.findByTagName(tag.tagName);
@@ -138,7 +138,7 @@ export class NotificationsGateway  {
                             this.wss.to(recipient.notificationSocketId).emit('inviteReceived', { invite: invite, conv: conv, user: user });
                             this.wss.to(socketId).emit("inviteSent", { invite: invite, conv: conv });
                             console.log(`Conversation invite sent successfully from ${user.tagName} to ${recipient.tagName}`);
-                        } else throw `User with tagname ${msg.userId} does not exist` 
+                        } else throw `User with tagname ${msg.tagName} does not exist` 
                     } else throw `Recipient ${recipient.tagName} for invite ${invite.id} has connected no socket client; will receive invite on next login!`;  
                 } else throw `User with tagname ${msg.userId} does not exist`;
             } else throw `Invite incorrect format ${msg}`;

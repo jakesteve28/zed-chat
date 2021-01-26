@@ -5,5 +5,5 @@ export default {
     firstName: /^([A-Z]){1}([a-zA-Z]){1,32}$/,
     lastName: /^([A-Z]){1}([a-zA-Z]){1,32}$/,
     messageBody: /^(.){1,200}$/,
-    conversationName: /^(.){4,64}$/
+    conversationName: /^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]){4,64}$/
 };
