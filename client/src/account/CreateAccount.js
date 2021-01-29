@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap';
 import './createaccount.css';
 import { Redirect } from 'react-router-dom';
 import regex from '../regex';
 import useWindowSize from '../sidebar/windowSize';
+import { useDispatch } from 'react-redux';
+import { setTopbarMessage } from '../uiSlice';
 
 function CreateAccount(){
     const [tagName, setTagName] = useState("");
@@ -19,6 +21,7 @@ function CreateAccount(){
     const [pw1Invalid, setPw1Invalid] = useState(false);
     const [pw2Invalid, setPw2Invalid] = useState(false);
     const size = useWindowSize();
+    const dispatch = useDispatch();
 
     const clearErr = () => {
         setPasswordNoMatch(false);
@@ -84,6 +87,11 @@ function CreateAccount(){
         console.log(body);
         setBackToLogin(true);
     }
+
+    useEffect(() => {
+        dispatch(setTopbarMessage(""))
+    }, []);
+
     return (
         (!backToLogin) ? 
         <Container className="h-100 w-100" fluid>

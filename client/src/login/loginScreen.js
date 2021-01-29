@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap'
 import { Redirect, Link } from 'react-router-dom'
@@ -25,7 +25,9 @@ import {
 import { addFriend, 
   addFriendRequest 
 } from '../account/friendsSlice';
-
+import {
+  setTopbarMessage
+} from '../uiSlice';
 const getAccount = async (id, authToken) => {
   const account = await fetch(`http://localhost:3000/api/users/${id}`, {
     headers: {
@@ -125,6 +127,11 @@ function LoginScreen() {
     if(!passing) setError(true);
     return passing;
   };
+
+
+  useEffect(() => {
+      dispatch(setTopbarMessage(""))
+  }, []);
 
   const submit = async () => {
     setError(false);

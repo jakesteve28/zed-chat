@@ -24,7 +24,7 @@ import {
 } from '../currentConversation/conversationsSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { SettingsDropdown, NotificationsDropdown, FriendsDropdown } from './Dropdowns';
-
+import { selectTopbarMessage, setTopBarMessage } from '../uiSlice';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
       flexGrow: 1,
+      color: "white"
     },
     menu : {
       backgroundColor: "#404040"
@@ -82,18 +83,7 @@ export default function TopBar(){
     const view = useSelector(selectView);
     const showConv = useSelector(selectShowConvList);
     const location = useLocation();
-    const [bannerMessage, setBannerMessage] = useState("");
-
-    const topbarMessage = () => {
-
-    }
-
-    useEffect(() => {
-      if(view === false){
-        setBannerMessage();
-      }
-    }, [view])
-
+    const topbarMessage = useSelector(selectTopbarMessage);
     return (
         <CssBaseline>
         <AppBar position="fixed"  className={classes.appBar}>
@@ -116,7 +106,7 @@ export default function TopBar(){
                             <>
                               <StartChatButton></StartChatButton>
                               <NotificationsDropdown></NotificationsDropdown>
-                              <FriendsDropdown></FriendsDropdown>                   
+                              <FriendsDropdown></FriendsDropdown>              
                             </>
                        )
                       : ""
@@ -125,7 +115,7 @@ export default function TopBar(){
                </Container>
             </Typography>
             <Typography component={'span'} variant="h4" className={classes.title}>
-                <span style={{ opacity: 0.67 }} className="text-white lead">{bannerMessage}</span>
+                <span style={{ opacity: 0.67 }} className="text-white lead">{topbarMessage}</span>
             </Typography>
             {
               (account.loggedIn === false && location.pathname !== "/login") ? (<Link className="rounded-pill btn btn-outline-primary mr-5 rounded-pill" style={{ opacity: 0.67 }} renderas={Button} to="/login">

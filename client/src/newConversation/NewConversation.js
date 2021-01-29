@@ -3,7 +3,7 @@ import { Row, Col, InputGroup, FormControl, Button, Container } from 'react-boot
 import { selectAccount } from '../account/accountSettingsSlice';
 import { selectFriends } from '../account/friendsSlice';
 import { selectConversations } from '../currentConversation/conversationsSlice';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import useWindowSize from '../sidebar/windowSize';
 import './new-conversation.css';
 import regex from '../regex.js';
@@ -11,14 +11,13 @@ import { SearchOutlined } from '@material-ui/icons';
 import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core';
 import EnhancedEncryptionIcon from '@material-ui/icons/EnhancedEncryption';
-import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
-import Tooltip from '@material-ui/core/Tooltip';
 import SendIcon from '@material-ui/icons/Send';
 import { notificationSocket } from '../socket/notificationSocket';
-import { Modal } from '@material-ui/core';
+import { Modal, Tooltip } from '@material-ui/core';
 import PasswordModalBody from './SetPWModal';
-import BackgroundModalBody from './SetBGModal';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import { setTopbarMessage } from '../uiSlice';
+
 const FriendCheckbox = withStyles({
     root: {
         color: "#303030",
@@ -68,12 +67,10 @@ export default function NewConversation(){
     const [buttonsDisabled, setButtonsDisabled] = useState(true);
     const newName = useRef(null);
     const errorMsgs = useRef([]);
-    const searchBarInput = useRef(null);
     const [passwordOpened, setPasswordOpened] = useState(false);
-    const [backgroundOpened, setBackgroundOpened] = useState(false);
     const [convPassword, setConvPassword] = useState("");
     const [backgroundImage, setBackgroundImage] = useState("");
-
+    const dispatch = useDispatch();
     const filterList = () => {
         setErrorSearch(false);
         setError(false);
@@ -87,7 +84,6 @@ export default function NewConversation(){
         }
         setFilteredFriends(filteredFriends.filter(friend => (friend.tagName.includes(searchBar) || searchBar.includes(friend.tagName))));
     }
-
     const handleCheck = (tagName, checked) => {
         const arr = JSON.parse(JSON.stringify(selectedFriends));
         if(checked){
@@ -153,15 +149,12 @@ export default function NewConversation(){
         if(!passing) setError(true);
         return passing;
     }
-
     const handleSetConvPassword = (value) => {
         setConvPassword(value);
     }
-
     const handleSetBackgroundImage = (value) => {
         setBackgroundImage(value);
     }
-
     const submit = () => {
         errorMsgs.current = [];
         setError(false);
@@ -184,7 +177,9 @@ export default function NewConversation(){
         if(newName && newName.current){
             newName.current.focus();
         }
+        dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon>&nbsp;New Conversation</span>)));
     }, []);
+
     useEffect(() => {
         if(selectedFriends.length < 1){
             setButtonsDisabled(true);
@@ -194,23 +189,26 @@ export default function NewConversation(){
             console.log("Buttons enabled")
         }
     }, [selectedFriends]);
+
     useEffect(() => {
         setFilteredFriends(JSON.parse(JSON.stringify(friends)));
     }, [friends]);
 
+    let enterChatRef = useRef(null);
+
+    useEffect(() => {
+        if(enterChatRef.current){
+            enterChatRef.current.focus();
+        } 
+    }, [enterChatRef]);
 
     return (
         <div className={(size.width > 768) ? "sidebar-padding new-conv-container" : "new-conv-container"}>
-            <Row className="pb-4 mb-4"  style={{ borderBottom: "1px solid #303030" }}>
-                <Col className="text-center" style={{ color: "#EEEEEE", opacity: 0.8 }}>
-                    <QuestionAnswerIcon style={{ height: 40, width: 40}}></QuestionAnswerIcon>
-                </Col>
-            </Row>
-            <Row className="mt-2 mb-2"  style={{ borderBottom: "1px solid #303030" }}>
+            <Row className="mt-2 mb-2">
                 <Col className="text-center mx-auto friend-search-new-chat">
                     <InputGroup className="mt-2 mx-auto">
                         <FormControl
-                            style={{ textAlign: "center", fontSize: "19pt", opaciyt: 0.8, color: "#d9534f", minHeight: '50px', border: 'none', backgroundColor: "#191919", }}
+                            style={{ maxWidth: "250px", textAlign: "center", fontSize: "19pt", color: "#d9534f", minHeight: '50px', border: 'none', backgroundColor: "#191919" }}
                             placeholder="Enter Chat Name"
                             aria-label="Enter Chat Name"
                             aria-describedby="basic-addon1"
@@ -218,11 +216,12 @@ export default function NewConversation(){
                             className={ (errorName) ? "mx-auto lead form-control-red" : "mx-auto lead form-control-custom"}
                             autoComplete="new-password"
                             name="setNameNewConv"
+                            ref={enterChatRef}
                             />
                     </InputGroup>
                 </Col>
             </Row>
-            <Row className="mb-1" style={{ borderBottom: "1px solid #303030" }}>
+            <Row className="mb-1">
                 <Col className="text-center mx-auto">
                     <InputGroup className="mb-3 mt-2 mx-auto">
                         <FormControl

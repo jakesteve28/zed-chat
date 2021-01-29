@@ -1,16 +1,26 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Container, Row } from 'react-bootstrap'
 import CurrentConversationMessageBox from './CurrentConversationMessageBox';
 import CurrentConversationMessagesListView from './CurrentConversationMessagesListView';
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
     selectView
   } from './conversationsSlice';
 import useWindowSize from '../sidebar/windowSize'
+import {
+    selectCurrentConversation, setCurrentConversation
+} from './conversationsSlice';
 
 export default function CurrentConversationContainer(){
     const size = useWindowSize();
     const defaultView = useSelector(selectView);
+    const conversation = useSelector(selectCurrentConversation);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        if(conversation && conversation.conversationName){
+            dispatch(setCurrentConversation((<span><QuestionAnswerIcon></QuestionAnswerIcon>&nbsp;{conversation.conversationName}</span>)))
+        }
+    }, [conversation]);
     return (
         (defaultView) ?
         <Container fluid>

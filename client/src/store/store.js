@@ -5,6 +5,7 @@ import accountReducer from '../account/accountSettingsSlice'
 import friendsReducer from '../account/friendsSlice'
 import inviteReducer from '../topbar/inviteSlice'
 import { createSlice } from '@reduxjs/toolkit';
+import uiReducer from '../uiSlice';
 
 export const globalSlice = createSlice({
   name: 'globals',
@@ -61,6 +62,7 @@ export default configureStore({
     account: accountReducer,
     invite: inviteReducer,
     friends: friendsReducer,
-    globals: reducer
+    globals: reducer,
+    ui: uiReducer
   },
 });

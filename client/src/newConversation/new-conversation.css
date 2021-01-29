@@ -28,19 +28,16 @@
 }
 
 .new-conv-container {
-    padding: 50px;
     border-radius: 15px;
-    opacity: 0.9;
+    opacity: .9;
     text-align: center !important;
-    background-color: #191919;
-    max-width: 500px;
-    width: 500px;
+    background-color: rgba(0, 0, 0, 0.5);
     margin: auto;
+    padding-top: 30px !important;
 } 
 
 .sidebar-padding {
-    margin-left: 35%;
-    margin-right: 40%;
+    margin-left: 240px;
 }
 
 .friend-search-new-chat {

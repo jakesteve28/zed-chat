@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {  Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap'
 import regex from '../regex';
 import './createaccount.css';
 import useWindowSize from '../sidebar/windowSize';
+import { setTopbarMessage } from '../uiSlice';
+import { useDispatch } from 'react-redux';
 
 export default function ForgotPassword(){
     const [email, setEmail] = useState("");
@@ -12,6 +14,8 @@ export default function ForgotPassword(){
     const [emailInvalid, setEmailInvalid] = useState(false);
     const [tagnameInvalid, setTagnameInvalid] = useState(false);
     const size = useWindowSize();
+    const dispatch = useDispatch();
+
     const clearErr = () => {
       setEmailInvalid(false);
       setTagnameInvalid(false);
@@ -45,6 +49,11 @@ export default function ForgotPassword(){
       }
       console.log(`Sending forgot password request for user @${tagname} with email ${email}`);
     }
+
+    useEffect(() => {
+      dispatch(setTopbarMessage(""))
+    }, []);
+
     return (
             <Container className="h-100 w-100 pb-5" fluid>
               <Row className="p-3 mt-5 text-white lead text-center">
