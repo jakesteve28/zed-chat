@@ -79,8 +79,8 @@ export default function CurrentConversationMessageBox(){
     return ( 
         <div>
             <Row className="w-100 text-center" style={{ position: "fixed", bottom: 40, left: 30 }}>
-                {(size.width > 768) ? (<Col xs="3"></Col>) : "" }
-                <Col xs="8" className="mx-auto" style={{ paddingRight: "15px"}}>
+                {(size.width > 768) ? (<Col style={{ minWidth: "240px", maxWidth: "240px" }}></Col>) : "" }
+                <Col className="mx-auto" style={{ paddingRight: "15px", paddingLeft: (size.width > 768) ? "0%" : "3%" }}>
                 {(error) ? (<div className="text-danger lead" style={{ opacity: 0.7 }}>{errorMsgs}</div>) : ""}
                 <InputGroup className="pb-3 mx-auto">
                     <FormControl

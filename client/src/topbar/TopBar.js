@@ -19,10 +19,12 @@ import {
   selectCurrentConversation,
   selectView,
   selectShowConvList,
-  setShowConvList
+  setShowConvList,
+  setView
 } from '../currentConversation/conversationsSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { SettingsDropdown, NotificationsDropdown, FriendsDropdown } from './Dropdowns';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -47,10 +49,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function StartChatButton(){
+  const view = useSelector(selectView);
+  const showConvList = useSelector(selectShowConvList);
+  const dispatch = useDispatch()
   return (
     <div>
-      <Link id="accountSettings" style={{ display: "none" }} to="/newConversation"></Link>
-      <Button onClick={async () => { document.getElementById("accountSettings").click(); }} variant="primary" className="rounded-pill mx-auto my-form-control-button" style={{ opacity: 0.75, boxShadow: "black 5px 5px " }}>
+      <Link id="startChat" style={{ display: "none" }} to="/newConversation"></Link>
+      <Button onClick={async () => { 
+          if(showConvList){
+            dispatch(setShowConvList(false));
+            //Hides the sidebar
+          }
+          if(view){
+            dispatch(setView(false));
+            //Sets the default view to false
+          }
+          document.getElementById("startChat").click(); 
+        }} variant="primary" className="rounded-pill mx-auto my-form-control-button" style={{ opacity: 0.75, boxShadow: "black 5px 5px " }}>
         <ForumIcon></ForumIcon> Start chat
       </Button>
     </div>
@@ -69,8 +84,14 @@ export default function TopBar(){
     const location = useLocation();
     const [bannerMessage, setBannerMessage] = useState("");
 
+    const topbarMessage = () => {
+
+    }
+
     useEffect(() => {
-      setBannerMessage("");
+      if(view === false){
+        setBannerMessage();
+      }
     }, [view])
 
     return (
@@ -83,23 +104,23 @@ export default function TopBar(){
                <Container fluid>
                   <Row className="text-center">
                     {
-                    (account.loggedIn && !screenSmall) ? 
+                      (account.loggedIn && screenSmall && !showConv) ?
+                        (
+                          <Button style={{backgroundColor: "#191919", border: "none"}} onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
+                        )
+                      : ""
+                    }   
+                    {
+                      (account.loggedIn) ? 
                           (
                             <>
                               <StartChatButton></StartChatButton>
                               <NotificationsDropdown></NotificationsDropdown>
                               <FriendsDropdown></FriendsDropdown>                   
-                          </>
+                            </>
                        )
                       : ""
                     }
-                    {
-                        (account.loggedIn && screenSmall && !showConv) ?
-                          (
-                            <Button style={{backgroundColor: "#191919", border: "none"}} onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
-                          )
-                        : ""
-                    }        
                   </Row>
                </Container>
             </Typography>

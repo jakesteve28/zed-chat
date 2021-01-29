@@ -63,7 +63,6 @@ export default function NewConversation(){
     const [error, setError] = useState(false);
     const [selectedFriends, setSelectedFriends] = useState([]);
     const [filteredFriends, setFilteredFriends] = useState([]);
-    const [sidebarAlign, setSidebarAlign] = useState(false);
     const [errorName, setErrorName] = useState(false);
     const [errorSearch, setErrorSearch] = useState(false);
     const [buttonsDisabled, setButtonsDisabled] = useState(true);
@@ -187,13 +186,6 @@ export default function NewConversation(){
         }
     }, []);
     useEffect(() => {
-        if(size.width > 768) {
-            setSidebarAlign(true);
-        } else {
-            setSidebarAlign(false);
-        }
-    }, [size.width]);
-    useEffect(() => {
         if(selectedFriends.length < 1){
             setButtonsDisabled(true);
             console.log("Buttons disabled")
@@ -208,7 +200,7 @@ export default function NewConversation(){
 
 
     return (
-        <div className={(sidebarAlign) ? "sidebar-padding new-conv-container" : "new-conv-container"}>
+        <div className={(size.width > 768) ? "sidebar-padding new-conv-container" : "new-conv-container"}>
             <Row className="pb-4 mb-4"  style={{ borderBottom: "1px solid #303030" }}>
                 <Col className="text-center" style={{ color: "#EEEEEE", opacity: 0.8 }}>
                     <QuestionAnswerIcon style={{ height: 40, width: 40}}></QuestionAnswerIcon>
@@ -286,7 +278,7 @@ export default function NewConversation(){
 
                         }} onClick={ () => setPasswordOpened(true) }>
                             <Tooltip title="Set Password">
-                                    <EnhancedEncryptionIcon style={{ color: "#BBBBBB", width: 50, height: 50 }}></EnhancedEncryptionIcon>
+                                    <EnhancedEncryptionIcon style={{ color: "#BBBBBB", width: 40, height: 40 }}></EnhancedEncryptionIcon>
                             </Tooltip>
                         </Button>
                 </Col>
@@ -294,7 +286,7 @@ export default function NewConversation(){
                 <Col xs="4" className="mt-3 p-2">
                     <Button className="rounded-pill" disabled={buttonsDisabled} style={{ opacity: (buttonsDisabled) ? 0.5 : 1.0,  border: "none", backgroundColor: "#191919", minWidth: "100px" }} onClick={ () => submit() }>
                         <Tooltip title="Send Chat Invite(s)">
-                            <SendIcon style={{ color: "#BBBBBB", width: 50, height: 50 }}></SendIcon>
+                            <SendIcon style={{ color: "#BBBBBB", width: 40, height: 40 }}></SendIcon>
                         </Tooltip>
                     </Button>
                 </Col>

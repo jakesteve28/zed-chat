@@ -139,7 +139,7 @@ function CreateAccount(){
                             <ul style={{ listStyleType: "none", marginRight: "auto", marginLeft: "auto", paddingRight: "30px" }}>
                               {(error) ?  <li><h6 className="border-bottom pb-2 border-danger text-danger font-weight-bold">Errors</h6></li> : ""}
                               {
-                                (error) ? errorMsgs.map(el => (<li className="font-italic lead text-danger">{el}</li>)) : ""
+                                (error) ? errorMsgs.map(el => (<li key={el} className="font-italic lead text-danger">{el}</li>)) : ""
                               }   
                             </ul>    
                           </Col>

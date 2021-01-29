@@ -17,7 +17,7 @@ export default function CurrentConversationContainer(){
             
         </Container>
         :
-        <Container className="" style={{ minHeight: size.height, height: size.height}} fluid>
+        <Container className="pl-3" style={{ minHeight: size.height, height: size.height}} fluid>
             <Row style={{ minHeight: size.height - 150, height: size.height - 150, paddingBottom: 'auto'}}>
                 <CurrentConversationMessagesListView defaultView={defaultView} style={{ minHeight: size.height, height: size.height}}></CurrentConversationMessagesListView>
             </Row>

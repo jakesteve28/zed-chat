@@ -1,10 +1,176 @@
-hoverlistitem:hover {
+/* hoverlistitem:hover {
     background-color: "#404040";
-}
+} */
 .show {
-    display: "block" !important;
+    display: block !important;
 }
 
 .not-show {
-    display: "none" !important;
+    display: none !important;
+}
+
+.narrow {
+    width: 22%;
+    min-width: 280px;
+    background-color: #222222;
+    opacity: 0.8;
+}
+
+.full-width {
+    width: 100%;
+    min-width: 280px;
+    background-color: #222222;
+    opacity: 0.8;
+}
+
+.sidebar-list-item {
+    min-width: 250px;
+    padding-top: 20px !important ;
+}
+
+.sidebar-list-item .hide-conv-info {
+    display: none;
+}
+
+.sidebar-list-item:hover {
+    background-color: #404040 !important;
+    cursor: pointer;
+}
+
+.sidebar-list-item:hover .hide-conv-info {
+    display: block !important;
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+.sidebar-list-item:hover .dropdown-toggle {
+    background-color: #404040 !important;
+}
+
+.sidebar-list-item {
+    background-color: #404040 !important;
+}
+
+.form-control-custom, .form-control-red {
+    background-color: #404040;
+    border: none;
+    color: #AAAAAA !important;
+    min-width: 105px !important;
+}
+
+.form-control-custom::placeholder {
+    color: #EEEEEE !important; 
+    font-size: 13pt !important;
+}
+
+.form-control-custom::-webkit-input-placeholder {
+    color: #EEEEEE !important; 
+    font-size: 13pt;
+}
+
+.form-control-custom:-moz-placeholder {
+    color: #EEEEEE !important; 
+    font-size: 13pt;
+}
+
+.form-control-custom::-moz-placeholder {
+    color: #EEEEEE !important; 
+    font-size: 13pt;
+}
+
+.form-control-custom::placeholder {
+    color: #EEEEEE !important; 
+    font-size: 13pt;
+}
+
+.form-control-custom:-ms-input-placeholder {
+    color: #EEEEEE !important; 
+    font-size: 13pt;
+}
+
+.form-control-custom:focus {
+    box-shadow: none !important;
+    border: none !important;
+    background-color: #404040;
+}
+
+.form-control-red::placeholder {
+    color: #d9534f !important; 
+    font-size: 13pt !important;
+}
+.form-control-red::-webkit-input-placeholder {
+    color: #d9534f !important; 
+    font-size: 13pt;
+}
+.form-control-red:-moz-placeholder {
+    color: #d9534f !important; 
+    font-size: 13pt;
+}
+.form-control-red::-moz-placeholder {
+    color: #d9534f !important; 
+    font-size: 13pt;
+}
+.form-control-red::placeholder {
+    color: #d9534f !important; 
+    font-size: 13pt;
+}
+.form-control-red:-ms-input-placeholder {
+    color: #d9534f !important; 
+    font-size: 13pt;
+}
+
+.form-control-red:focus {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.sidebar-search-btn {
+    background-color: #404040;
+    border: none;
+    margin-left: 30px;
+}
+
+.sidebar-search-btn:hover {
+    background-color: #676767 !important;
+}
+
+.sidebar-search-btn:active, .sidebar-search-btn:focus {
+    border:none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: #222222 !important;
+    background-color: #676767;
+}
+
+.my-dropdown {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-width: 150px !important;
+}
+
+.conv-dropdown-item {
+    min-width: 110px !important;
+    background-color: #404040 !important;
+    padding: 20px !important;
+    cursor: pointer !important;
+    margin-left: 50px !important;
+    border: 1px solid #333333 !important;
+}
+
+.conv-info {
+    max-width: 180px !important;
+    min-width: 180px !important;
+}
+
+.dropdown-toggle-conv-info {
+    margin-right: 100px !important;
+    text-align: left;
+}
+
+.light-hover {
+    background-color: #222222 !important;
+}
+.light-hover:hover .light-hover {
+    background-color: #404040 !important;
 }

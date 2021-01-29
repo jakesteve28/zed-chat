@@ -59,11 +59,20 @@ export default function CurrentConversationMessagesListView(props){
             </Row>
         :
         <Row className="w-100" style={{ marginTop: 75 }}>
-            {(size.width > 768 ? <Col xs="3"></Col> : "")}
-            <Col xs={(size.width > 768 ? "9" : "12")}>
+            {(size.width > 768 ? <Col style={{ minWidth: "240px", maxWidth: "240px" }}></Col> : "")}
+            <Col style={{ paddingLeft: (size.width > 768) ? "0%" : "3%" }}  >
                 <Container fluid>
                     <Row style={{ height: rowHeight}}>
-                        <Col ref={colRef} className="ul" sm={(size.width < 768) ? "10" : "8"} style={{ bottom: 150, paddingBottom: 50, height: rowHeight - 10, overflow: "auto", position: "fixed" }}>
+                        <Col ref={colRef} className="ul" style={{ 
+                            bottom: 150, 
+                            paddingBottom: 50, 
+                            height: rowHeight - 10, 
+                            overflowY: "scroll",
+                            position: "fixed", 
+                            paddingLeft: "20px",
+                             paddingRight: "50px",
+                              width: (size.width > 768) ? (size.width - 240) : size.width,
+                               maxWidth: (size.width > 768) ? (size.width - 240): size.width }}>
                             {messages.map((message) => {
                                 const dateNow = Date.now()
                                 const date = Date.parse(message.createdAt)
@@ -86,7 +95,8 @@ export default function CurrentConversationMessagesListView(props){
                                 const minsAgo = ((dateNow - date) / 1000 ) / 60;
                                 
                                 return (message.user.id === account.id) ? (
-                                    <Container key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto" }} fluid>
+                                    //Message from me
+                                    <Container key={Math.random()} className="li mt-2 mb-2" style={{ marginTop: "auto", paddingRight: "60px" }} fluid>
                                         <Row className="mt-1 mb-1">
                                             <Col xs="3" className="text-center">
                                             </Col>
@@ -96,6 +106,7 @@ export default function CurrentConversationMessagesListView(props){
                                         </Row>
                                     </Container>
                                     ) :
+                                    //Message from someone else
                                     (<Container key={Math.random()}  className="li mt-2 mb-3" fluid>
                                          <Row className="mt-1 mb-1">
                                             <Col xs="8" className="text-left">
