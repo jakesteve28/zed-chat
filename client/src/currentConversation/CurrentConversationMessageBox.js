@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react' 
-import { Row, Col, InputGroup, FormControl, Button } from 'react-bootstrap';
+import { Row, Col, InputGroup, FormControl, Button, Spinner } from 'react-bootstrap';
 import { SendRounded } from '@material-ui/icons';
 import {
     selectCurrentConversation
@@ -24,7 +24,8 @@ export default function CurrentConversationMessageBox(){
     const [error, setError] = useState(false);
     const [pending, setPending] = useState(false);
     const [errorMsgs, setErrorMsgs] = useState([]);
-
+    const [sending, setSending] = useState("");
+    const [spinning, setSpinning] = useState(false);
     const checkInput = () => {
         let passing = true;
         if(regex.messageBody.test(message) === false){
@@ -44,6 +45,7 @@ export default function CurrentConversationMessageBox(){
         setPending(true);
         if(chatSocket){
            chatSocket.emit('chatToServer', { sender: account.tagName, room: currentConversation.id, body: `${message}` });
+           setSpinning(true);
            formRef.current.value = ""
            setPending(false);
         }
@@ -75,7 +77,11 @@ export default function CurrentConversationMessageBox(){
             }
         }
     }, [currentConversation.id])
-
+    useEffect(() => {
+        if(currentConversation.messages && Array.isArray(currentConversation.messages)){
+            setSpinning(false);
+        }
+    }, [currentConversation.messages])
     return ( 
         <div>
             <Row className="w-100 text-center" style={{ position: "fixed", bottom: 40, left: 30 }}>
@@ -107,18 +113,22 @@ export default function CurrentConversationMessageBox(){
                         }}
                     />
                     <InputGroup.Append>
-                        <Button onClick={async () => { 
-                            await sendMessage() } } 
-                                className="ml-1 rounded-pill text-right" 
-                                variant="outline-secondary" 
-                                style={{ "border": "none", 
-                                backgroundColor: "#404040", 
-                                color: "#02a5ff" }} 
-                                id="basic-addon2">
-                            <SendRounded 
-                                style={{ color: "white", opacity: "0.87"}}
-                            >
-                            </SendRounded></Button>
+                    {
+                        (spinning) ? <Spinner className="m-2 p-2" size="lg" variant="info" animation="border" /> :
+                            (<Button onClick={async () => { 
+                                await sendMessage() } } 
+                                    className="ml-1 rounded-pill text-right" 
+                                    variant="outline-secondary" 
+                                    style={{ "border": "none", 
+                                    backgroundColor: "#404040", 
+                                    color: "#02a5ff" }} 
+                                    id="basic-addon2">
+                                <SendRounded 
+                                    style={{ color: "white", opacity: "0.87"}}
+                                >
+                                </SendRounded>
+                            </Button>)
+                    }  
                     </InputGroup.Append>
                 </InputGroup>
                 </Col>

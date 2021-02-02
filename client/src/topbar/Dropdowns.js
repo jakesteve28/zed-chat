@@ -34,6 +34,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import GroupIcon from '@material-ui/icons/Group';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export function FriendsDropdown(){
     const token = useSelector(selectToken);
@@ -115,9 +116,11 @@ export function FriendsDropdown(){
 
     return (
       <Dropdown className="ml-3 p-1" style={{ backgroundColor: "#191919" }} >
-        <Dropdown.Toggle as="button" style={{ border: "none", color: "white", backgroundColor: "#191919" }} className="font-weight-bold rounded-pill ml-2">
-            <PeopleAltIcon></PeopleAltIcon>
-        </Dropdown.Toggle>
+        <Tooltip title="Friends List">
+          <Dropdown.Toggle as="button" style={{ border: "none", color: "white", backgroundColor: "#191919" }} className="top-dropdown-button font-weight-bold rounded-pill ml-2">
+              <PeopleAltIcon></PeopleAltIcon>
+          </Dropdown.Toggle>
+        </Tooltip>
         <Dropdown.Menu style={{ backgroundColor: "#191919", minWidth: "325px"}} className="dropdown-menu-custom-bg">
         <Dropdown.ItemText className="text-center font-weight-bold lead mb-1" style={{ backgroundColor: "#191919", opacity: 0.9, color: "#AAAAAA" }}><GroupIcon></GroupIcon>&nbsp;&nbsp;Friends</Dropdown.ItemText>
           <Container fluid className="h-100" style={{ backgroundColor: "#191919", minWidth: "325px", paddingTop: "20px"}}>
@@ -252,17 +255,19 @@ export function NotificationsDropdown(){
     const account = useSelector(selectAccount);
     return (
       <Dropdown className="ml-3 p-1 topbar-dropdown" style={{ backgroundColor: "#191919", opacity: 0.95 }} >
-        <Dropdown.Toggle as="button" style={{ border: "none", color: "white", backgroundColor: "#191919" }} className="font-weight-bold rounded-pill ml-2">
-          {
-            (receivedInvites.length >= 1 || friendRequests.length >= 1) 
-            ? 
-            <Badge color="default" overlap="circle" badgeContent=" " variant="dot">
-              <NotificationsIcon></NotificationsIcon>
-            </Badge> 
-            : 
-            <NotificationsIcon></NotificationsIcon>
-          }
-        </Dropdown.Toggle>       
+          <Tooltip title="Notifications">
+            <Dropdown.Toggle as="button" style={{ border: "none", color: "white", backgroundColor: "#191919" }} className="top-dropdown-button font-weight-bold rounded-pill ml-2">
+              {
+                (receivedInvites.length >= 1 || friendRequests.length >= 1) 
+                ? 
+                <Badge color="default" overlap="circle" badgeContent=" " variant="dot">
+                  <NotificationsIcon></NotificationsIcon>
+                </Badge> 
+                : 
+                <NotificationsIcon></NotificationsIcon>
+              }
+            </Dropdown.Toggle>    
+          </Tooltip>   
           <Dropdown.Menu className="dropdown-menu-custom-bg" style={{ backgroundColor: "#191919", minWidth: "350px" }}>
             <Dropdown.ItemText className="text-center font-weight-bold lead p-3 pb-2" style={{ opacity: 0.9, color: "#AAAAAA" }}><NotificationsIcon></NotificationsIcon>&nbsp;&nbsp;Notifications</Dropdown.ItemText>
             <Container fluid style={{ maxHeight: "250px", minHeight: "250px", minWidth: "250px", overflowY: "scroll"}}>
@@ -308,9 +313,9 @@ export function SettingsDropdown(){
         console.log("Successfully logged out");
     }
     return (
-        <Dropdown className="topbar-dropdown" style={{ backgroundColor: "#191919", position: "relative", maxWidth: "200px", opacity: 0.8}}>              
+        <Dropdown className="topbar-dropdown" style={{ backgroundColor: "#191919", position: "relative", maxWidth: "100px", opacity: 0.9 }}>              
             <Dropdown.Toggle className="dropdown-toggle text-white" style={{ border:" none", backgroundColor: "#191919"}} as="button" id="dropdown-custom-2"><MoreVertIcon></MoreVertIcon></Dropdown.Toggle>
-            <Dropdown.Menu className="dropdown-menu-custom-bg" style={{ backgroundColor: "#191919" }}>
+            <Dropdown.Menu className="dropdown-menu-custom-bg-settings" style={{ backgroundColor: "#191919", maxWidth: "100px" }}>
                 <Dropdown.Item  className="text-white text-center dropdown-item-settings" style={{ backgroundColor: "#404040", padding: "15px" }} as="button" onClick={() => document.querySelector("#accountSettings").click()}><Link id="accountSettings" as="button" style={{ textDecoration: 'none', color: "#AAAAAA" }} to="/settings">Account&nbsp;<AccountBoxIcon></AccountBoxIcon></Link></Dropdown.Item>
                 <Dropdown.Item  className="text-white text-center dropdown-item-settings" style={{ backgroundColor: "#404040", padding: "15px"}} as="button" onClick={() => { logoutAccount() }}><Link style={{ textDecoration: 'none', color: "#AAAAAA" }} to="/login">Logout&nbsp;<ExitToAppIcon></ExitToAppIcon></Link></Dropdown.Item>
             </Dropdown.Menu>

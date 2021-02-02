@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
       display: 'flex',
       flexGrow: 1,
       backgroundColor: "#191919",
-      height: "100%"
+      height: "100%",
+      opacity: 0.87
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
@@ -114,9 +115,17 @@ export default function TopBar(){
                   </Row>
                </Container>
             </Typography>
-            <Typography component={'span'} variant="h4" className={classes.title}>
-                <span style={{ opacity: 0.67 }} className="text-white lead">{topbarMessage}</span>
-            </Typography>
+
+            {
+                (size.width > 768)
+               ?
+                <Typography component={'span'} variant="h4" className={classes.title}>
+                    <span style={{ opacity: 0.67 }} className="text-white lead">{topbarMessage}</span>
+                </Typography> 
+                :  ""
+            }
+            
+            
             {
               (account.loggedIn === false && location.pathname !== "/login") ? (<Link className="rounded-pill btn btn-outline-primary mr-5 rounded-pill" style={{ opacity: 0.67 }} renderas={Button} to="/login">
               Login

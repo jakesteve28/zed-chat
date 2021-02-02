@@ -10,17 +10,11 @@ import useWindowSize from '../sidebar/windowSize'
 import {
     selectCurrentConversation, setCurrentConversation
 } from './conversationsSlice';
-
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import { setTopbarMessage } from '../uiSlice';
 export default function CurrentConversationContainer(){
     const size = useWindowSize();
-    const defaultView = useSelector(selectView);
-    const conversation = useSelector(selectCurrentConversation);
-    const dispatch = useDispatch();
-    useEffect(() => {
-        if(conversation && conversation.conversationName){
-            dispatch(setCurrentConversation((<span><QuestionAnswerIcon></QuestionAnswerIcon>&nbsp;{conversation.conversationName}</span>)))
-        }
-    }, [conversation]);
+    const defaultView = useSelector(selectView);    
     return (
         (defaultView) ?
         <Container fluid>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap'
-import { Redirect, Link } from 'react-router-dom'
+import { Button, InputGroup, Spinner, FormControl, Container, Row, Col } from 'react-bootstrap'
+import { Redirect, Link } from 'react-router-dom';
 import regex from '../regex';
 import './loginscreen.css';
 import {
@@ -113,6 +113,7 @@ function LoginScreen() {
   const [errorMsgs, setErrorMsgs] = useState([]);
   const dispatch = useDispatch();
   const account = useSelector(selectAccount);
+  const [spinning, setSpinning] = useState(false);
 
   const checkInput = () => {
     let passing = true;
@@ -128,7 +129,6 @@ function LoginScreen() {
     return passing;
   };
 
-
   useEffect(() => {
       dispatch(setTopbarMessage(""))
   }, []);
@@ -136,8 +136,10 @@ function LoginScreen() {
   const submit = async () => {
     setError(false);
     setErrorMsgs([]);
+    setSpinning(true);
     if(!checkInput()){
       console.log("Invalid form field inputs", errorMsgs);
+      setSpinning(false);
       return;
     }
     const { id, authToken } = await getAuthToken(userName, password);
@@ -149,8 +151,7 @@ function LoginScreen() {
         bodyAcc.tagName && 
         Array.isArray(bodyAcc.conversations) &&
         Array.isArray(bodyAcc.friends) &&
-        Array.isArray(bodyAcc.friendRequests) &&
-        Array.isArray(bodyAcc.friendRequests) 
+        Array.isArray(bodyAcc.friendRequests)
       ) {
         dispatch(setToken(`${authToken}`))
         dispatch(setEmail(bodyAcc.email))
@@ -172,12 +173,15 @@ function LoginScreen() {
           return null;
         })  
     } else {
-       console.log("Error retrieving user details from server!", errorMsgs);
+      setError(true);
+      setErrorMsgs(["Error retrieving user details from server!"]);
+      console.log("Error retrieving user details from server!");
+      setSpinning(false);
     }
     const friendRequests = await getFriendRequests(id, authToken);    
     const requests = []
     const sent = []
-    if(friendRequests){   
+    if(friendRequests && Array.isArray(friendRequests)){   
       for(let request of friendRequests){
         if(request.recipientId === bodyAcc.id){   
           requests.push(request)
@@ -187,7 +191,11 @@ function LoginScreen() {
         }
       }
     } else {
-      console.log("Error fetching received friend requests")
+      setError(true);
+      setErrorMsgs(["Error fetching received friend requests"]);
+      console.log("Error fetching received friend requests");
+      setSpinning(false);
+      return;
     }
     // console.log("Received Friend Requests: ", requests)
     // console.log("Sent Friend Requests: ", sent)
@@ -211,8 +219,10 @@ function LoginScreen() {
           dispatch(addReceivedInvite(invite))
       }
     }
-    console.log("Successfully logged in, account fetched")
+    console.log("Successfully logged in, account fetched");
+    setSpinning(false);
   }
+
   return (
     (!account.loggedIn) ? (
     <Container className="h-100 w-100" fluid>
@@ -264,18 +274,33 @@ function LoginScreen() {
                       <Button style={{ color: "white", backgroundColor: "#191919", opacity: 0.87, border:"none"}} variant="dark" className="mx-auto button-outline-black " onClick={() => document.getElementById("link-forgot-password").click() }><Link id="link-forgot-password" style={{ textDecoration: 'none', color: "white" }} to="/forgotPassword">Forgot&nbsp;Password?</Link></Button>
                   </Col>
                 </Row>
-                <Row className="mt-3 mb-5">
+                <Row className="mt-3 mb-2">
                   <Col>
-                    <Button onClick={submit} size="lg" className="rounded-pill mb-4 mx-auto" variant="outline-success" style={{ opacity: 0.8, maxWidth: '200px', marginTop: "20px" }} block>Login</Button>
+                    {
+                      (spinning) ?  <Spinner animation="border" className="mb-4" style={{ height: 60, width: 60 }} variant="success" /> : <Button onClick={submit} size="lg" className="rounded-pill mb-4 mx-auto" variant="outline-success" style={{ opacity: 0.8, maxWidth: '200px', marginTop: "20px" }} block>Login</Button>
+                    }
                   </Col>
                 </Row>
+                <Row className="mt-3 mb-3">
+                  { 
+                    (error) ? (<Col className="text-center">
+                                <ul>
+                                  {
+                                    errorMsgs.map(err => <li key={err} className="text-danger text-center lead font-italic">{err}</li>)
+                                  }
+                                </ul>
+                              </Col>)
+                            : ""
+                    }
+                    { 
+                      (spinning) ? (<Col className="text-center">
+                                      <span className="text-success lead font-italic font-weight-bolder" style={{ opacity: 1.0, fontSize: "15pt" }}>Logging in...</span>
+                                    </Col>)
+                                  : ""
+                    }
+                  </Row>
             </Container>
         </Col> 
-      </Row>
-      <Row>
-        <Col className="text-center">
-          <span className="text-danger text-center lead font-italic" style={{ opacity: 0.67 }}>{(error) ? errorMsgs : ""}</span>
-        </Col>
       </Row>
     </Container>)
     : <Redirect to="/home"></Redirect>

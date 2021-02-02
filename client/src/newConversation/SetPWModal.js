@@ -39,8 +39,8 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
         <div className="modal-password-set">
             <Container fluid>
                 <Row className="pt-2 pb-3">
-                    <Col style={{ borderBottom: "1px solid #303030" }} xs="10" className="mx-auto text-center pt-3">
-                        <EnhancedEncryptionIcon style={{ width: 50, height: 50 }}></EnhancedEncryptionIcon>
+                    <Col className="mx-auto text-center pt-3">
+                        <EnhancedEncryptionIcon style={{ width: 42, height: 42 }}></EnhancedEncryptionIcon>
                     </Col>
                 </Row>
                 <Row>
@@ -48,11 +48,11 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
                         <h5>Set Password</h5>
                     </Col>
                 </Row>
-                <Row className="pt-2 mt-1">
+                <Row className="pt-2 pb-2">
                     <Col style={{ borderBottom: "1px solid #303030"}} className="mx-auto text-center" xs="10">
                         <InputGroup className="mb-3 mt-2 mx-auto">
                                 <FormControl
-                                    style={{ textAlign: "center", color: "#3b90ff", minHeight: '50px', border: 'none', minWidth: "80%", backgroundColor: "#191919" }}
+                                    style={{ fontSize: "18pt", textAlign: "center", color: "white", minHeight: '50px', border: 'none', minWidth: "80%", backgroundColor: "#252525" }}
                                     placeholder="Enter Password"
                                     type="password"
                                     aria-label="Enter Password"
@@ -70,7 +70,7 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
                 </Row>
                 <Row className="pt-3 mt-2">
                     <Col className="mx-auto text-center" xs="10">
-                        <Button onClick={ () => submit() } variant="outline-success" style={{ border: "none", backgroundColor: "#191919", marginLeft: "auto", marginRight: "auto"}} className="rounded-pill">Set Password</Button>
+                        <Button onClick={ () => submit() } variant="outline-success" size="lg" style={{ backgroundColor: "#252525", marginLeft: "auto", marginRight: "auto"}} className="p-3 rounded-pill">Set Password</Button>
                     </Col>
                 </Row>
             </Container>

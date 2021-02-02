@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,26 +11,16 @@ import "./sidebar.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { removeConversation, selectConversations, setCurrentConversation, selectShowConvList, setShowConvList, selectCurrentConversation  } from '../currentConversation/conversationsSlice';
 import { setView } from '../currentConversation/conversationsSlice';
-import SelectableContext from "react-bootstrap/SelectableContext";
 import { selectAccount } from '../account/accountSettingsSlice' ;
 import { SearchOutlined } from '@material-ui/icons';
 import { useHistory, useLocation } from 'react-router-dom';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import InfoIcon from '@material-ui/icons/Info';
-
-
-const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
-    <Container fluid
-      ref={ref}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick(e);
-      }}>
-      {children}
-      </Container>
-  ));
+import { setTopbarMessage } from '../uiSlice';
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import Tooltip from '@material-ui/core/Tooltip';
+import { setSidebarState, selectSidebarState } from '../uiSlice';
 
 const useStyles = makeStyles((theme) => ({
     animate_in: {
@@ -46,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
         animationName: "fadeout",
         animationDuration: "1s"
     },
-
     '@keyframes fadeout': {
         '0%': {
             width: "25%"
@@ -89,8 +78,6 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-
-
 export default function Sidebar(){
     const size = useWindowSize();
     const classes = useStyles();
@@ -103,13 +90,24 @@ export default function Sidebar(){
     const history = useHistory();
     const location = useLocation();
     const currentConversation = useSelector(selectCurrentConversation);
-
+    const sidebarState = useSelector(selectSidebarState);
     const cl = (el) => {
         if(!el.pending){
             console.log("Setting current conversation...", el);
             console.log(history, location);
             if(location.pathname !== '/home'){
                 history.push('/home');
+            }
+            // if(currentConversation.conversationName === el.conversationName){
+            //     return;
+            // }
+            if(el && el.conversationName !== '' && size.width > 768){
+                //Wide screen shows name
+                dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon>&nbsp;{el.conversationName}</span>)));
+            }  
+            if(el && el.conversationName !== '' && size.width <= 768) {
+                //Narrow screen only icon
+                dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon></span>))); 
             }
             dispatch(setView(false)); //Set NOT default view
             dispatch(setCurrentConversation(el)); //Speaks for itself
@@ -133,28 +131,51 @@ export default function Sidebar(){
             return self.indexOf(value) === index;
         })
     }
-    //What width should the sidebar be
-    //TODO
-    //THIS RUNS SLOW
-    //CHANGE THIS TO CSS RULES
     function getPaper(){
-        //showConvList === true means "show full screen sidebar"
-        //false means "NOT full screen sidebar. Could be narrow/no show"
         if(narrowScreen && showConvList){
+            //Only show conversation list, aka sidebar
             return classes.fullDrawerPaper;
-        } else if(narrowScreen && !showConvList) { 
+        } else if(narrowScreen && !showConvList) {
+            //Only show current conversation, hide sidebar  
             return classes.hidePaper;
         } else if(!narrowScreen && !showConvList) {
+            //Narrow sidebar for wider screens
             return classes.narrowPaper;
         } else {
             return classes.narrowPaper;
         }  
     }
-
     const handleSearch = () => {
-
+        alert("Searching!");
     }
-    let convMap = useRef({});
+    const getMinWidthListItem = () => {
+        if(narrowScreen && showConvList){
+            //Only show conversation list, aka sidebar
+            return "450px";
+        } else if(narrowScreen && !showConvList) {
+            //Only show current conversation, hide sidebar  
+            return "0px";
+        } else if(!narrowScreen && !showConvList) {
+            //Narrow sidebar for wider screens
+            return "200px";
+        } else {
+            return "200px";
+        } 
+    }
+    const getButtonMargin = () => {
+        if(narrowScreen && showConvList){
+            //Only show conversation list, aka sidebar
+            return "150px";
+        } else if(narrowScreen && !showConvList) {
+            //Only show current conversation, hide sidebar  
+            return "0px";
+        } else if(!narrowScreen && !showConvList) {
+            //Narrow sidebar for wider screens
+            return "-5px";
+        } else {
+            return "-5px";
+        } 
+    }
 
     return (
         <Drawer
@@ -179,30 +200,32 @@ export default function Sidebar(){
                                     autoComplete="new-password"
                                 />  
                                 <InputGroup.Append style={{ maxWidth: "30px" }}>
-                                    <Button variant="dark" style={{ backgroundColor: "#404040", border: "none" }}><SearchOutlined style={{ color: "#EEEEEE" }}></SearchOutlined></Button>
+                                    <Tooltip title="Search Chats">
+                                        <Button variant="dark" className="custom-sidebar-search-button" style={{ backgroundColor: "#404040", border: "none" }}><SearchOutlined style={{ color: "#EEEEEE" }}></SearchOutlined></Button>
+                                    </Tooltip>
                                 </InputGroup.Append>      
                         </InputGroup>
                    </Container>
                 </ListItem>
                     {                   
                     conversations.map((el) => {
-                        if(convMap.current){
-                            if(convMap.current[el.id]){
-                                return ""
-                            } else {
-                                convMap.current[el.id] = true;
-                            }
-                        }
+                        // if(convMap.current){
+                        //     if(convMap.current[el.id]){
+                        //         return ""
+                        //     } else {
+                        //         convMap.current[el.id] = true;
+                        //     }
+                        // }
                         if(el.pending === true){
                             return ""
                         }
                         return (
-                            <ListItem key={el.id} className="sidebar-list-item light-hover" style={{ backgroundColor: "#222222" }} >
-                                <Container onClick={() => cl(el)} fluid style={{ backgroundColor: "#222222" }} className="light-hover" >
+                            <ListItem onClick={() => cl(el)} key={el.id} className="sidebar-list-item light-hover" style={{ backgroundColor: "#222222" }} >
+                                <Container fluid style={{ backgroundColor: "#222222" }} className="light-hover" >
                                     <Row style={{ backgroundColor: "#222222" }} className="light-hover">
-                                        <Col className="conv-info light-hover">
+                                        <Col className="conv-info light-hover" style={{ minWidth: getMinWidthListItem() }}>
                                             <Container fluid className="light-hover">
-                                                <Row className="font-italic text-primary text-truncate" style={{ fontSize: "11pt" }}>
+                                                <Row className="font-italic text-primary" style={{ fontSize: "11pt", minWidth: getMinWidthListItem()  }}>
                                                     {el ? el.conversationName : "Chat Name"}
                                                 </Row>
                                                 <Row className="w-100" style={{ fontSize: "9pt" }}>
@@ -217,7 +240,7 @@ export default function Sidebar(){
                                                 </Row>
                                             </Container>
                                         </Col>
-                                        <Col className="hide-conv-info text-left light-hover" style={{ backgroundColor: "#222222" }}>
+                                        <Col className="hide-conv-info text-right light-hover" style={{ backgroundColor: "#222222", marginLeft: getButtonMargin() }}>
                                             <Container className="light-hover" style={{ backgroundColor: "#222222" }} fluid>
                                                 <Dropdown className="light-hover" style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
                                                     <Dropdown.Toggle 
@@ -226,7 +249,7 @@ export default function Sidebar(){
                                                         as={Button} variant="dark" id="dropdown-custom-components">
                                                         <MoreVertIcon></MoreVertIcon>
                                                     </Dropdown.Toggle>
-                                                    <Dropdown.Menu  style={{ backgroundColor: "#222222", minWidth: "100px"} } className="my-dropdown shadow text-white text-center">        
+                                                    <Dropdown.Menu style={{ backgroundColor: "#222222"}} className="my-dropdown shadow text-white text-center">        
                                                         <Dropdown.Item  
                                                                 className="text-white shadow conv-dropdown-item" 
                                                                 as="button" onClick={ 

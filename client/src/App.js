@@ -190,13 +190,22 @@ function NewConv(){
 function SettingScr(){
   const classes = useStyles();
   return (
-    <div className={classes.root}>
+    <div className="w-100 h-100">
+      <NotificationSocket></NotificationSocket>
+      <ChatSocket></ChatSocket>
       <CssBaseline />
-      <TopBar></TopBar>
-      <Sidebar></Sidebar>
-      <main className={classes.content}>
+        <TopBar></TopBar>
+        <Sidebar></Sidebar>
+        <Container fluid className="w-100 h-100" style={{ 
+            backgroundImage: `url("https://oregonwild.org/sites/default/files/featured-imgs/MtHood.JohnEklund.jpg")`, 
+            margin: "auto",
+            backgroundPosition: "center right",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            paddingTop: "100px"
+          }} >
           <Settings></Settings>
-      </main>
+        </Container>
     </div>
     )
 }

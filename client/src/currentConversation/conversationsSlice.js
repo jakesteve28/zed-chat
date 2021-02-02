@@ -27,14 +27,22 @@ export const conversationsSlice = createSlice({
         const convs = JSON.parse(JSON.stringify(state.conversations)) 
         for(let conv of convs){
             if(conv.id === action.payload.conversation.id){
-                if(!conv.messages) conv.messages = []
-                conv.messages.push(action.payload.message)
                 if(conv.id === state.currentConversation.id){
                     if(!Array.isArray(state.currentConversation.messages) || !state.currentConversation.messages) {
                         state.currentConversation.messages = []
-                    } state.currentConversation.messages.push(action.payload.message)
+                    } 
+                    state.currentConversation.messages.push(action.payload.message);
+                    break;
                 }
-                //state.currentConversation = conv
+                if(!conv.messages) {
+                    conv.messages = []
+                    conv.messages.push(action.payload.message);
+                    break;
+                }
+                if(Array.isArray(conv.messages)){
+                    conv.messages.push(action.payload.message);
+                    break;
+                }
             }
         }
         state.conversations = JSON.parse(JSON.stringify(convs))

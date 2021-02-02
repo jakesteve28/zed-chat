@@ -32,3 +32,94 @@
     justify-content:center;
     flex-direction: column-reverse;
 }
+
+.message-from-me {
+    transition: all 200ms 2ms;
+    padding: 15px !important;
+    width:auto;
+}
+
+.message-from-me:hover,
+.message-from-me:focus,
+.message-from-me:active {
+    transform: scale(1.1) !important;
+    cursor: pointer !important;
+    background-color: darkblue !important;
+}
+
+.message-from-other {
+    transition: all 200ms 2ms;
+    padding: 15px !important;
+}
+
+.message-from-other:hover,
+.message-from-other:focus,
+.message-from-other:active {
+    transform: scale(1.1) !important;
+    cursor: pointer !important;
+    background-color: darkslategrey !important;
+}
+.message-menu-button {
+    text-align: right !important;
+    background-color: transparent !important; 
+    border: none;
+    outline: none;
+    color: white;
+    max-width: 30px; 
+    margin: auto !important;
+    padding-top: 20px !important;
+}
+ 
+.message-menu-button:hover,
+.message-menu-button:active,
+.message-menu-button:focus {
+    text-align: center !important;
+    background-color: transparent !important; 
+    border: none !important;
+    outline: none !important;
+    color: white !important;
+    max-width: 30px !important;
+}
+
+.message-dropdown-sender {
+    border: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+    max-width: 30px !important;
+    max-height: 40px !important;
+    margin-left: auto;
+}
+
+.message-dropdown-received {
+    border: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+    max-width: 30px !important;
+    max-height: 40px !important;
+    margin-right: auto !important;
+}
+
+.my-dropdown-message {
+    background-color: #191919 !important;
+    opacity: 0.87 !important;
+    color: white !important;
+}
+
+.my-dropdown-message:hover {
+    background-color: #404040 !important;
+}
+
+.dropdown-item-message {
+    background-color: transparent !important;
+}
+
+.dropdown-item-message:hover {
+    background-color: transparent !important;
+}
+
+.dropdown-item-message:focus, 
+.dropdown-item-message:active {
+    border: none !important; 
+    outline: none !important; 
+    color: #FF3D3D  !important;
+}

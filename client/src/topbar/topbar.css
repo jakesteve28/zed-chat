@@ -116,7 +116,12 @@
 }
 .dropdown-menu-custom-bg {
   background-color: #191919 !important;
-  min-width: 350px;
+  min-width: 250px;
+}
+
+.dropdown-menu-custom-bg-settings {
+  background-color: #191919 !important;
+  min-width: 190px;
 }
 
 .dropdown-item-settings {
@@ -126,4 +131,26 @@
 
 .dropdown-item-settings:hover {
   background-color: #404040 !important;
+}
+
+.top-dropdown-button, 
+.top-dropdown-button:active, 
+.top-dropdown-button:focus,
+.top-dropdown-button:hover {
+  border: none !important;
+  outline: none !important;
+  color: #AAAAAA !important;
+  opacity: 0.87 !important;
+}
+
+.top-dropdown-button {
+  margin: -10px;
+}
+
+.top-dropdown-button:active, 
+.top-dropdown-button:focus,
+.top-dropdown-button:hover {
+  border: none !important;
+  outline: none !important;
+  color: #3db8ff !important;
 }

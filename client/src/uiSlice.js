@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// export const sidebarStates = {
-//     hidden: "hidden",
-//     show: "show",
-//     full: "full"
-// }
+export const sidebarStates = {
+    hidden: "hidden",
+    show: "show",
+    full: "full"
+}
 
 // export const backgroundColors = {
 //     black: "#191919",
@@ -44,20 +44,20 @@ export const uiSlice = createSlice({
     conversationBackground: "mthood"
   },
   reducers: {
-    // setSidebarState: (state, action) => {
-    //     switch(action.payload){
-    //         case action.payload === sidebarStates.hidden:
-    //             state.sidebarState = sidebarStates.hidden;
-    //             break ;
-    //         case action.payload === sidebarStates.show:
-    //             state.sidebarState = sidebarStates.show;
-    //             break ;
-    //         case action.payload === sidebarStates.full:
-    //             state.sidebarState = sidebarStates.full;
-    //             break ;
-    //         default: state.sidebarState = sidebarStates.show; break;
-    //     }
-    // }, 
+    setSidebarState: (state, action) => {
+        switch(action.payload){
+            case action.payload === sidebarStates.hidden && state.sidebarState !== sidebarStates.hidden:
+                state.sidebarState = sidebarStates.hidden;
+                break ;
+            case action.payload === sidebarStates.show && state.sidebarState !== sidebarStates.show:
+                state.sidebarState = sidebarStates.show;
+                break ;
+            case action.payload === sidebarStates.full && state.sidebarState !== sidebarStates.full:
+                state.sidebarState = sidebarStates.full;
+                break ;
+            default: state.sidebarState = sidebarStates.show; break;
+        }
+    }, 
     setTopbarMessage: (state, action) => {
         state.topbarMessage = action.payload;
     },  

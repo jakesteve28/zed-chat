@@ -1,13 +1,12 @@
 .modal-password-set {
-    position: fixed;
-    width: 325;
-    height: 300;
+    width: 400px;
+    height: 400px;
     border-radius: 15px;
-    opacity: 0.7;
-    background-color: #191919;
+    opacity: 0.85;
+    background-color: #252525;
     color: #CCCCCC;
     margin: auto;
-    top: 30%;
-    left: 40%;
+    top: 100px;
     padding: 40px;
+    margin-top: 150px;
 }
