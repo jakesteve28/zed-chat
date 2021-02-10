@@ -12,13 +12,19 @@ export const friendsSlice = createSlice({
        state.friends = []
     },
     addFriend: (state, action) => {
-        if(action.payload.password) delete action.payload.password;
+        if(state.friends.filter(friend => friend.id === action.payload.id || friend.tagName === action.payload.tagName).length > 0){
+            return;
+        }
+        if(action.payload.password) delete action.payload.password;  
         state.friends = [...state.friends, action.payload]
     },
     removeFriend: (state, action) => {
         state.friends = state.friends.filter(el => el.id !== action.payload)
     },
     addFriendRequest: (state, action) => {
+        if(state.friendRequests.filter(req => req.id === action.payload.id).length > 0){
+          return;
+        }
         state.friendRequests = [...state.friendRequests, action.payload]
     },
     removeFriendRequest: (state, action) => {

@@ -25,21 +25,19 @@ export class ConversationService {
     options(): any {
         return { availableMethods : ["GET", "POST", "PUT", "DELETE", "OPTIONS"]}
     }
-    async create(user: string): Promise<Conversation> {
+    async create(userId: string, conversationName: string): Promise<Conversation> {
         const conversation = new Conversation();
-        const __user = await this.userService.findByTagName(user)
-        conversation.conversationName = `Empty Conversation`
-        conversation.users = [] 
-        conversation.users.push(__user)
+        const user = await this.userService.findByTagName(userId);
+        conversation.users = [];
+        conversation.users.push(user);
        // const _conversation = await this.conversationRepository.save(conversation);
         //const _user = await this.userService.addConversation(__user.id, conversation.id);
         //if(_user.conversations.filter((conv) => conv.id === _conversation.id).length < 1)
          //   throw `User: ${_user.id} conversations[] unsuccessfully updated`
         //if(_conversation.users.filter((user) => user.id === _user.id).length < 1)
         //    throw `Conversation: ${_conversation.id} users[] unsuccessfully updated`
-        const conv = await this.conversationRepository.save(conversation);
-        conv.conversationName = `Chat with @${__user.tagName}`
-        return this.conversationRepository.save(conv)
+        conversation.conversationName = conversationName;
+        return this.conversationRepository.save(conversation);
     }
     async markAccepted(convId: string): Promise<Conversation> {
         const conv = await this.conversationRepository.findOne(convId);
@@ -85,5 +83,4 @@ export class ConversationService {
         }, relations: ["messages"]});
         return conversation.messages;
     }
-
 }

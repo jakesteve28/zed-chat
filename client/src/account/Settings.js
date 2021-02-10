@@ -1,19 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react'
-import {  Container, Row, Col, Button, FormControl, InputGroup } from 'react-bootstrap'
+import React, { useEffect, useState, useRef } from 'react';
+import {  Container, Row, Col, Button } from 'react-bootstrap';
 import {
-    selectAccount
-} from './accountSettingsSlice'
-import { useSelector, useDispatch } from 'react-redux'
+    selectAccount,
+    logout,
+    clearAccount
+} from './accountSettingsSlice';
+import { clearAuth } from '../auth/authSlice';
+import { clearConversations } from '../currentConversation/conversationsSlice';
+import { clearInvites } from '../topbar/inviteSlice';
+import { clearFriends } from '../account/friendsSlice';
+import { useSelector, useDispatch } from 'react-redux';
 import { setTopbarMessage } from '../uiSlice';
 import SettingsIcon from '@material-ui/icons/Settings';
 import useWindowSize from '../sidebar/windowSize';
-import { notificationSocket } from '../socket/notificationSocket';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import TransferWithinAStationIcon from '@material-ui/icons/TransferWithinAStation';
 import LockIcon from '@material-ui/icons/Lock';
 import InfoIcon from '@material-ui/icons/Info';
 import SecurityIcon from '@material-ui/icons/Security';
 import './settings.css';
+import About from './Modals/About';
+import ChangeTagname from './Modals/ChangeTagname';
+import DeleteAccount from './Modals/DeleteAccount';
+import PrivacySecurityDisclaimer from './Modals/Privacy.Security.Disclaimer';
+import ResetPW from './Modals/ResetPW';
+import { Modal } from '@material-ui/core';
 
 export default function Settings(){
     const account = useSelector(selectAccount);
@@ -26,30 +37,40 @@ export default function Settings(){
     const [inputPlaceholder, setInputPlaceholder] = useState("")
     const inputRef = useRef(null);
     const wide = size.width > 768;
+    const [aboutOpened, setAboutOpened] = useState(false);
+    const [deleteAccOpened, setDeleteAccOpened] = useState(false);
+    const [privacyOpened, setPrivacyOpened] = useState(false);
+    const [resetPWOpened, setResetPWOpened] = useState(false);
+    const [changeTagnameOpened, setChangeTagnameOpened] = useState(false);
+
+    const logoutAccount = () => {
+        dispatch(logout());
+        dispatch(clearAccount());
+        dispatch(clearAuth());
+        dispatch(clearConversations());
+        dispatch(clearInvites());
+        dispatch(clearFriends());
+        console.log("Successfully logged out");
+    }
+
     const resetPassword = () => {
-        //Pop a toast, logout in 3 seconds 
-        //Handled in email to user
+        setResetPWOpened(true);
     }
 
     const changeTagname = () => {
-        //Pop a toast, logout in 3 seconds
-        //Handled in email to user
+        setChangeTagnameOpened(true);
     }
 
     const deleteAccount = () => {
-        //Pops open a "are you sure" modal with a description of what will happen
-        //Recursively purges everything in database related to user's ID 
-        //Pops a toast up when done, logs out, flags email and IP (cant recreate account)
+        setDeleteAccOpened(true);
     }
 
     const aboutPage = () => {
-        //Navigate to about page in new tab 
-        //(probably main marketing page)
+        setAboutOpened(true);
     }
 
     const privacyDisclaimer = () => {
-        //Pops up a modal with any legal crap about using the app and the
-        //data I store
+        setPrivacyOpened(true);
     }
     useEffect(() => {
         if(size.width > 768) {
@@ -59,7 +80,50 @@ export default function Settings(){
         }
     }, [size.width]);
     return (
+        
         <Container className="h-100 w-100" fluid  style={{ margin: "auto", paddingLeft: (wide) ?  "240px" : "0px" }}>
+            <Row className="pt-3">
+                <Modal
+                    open={aboutOpened}
+                    onClose={() => setAboutOpened(false)}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                >
+                    <About></About>
+                </Modal>
+                <Modal
+                    open={changeTagnameOpened}
+                    onClose={() => setChangeTagnameOpened(false)}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                >
+                    <ChangeTagname logoutAccount={logoutAccount}></ChangeTagname>
+                </Modal>
+                <Modal
+                    open={deleteAccOpened}
+                    onClose={() => setDeleteAccOpened(false)}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                >
+                    <DeleteAccount logoutAccount={logoutAccount}></DeleteAccount>
+                </Modal>
+                <Modal
+                    open={privacyOpened}
+                    onClose={() => setPrivacyOpened(false)}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                >
+                    <PrivacySecurityDisclaimer></PrivacySecurityDisclaimer>
+                </Modal>
+                <Modal
+                    open={resetPWOpened}
+                    onClose={() => setResetPWOpened(false)}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                >
+                    <ResetPW logoutAccount={logoutAccount}></ResetPW>
+                </Modal>
+            </Row>
             <Row>
                 <Col className="mx-auto p-5" xs="8" style={{ opacity: 0.8, borderRadius: "10px", backgroundColor: "#191919", maxWidth: "500px" }}>
                     <Container fluid>       

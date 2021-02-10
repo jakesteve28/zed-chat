@@ -43,7 +43,6 @@ export class UserService {
 
   async findByTagName(tagName: string): Promise<User> {
     const user = await  this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends", "friendRequests"]});
-    
     return user;
   }
 
@@ -156,6 +155,8 @@ export class UserService {
     const user = await this.usersRepository.findOne(userId);
     if(!notificationSocketId || notificationSocketId === '' || notificationSocketId === '0' || notificationSocketId === 'disconnected'){
        notificationSocketId = "disconnected";
+       user.loggedIn = false;
+       user.isOnline = false;
     }
     if(user){
       console.log("Setting notification socket ID for user | " + user.tagName + " | to | " + notificationSocketId + " |");
@@ -178,6 +179,10 @@ export class UserService {
     user.chatSocketId = chatSocketId; 
     if(user){
       console.log(`Setting chat socket ID for user | ${user.tagName} | to |  ${chatSocketId}  |`);
+      if(chatSocketId === 'disconnected') {
+        user.loggedIn = false;
+        user.isOnline = false;
+      }
       const ret = await this.usersRepository.save(user);
       if(ret){
         ret.password = undefined;
@@ -191,6 +196,14 @@ export class UserService {
     }
   }
 
+  async disconnect(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOne(userId);
+    user.chatSocketId = 'disconnected';
+    user.currentConversationId = '0';
+    user.loggedIn = false; 
+    return this.usersRepository.save(user);
+  }
+
   async findByChatSocketId(chatSocketId: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { chatSocketId: chatSocketId }});
     if(user) return user;
@@ -202,4 +215,34 @@ export class UserService {
     if(user) return user;
     else return null;
   }
+
+  async login(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOne(userId, { relations: ["conversations", "friends", "friendRequests"]});
+    if(user){
+      for(let conv of user.conversations){
+        conv.messages = await this.conversationService.getMessages(conv.id);
+      }
+      if(user.loggedIn === true) {
+         console.log("User already marked as logged in in database"); 
+         return user;
+      }
+      user.loggedIn = true;
+      user.isOnline = true;
+      return this.usersRepository.save(user);
+    }
+  }
+
+  async logout(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOne(userId);
+    if(user){
+      if(user.loggedIn === false) {
+         console.log("User already marked as logged out in database"); 
+         return user;
+      }
+      user.loggedIn = false;
+      user.isOnline = true;
+      return this.usersRepository.save(user);
+    }
+  }
+
  } 

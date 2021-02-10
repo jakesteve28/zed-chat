@@ -1,4 +1,5 @@
 export default {
+    tagNameSearch: /^([a-zA-Z0-9_-]){1,20}$/,
     tagName: /^([a-zA-Z0-9_-]){8,20}$/,
     password: /^([a-zA-Z0-9\_\-\$\#\%\^\&\*\(\)]){8,32}$/,
     email: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,

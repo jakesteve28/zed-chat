@@ -123,6 +123,8 @@ export class NotificationsGateway  {
         try {
             const socketId = client.id;
             const msg = data;
+            //Create conversation with sender, set pending to true
+            //Pending convs dont show or are  greyed out
             if(msg.sender && msg.tagName){
                 if(msg.sender.tagName === msg.tagName) throw "User cannot send invite to self"
                 const recipient = await this.userService.findByTagName(msg.tagName);
@@ -130,7 +132,7 @@ export class NotificationsGateway  {
                     const tag = msg.sender
                     const user = await this.userService.findByTagName(tag.tagName);
                     user.password = undefined;
-                    const conv = await this.conversationService.findOne(msg.conversationId)
+                    const conv = await this.conversationService.create(user.tagName, msg.conversationName);
                     console.log("Handle invite from: " + JSON.stringify(tag.tagName) + " for conversation " + conv.id)
                     const invite = await this.inviteService.create(user.id, recipient.id, conv.id)
                     if(recipient.notificationSocketId !== 'disconnected'){
@@ -159,9 +161,9 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage('acceptInvite')
-    async handleAcceptInvite(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleAcceptInvite(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             const socketId = client.id;
             const inviteId = msg.inviteId;
             const invite = await this.inviteService.acceptInvite(inviteId);

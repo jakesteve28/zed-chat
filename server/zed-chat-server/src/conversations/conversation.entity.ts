@@ -20,7 +20,7 @@ export class Conversation {
   @CreateDateColumn()
     createdAt: string;
 
-  @ManyToMany(type => User, user => user.conversations)
+  @ManyToMany(type => User, user => user.conversations, { eager: true })
     users: User[];
 
   @OneToMany(type  => Message, message => message.conversation)

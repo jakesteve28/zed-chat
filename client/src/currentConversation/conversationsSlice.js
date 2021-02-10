@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import produce from 'immer'; 
 
 export const conversationsSlice = createSlice({
   name: 'conversations',
@@ -11,22 +12,41 @@ export const conversationsSlice = createSlice({
   reducers: {
     clearConversations: (state) => {
         state.conversations = [];
-        state.currentConversation = { messages: [], joined: false, typing: false };
+        state.currentConversation = { messages: [], joined: false, typing: false, id: 0 };
         state.defaultView = true;
+        state.showConvList = false;
     },
     addConversation: (state, action) => {
-        state.conversations.push(action.payload.conversation)
+        if(state.conversations.filter(conv => conv.id === action.payload.conversation.id).length  > 0) {
+            console.log("Error: cannot add conversation because one already exists in store");
+            return;
+        }
+        state.conversations.push(action.payload.conversation);
     },
     removeConversation: (state, action) => {
-        state.conversations = state.conversations.filter((conv) => { return conv.id !== action.payload.id})
+        state.conversations = state.conversations.filter((conv) => { return conv.id !== action.payload.id});
     },
     setCurrentConversation: (state, action) => {
-        state.currentConversation = action.payload
+        if(state.conversations.filter(conv => conv.id === action.payload.conversation.id).length < 1) {
+            console.log("Error: cannot set current conversation to a conversation that doesn't exist in the store");
+            return;
+        }
+        state.currentConversation = action.payload.conversation;
     },
     addMessage: (state, action) => {
-        const convs = JSON.parse(JSON.stringify(state.conversations)) 
+        const convs = produce(state.conversations, draftState => {});
         for(let conv of convs){
             if(conv.id === action.payload.conversation.id){
+                if(!Array.isArray(conv.messages)){
+                    console.log("Messages don't exist yet");
+                    conv.messages = [];
+                    conv.messages.push(action.payload.message);
+                    break; 
+                }
+                if(conv.messages.filter(msg => msg.id === action.payload.message.id).length > 0) {
+                    console.log("Error: Cannot add message because it already exists in the state!");
+                    break;
+                }
                 if(conv.id === state.currentConversation.id){
                     if(!Array.isArray(state.currentConversation.messages) || !state.currentConversation.messages) {
                         state.currentConversation.messages = []
@@ -35,7 +55,7 @@ export const conversationsSlice = createSlice({
                     break;
                 }
                 if(!conv.messages) {
-                    conv.messages = []
+                    conv.messages = [];
                     conv.messages.push(action.payload.message);
                     break;
                 }
@@ -45,10 +65,7 @@ export const conversationsSlice = createSlice({
                 }
             }
         }
-        state.conversations = JSON.parse(JSON.stringify(convs))
-    },
-    sendToCurrent: (state, action) => {
-        state.currentConversation.messages.push(action.payload)
+        state.conversations = produce(convs, draftState => {});
     },
     setJoined: (state, action) => {
         state.currentConversation.joined = action.payload
@@ -70,11 +87,15 @@ export const conversationsSlice = createSlice({
     },
     setShowConvList: (state, action) => {
         state.showConvList = action.payload
-    }
+    },
+    sortMessages: (state, action) => {
+        if(state.currentConversation.messages.length > 1) 
+            state.currentConversation.messages.sort((a, b) =>  Date.parse(a.createdAt) - Date.parse(b.createdAt));
+    },
   }
 });
 
-export const { setShowConvList, clearConversations, setView, setTyping, setRead, setJoined ,addMessage, setCurrentConversation, addConversation, removeConversation } = conversationsSlice.actions;
+export const { sortMessages, setShowConvList, clearConversations, setView, setTyping, setRead, setJoined, addMessage, setCurrentConversation, addConversation, removeConversation } = conversationsSlice.actions;
 
 export const selectConversations = state => state.conversations.conversations;
 export const selectCurrentConversation = state => state.conversations.currentConversation;

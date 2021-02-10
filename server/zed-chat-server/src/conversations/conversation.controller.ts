@@ -20,8 +20,8 @@ export class ConversationController {
   }
   @Post('create')
   @UseGuards(JwtAuthGuard)
-  async createConversation(@Body('tagName') tagName: string): Promise<Conversation> {
-    return this.conversationService.create(tagName)
+  async createConversation(@Body('tagName') tagName: string, @Body('conversationName') conversationName: string): Promise<Conversation> {
+    return this.conversationService.create(tagName, conversationName);
   }
   @Delete('remove')
   @UseGuards(JwtAuthGuard)

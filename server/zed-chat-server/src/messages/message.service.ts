@@ -32,4 +32,14 @@ export class MessageService {
         message.read = true;
         return this.messageRepository.save(message);
     }
+    async setAllRead(conversationId: string, userId: string):  Promise<Message[]> {
+        const messages = await this.conversationService.getMessages(conversationId);
+        for(let msg of messages){
+            if(msg.read !== true && msg.user.id !== userId){
+                msg.read = true;
+                await this.messageRepository.save(msg);
+            }
+        }
+        return messages;
+    }
 }

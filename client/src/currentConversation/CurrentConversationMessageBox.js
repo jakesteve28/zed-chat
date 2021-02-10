@@ -58,7 +58,7 @@ export default function CurrentConversationMessageBox(){
     }
     const sendTyping = (isTyping) => {
         if(chatSocket && account && currentConversation){
-            chatSocket.emit('typing', JSON.stringify({ sender: account.tagName, chatSocket: { id: chatSocket.id }, room: currentConversation.id, typing: isTyping }));
+            chatSocket.emit('typing', { sender: account.tagName, room: currentConversation.id, typing: isTyping } );
         }
         else {
             console.log("Error: no conversation to send typing to! Please refresh")
@@ -84,9 +84,9 @@ export default function CurrentConversationMessageBox(){
     }, [currentConversation.messages])
     return ( 
         <div>
-            <Row className="w-100 text-center" style={{ position: "fixed", bottom: 40, left: 30 }}>
+            <Row className="w-100 text-center" style={{ position: "fixed", bottom: 40, left: 50 }}>
                 {(size.width > 768) ? (<Col style={{ minWidth: "240px", maxWidth: "240px" }}></Col>) : "" }
-                <Col className="mx-auto" style={{ paddingRight: "15px", paddingLeft: (size.width > 768) ? "0%" : "3%" }}>
+                <Col className="mx-auto" style={{ paddingRight: "15px", paddingLeft: (size.width > 768) ? "2%" : "5%" }}>
                 {(error) ? (<div className="text-danger lead" style={{ opacity: 0.7 }}>{errorMsgs}</div>) : ""}
                 <InputGroup className="pb-3 mx-auto">
                     <FormControl

@@ -117,8 +117,8 @@ export class ChatGateway  {
         try {
             const socketId = client.id;
             const connectedUser = await this.userService.findByChatSocketId(socketId);
-            if(connectedUser){
-                const user = await this.userService.setChatSocketId(connectedUser.id, 'disconnected');
+            if(connectedUser) {
+                const user = await this.userService.disconnect(connectedUser.id);
                 if(!user) throw `Error: disconnecting chat socket failed with client ID ${socketId}!`;
                 client.leaveAll();
                 client.disconnect();
@@ -188,16 +188,16 @@ export class ChatGateway  {
      */
     @UseGuards(ChatGuard)
     @SubscribeMessage('readMessage')
-    async handleReadMessage(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    async handleReadMessage(@ConnectedSocket() client: Socket, @MessageBody() data) {
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             const reader = await this.userService.findOne(msg.readBy);
             if(reader){
                 reader.password = undefined; 
-                if(msg.id && msg.conversation && msg.room){
+                if(msg.message.id && msg.message.conversation){
                     console.log("Handle Read Message: " + msg);
-                    const message = await this.messageService.setRead(msg.id);
-                    const conv = await this.conversationService.findOne(msg.conversation.id);
+                    const message = await this.messageService.setRead(msg.message.id);
+                    const conv = await this.conversationService.findOne(msg.message.conversation.id);
                     conv.users.filter(user => user.id !== reader.id).map(val => {
                         if(val.chatSocketId !== 'disconnected'){
                             this.wss.to(val.chatSocketId).emit('readReceipt', { message: message }, () => {
@@ -224,15 +224,21 @@ export class ChatGateway  {
      */
     @UseGuards(ChatGuard)
     @SubscribeMessage('typing')
-    async handleTyping(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    async handleTyping(@ConnectedSocket() client: Socket, @MessageBody() data) {
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             const tag = msg.sender
             const user = await this.userService.findByTagName(tag);
             if(msg.room){
                 if(user){
                     user.password = undefined; 
-                    this.wss.to(msg.room).emit('typing', { conv: msg.room, user: user, typing: msg.typing })
+                    const users = await this.conversationService.getUsers(msg.room);
+                    for(let _user of users){
+                        if(_user.id === user.id) continue; 
+                        if(_user.chatSocketId !== 'disconnected'){
+                            this.wss.to(_user.chatSocketId).emit('typing', { conv: msg.room, user: user, typing: msg.typing })
+                        }
+                    }
                     console.log(`Success: emitting typing event ${msg.typing ? "start" : "finish"} from: @${user.tagName}`);
                 } else throw `User with ID: ${tag} does not exist`;
             } else {
@@ -330,20 +336,35 @@ export class ChatGateway  {
      */
     @UseGuards(ChatGuard)
     @SubscribeMessage('setCurrentConversation')
-    async handleSetCurrentConversation(@ConnectedSocket() client: Socket, @MessageBody() data: string ) {
+    async handleSetCurrentConversation(@ConnectedSocket() client: Socket, @MessageBody() data ) {
         try {
-            const msg = JSON.parse(data);
+            const msg = data;
             const socketId = client.id;
             const user = await this.userService.setCurrentConversationId(msg.user.id, msg.conversationId);
             if(user && user.currentConversationId === msg.conversationId){
                 user.password = undefined;
-                user.friends.map((friend) => {
+                const friends = await this.userService.getFriends(user.id);
+                friends.map((friend) => {
                     if(friend.chatSocketId !== 'disconnected'){
                         this.wss.to(friend.chatSocketId).emit('currentConversationUpdate', { user: user });
                         console.log(`Success: Emitted "currentConversationUpdate" event to @${friend.tagName}`); 
                     }
                     else console.log(`Warning: Cannot emit "currentConversationUpdate" to @${friend.tagName} because friend is not online`);
                 })
+                //console.log("Friends all updated. Now setting messages to 'read' in conversation");
+                const conversation = await this.conversationService.findOne(user.currentConversationId);
+                if(conversation.messages.length > 0) {
+                    const msgs = await this.messageService.setAllRead(conversation.id, user.id); 
+                    for(let msg of msgs) {
+                        if(msg.user.tagName !== user.tagName) {
+                            //other users in conversation 
+                            if(msg.user.chatSocketId !== 'disconnected'){
+                                this.wss.to(msg.user.chatSocketId).emit('readReceipt', { message: msg });
+                                console.log(`Emitted read receipt to user ${msg.user.tagName} with socketId ${msg.user.chatSocketId}`)                     
+                            }
+                        }
+                    }
+                }
             } else {
                 console.log(`Error: Setting current conversation for user failed`);
                 this.wss.to(socketId).emit("setCurrentConversationError", { msg: `Error with message's conversation: +  ${msg.conversationId}` });

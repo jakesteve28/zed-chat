@@ -258,7 +258,7 @@ export default function NewConversation(){
         console.log("Creating new conversation and sending invites to users from friends list. Users: ", selectedFriends);
         for(let user of selectedFriends){
             if(notificationSocket){
-                notificationSocket.emit('sentInvite', { sender: account, tagName: user }, () => {
+                notificationSocket.emit('sendInvite', { sender: account, tagName: user, conversationName: conversationName }, () => {
                     console.log("Successfully emitted send invite to user with tagname", user);
                 });
             }

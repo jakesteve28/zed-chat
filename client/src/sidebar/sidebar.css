@@ -181,3 +181,11 @@
 .light-hover:hover .light-hover {
     background-color: #404040 !important;
 }
+
+.light-selected {
+    background-color: #404040 !important;
+}
+
+.error-icon {
+    color: red !important;
+}

@@ -169,7 +169,6 @@ function NewConv(){
   return (
     <div className="w-100 h-100">
       <NotificationSocket></NotificationSocket>
-      <ChatSocket></ChatSocket>
       <CssBaseline />
         <TopBar></TopBar>
         <Sidebar></Sidebar>
@@ -192,7 +191,6 @@ function SettingScr(){
   return (
     <div className="w-100 h-100">
       <NotificationSocket></NotificationSocket>
-      <ChatSocket></ChatSocket>
       <CssBaseline />
         <TopBar></TopBar>
         <Sidebar></Sidebar>

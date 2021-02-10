@@ -1,0 +1,22 @@
+.settings-modal {
+    width: 400px;
+    min-height: 400px;
+    max-height: fit-content;
+    border-radius: 15px;
+    opacity: 0.85;
+    background-color: #252525;
+    color: #CCCCCC;
+    margin: auto;
+    top: 100px;
+    padding: 40px;
+    margin-top: 150px;
+}
+.change-tagname-input:hover {
+    background-color: #303030 !important;
+    cursor: text;
+}
+.error-placeholder {
+    color:red !important;
+    font-weight: bold;
+}
+  

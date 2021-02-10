@@ -6,13 +6,14 @@ import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.strategy';
+import { InviteModule } from 'src/invites/invite.module';
 
 @Module({
   imports: [forwardRef(() => UserModule), PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {expiresIn: '24h'}
-    })
+    }), InviteModule
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService]

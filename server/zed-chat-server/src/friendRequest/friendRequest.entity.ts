@@ -21,4 +21,7 @@ export class FriendRequest {
 
   @CreateDateColumn()
   createdAt: string;
+
+  @Column()
+  recipientTagname: string;
 }

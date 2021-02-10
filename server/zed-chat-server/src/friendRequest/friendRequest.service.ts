@@ -26,16 +26,14 @@ export class FriendRequestService {
         const sender = await this.userService.findOne(userId);
         const recipient = await this.userService.findOne(recipientId);
         if(sender && recipient && recipient.id){
-            if(sender.friendRequests.filter(el => el.recipientId === recipient.id ).length > 0){
-                throw "Cannot send more than 1 friend request to this user"
-            }
-            else {
+            // if(sender.friendRequests.filter(el => el.recipientId === recipient.id ).length > 0){
+            //     throw "Cannot send more than 1 friend request to this user"
+            // }
                 const friendRequest = new FriendRequest();
                 friendRequest.recipientId = recipient.id;
                 friendRequest.sender = sender
                 const ret = await this.friendRequestRepository.save(friendRequest);
                 return this.friendRequestRepository.findOne(ret.id, { relations: ['sender']})
-            }
         }
         if(!recipient || !recipient.id) throw "User does not exist"
         if(!sender) throw "Sender does not exist"

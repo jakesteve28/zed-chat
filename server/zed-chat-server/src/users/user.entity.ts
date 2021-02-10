@@ -56,5 +56,13 @@ export class User {
   @OneToMany(type => FriendRequest, friendRequest => friendRequest.sender)
   friendRequests: FriendRequest[]
 
+  @Column({ default: false })
+  loggedIn: boolean; 
+
+  @Column({ default: false })
+  flagged: boolean; 
+
+  @Column({ default: false })
+  disabled: boolean;
 
 }

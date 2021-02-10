@@ -82,6 +82,9 @@ const requestExists = (id, requests) => {
 }
 
 const setupEventListeners = (notificationSocket, dispatch, account, friends, requests, conversations, sentInvites, receivedInvites) => {
+    //After passing an enormous amount of shit, this function sets up the notification socket.
+    //I need to refactor this, document. I pulled it out of the "notifications socket" component below... 
+    //TODO
     notificationSocket.on(socketEvents.received.connectSuccess, (msg) => {
         console.log(`Successfully connected to notifications namespace with client ID | ${msg.clientId}`);
     });
@@ -192,6 +195,7 @@ const setupEventListeners = (notificationSocket, dispatch, account, friends, req
                     return;
                 } else {
                     dispatch(addFriendRequest(msg.friendRequest));
+                    toast.info(`Successfully sent friend request to ${msg.friendRequest.recipientId}`)
                     console.log(`Successfully sent friend request with ID | ${msg.friendRequest.id} | and added to state`);
                     return;
                 }
@@ -207,6 +211,7 @@ const setupEventListeners = (notificationSocket, dispatch, account, friends, req
 
     notificationSocket.on(socketEvents.received.friendRequestSentError, (msg) => {
         console.log(`Error: friend request sent server error | ${msg.msg}`);
+        toast.warning(`Server error: friend request not sent! ${msg.err}` , { position: "top-center", hideProgressBar: true, pauseOnHover: true})
     });
 
     notificationSocket.on(socketEvents.received.friendRequestDeclined, (msg) => {
@@ -238,6 +243,7 @@ const setupEventListeners = (notificationSocket, dispatch, account, friends, req
                         dispatch(removeFriend(recId));
                     } 
                     dispatch(declineRequest(msg.friendRequest.id));
+                    toast.warning(`Friend request declined`, { position: "top-center", hideProgressBar: true, pauseOnHover: true});
                     console.log(`Successfully marked friend request with ID | ${msg.friendRequest.id} | as declined in state`, requests);
                     return;
                 } else {
@@ -387,7 +393,15 @@ export default function NotificationSocket(){
             } catch(err) {
                 console.log("Error establishing notifications notificationSocket", err)
             }
-        } 
+        }
+        return () => {
+            if(notificationSocket) {
+                Object.keys(socketEvents.received).map(el => notificationSocket.off(el));
+                notificationSocket.close();    
+                notificationSocket = null;
+            }
+        }
+        
     }, []);
     return null;
 }

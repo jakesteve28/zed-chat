@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Button, Container, Row, Dropdown, Col, FormControl, InputGroup, Tabs, Tab } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import './topbar.css'
 import { Badge } from '@material-ui/core'
@@ -11,7 +11,9 @@ import {
   clearAccount
 } from '../account/accountSettingsSlice';
 import {
-  clearConversations
+  clearConversations,
+  selectCurrentConversation,
+  selectConversations
 } from '../currentConversation/conversationsSlice';
 import {
   selectFriends,
@@ -35,33 +37,52 @@ import GroupIcon from '@material-ui/icons/Group';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Tooltip from '@material-ui/core/Tooltip';
+import chatDisconnect from '../socket/chatSocket';
+import notificationsDisconnect from '../socket/notificationSocket';
 
 export function FriendsDropdown(){
+    const dispatch = useDispatch();
+    const history = useHistory();
     const token = useSelector(selectToken);
     const account = useSelector(selectAccount);
     const friends = useSelector(selectFriends);
+    const conversations = useSelector(selectConversations);
     const [addFriendInput, setAddFriendInput] = useState("");
     const [searchFriendInput, setSearchFriendInput] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
-    const [filteredFriends, setFilteredFriends] = useState([]);
+    const [filteredFriends, setFilteredFriends] = useState(null);
     const [searchError, setSearchError] = useState(false);
     const [addError, setAddError] = useState(false);
     const errorMsgs = useRef([]);
-
+    const currentConversation = useSelector(selectCurrentConversation);
+    
     const checkInput = () => {
-      if(!errorMsgs.current || Array.isArray(errorMsgs.current) === false || errorMsgs.current.length !== 0){
-          errorMsgs.current = []
-      }
       let passing = true;
-      if(regex.tagName.test(addFriendInput) === false){
+      errorMsgs.current = []
+      if(regex.tagNameSearch.test(searchFriendInput) === false){
         passing = false;
         errorMsgs.current.push("Invalid friend name");
       }
-      if(account.tagName === addFriendInput){
+      if(account.tagName === searchFriendInput){
         passing = false;
         errorMsgs.current.push("Cannot search/send self");
+      }
+      if(!passing) setError(true);
+      return passing;
+    }
+
+    const checkAddFriendInput = () => {
+      let passing = true;
+      errorMsgs.current = []
+      if(regex.tagName.test(addFriendInput) === false){
+        passing = false;
+        errorMsgs.current.push("Invalid tagname. Try 8-24 letters, numbers, dashes, underscores");
+      }
+      if(friends.filter(friend => friend.tagName === addFriendInput).length > 0) {
+        passing = false;
+        errorMsgs.current.push("Friend already exists");
       }
       if(!passing) setError(true);
       return passing;
@@ -93,7 +114,7 @@ export function FriendsDropdown(){
         errorMsgs.current = []
       }
       setAddError(false);
-      if(checkInput() === false){
+      if(checkAddFriendInput() === false){
         console.log("Error cannot send friend request", errorMsgs);
         setAddError(true)
         return;
@@ -102,13 +123,9 @@ export function FriendsDropdown(){
           notificationSocket.emit('sendFriendRequest', {
             senderId: account.id,
             recipientId: addFriendInput
-          }, () => console.log("Successfully emitted send friend request"));
-          setSuccess(true);
-          setSuccessMsg(`Sent friend request to @${addFriendInput}`);
-          setTimeout(() => {
-            setSuccess(false);
-            setSuccessMsg("");
-          }, 2000);
+          }, () => {
+            console.log(`Friend request sent to user @${addFriendInput}`);
+          });
         } else {
           console.log("Error sending friend request, not connected to notifications socket");
       }
@@ -128,45 +145,67 @@ export function FriendsDropdown(){
               <Col xs="10">
                   <InputGroup>
                     <FormControl
-                      style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "#2499bf", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
+                      style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
                       placeholder="Add Friend By Tagname"
                       aria-label="Add Friend By Tagname"
                       aria-describedby="basic-addon1"
-                      className="search-friend-bar"
+                      className={(addError) ? "search-friend-bar error-placeholder" : "search-friend-bar"}
                       onChange={(e) => { setAddFriendInput(e.target.value) }}
                     />
                 </InputGroup>
               </Col>
               <Col xs="2">
-                <Button variant="dark" className="mr-3 pr-2" style={{ display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => sendFriendRequest() } disabled={(addFriendInput.length > 8)}><PersonAddIcon style={{ height: 30, width: 30, color: "#AAAAAA" }}></PersonAddIcon></Button>
+                <Button variant="dark" className="mr-3 pr-2" style={{ display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => sendFriendRequest() } disabled={(addFriendInput.length < 8)}><PersonAddIcon className={(addError) ? "error-icon" : ""} style={{ height: 30, width: 30, color: "#AAAAAA" }}></PersonAddIcon></Button>
               </Col>
             </Row> 
-            <Row className="m-1 mt-2 mb-2 border-bottom border-dark mb-1 pb-3">
+            <Row className="m-1 mt-2 mb-2 mb-1 pb-3">
                 <Col xs="10">
                     <InputGroup>
                       <FormControl
-                        style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "#2499bf", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
+                        style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
                         placeholder="Search Friends..."
                         aria-label="Search Friends..."
                         aria-describedby="basic-addon1"
-                        className="search-friend-bar w-100"
+                        className={(searchError) ? "search-friend-bar error-placeholder" : "search-friend-bar"}
                         onChange={(e) => { setSearchFriendInput(e.target.value) }}
                       />
                   </InputGroup>
                 </Col>
                 <Col xs="2">
-                  <Button variant="dark" style={{  display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => searchFriends() }><SearchOutlined style={{ height: 30, width: 30, color: "#AAAAAA" }}></SearchOutlined></Button>
+                  <Button variant="dark" style={{  display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => searchFriends() }><SearchOutlined className={(searchError) ? "error-icon" : ""} style={{ height: 30, width: 30, color: "#AAAAAA" }}></SearchOutlined></Button>
                 </Col>
               </Row> 
               <Row style={{ maxWidth: "250px", minWidth: "250px", overflowY: "scroll", marginRight: "auto", marginLeft: "15px"}} className="mt-1 pb-1">
                 <Col style={{ maxHeight: "190px" }}>
                 {
-                 (Array.isArray(filteredFriends) && filteredFriends.length > 1) ?
+                 (Array.isArray(filteredFriends)) ?
                       filteredFriends.map((el) => {
+                        const convsWithFriend = []
+                        if(conversations && Array.isArray(conversations)) {
+                          for(let conv of conversations) {
+                             if(conv.users && Array.isArray(conv.users)) {
+                               for(let user of conv.users) {
+                                   if(user.tagName === el.tagName) {
+                                       convsWithFriend.push(conv);
+                                       break;
+                                   }
+                               }
+                             }
+                          }
+                        }
                         if(el && el.tagName){
                           return (
                             <Row key={el.tagName} style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
-                              <FriendListItem key={el.tagName} tagName={el.tagName}></FriendListItem>
+                              <FriendListItem 
+                                account={account} 
+                                currentConversation={currentConversation} 
+                                history={history} 
+                                dispatch={dispatch} 
+                                conversations={convsWithFriend} 
+                                key={el.tagName} 
+                                tagName={el.tagName} 
+                                isOnline={el.isOnline}>
+                              </FriendListItem>
                             </Row>
                           )
                         } else return null;                          
@@ -174,26 +213,36 @@ export function FriendsDropdown(){
                   :
                     friends.map((el) => {
                       if(el && el.tagName){
+                        const convsWithFriend = []
+                        if(conversations && Array.isArray(conversations)) {
+                           for(let conv of conversations) {
+                              if(conv.users && Array.isArray(conv.users)) {
+                                for(let user of conv.users) {
+                                    if(user.tagName === el.tagName) {
+                                        convsWithFriend.push(conv);
+                                        break;
+                                    }
+                                }
+                              }
+                           }
+                        }
                         return (
                             <Row key={el.tagName} style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
-                              <FriendListItem key={el.tagName} tagName={el.tagName}></FriendListItem>
-                              </Row>
+                              <FriendListItem 
+                                account={account} 
+                                currentConversation={currentConversation} 
+                                history={history} 
+                                dispatch={dispatch} 
+                                conversations={convsWithFriend} 
+                                key={el.tagName} 
+                                tagName={el.tagName} 
+                                isOnline={el.isOnline}>
+                              </FriendListItem>
+                            </Row>
                         )
                       } else return null;                          
                     })
                   }
-                  <Row key="1412qgsacxq25t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                  <FriendListItem tagName={"asdf1237"} isOnline={true}></FriendListItem>
-                  </Row>
-                  <Row key="1412qxfgbsgq25t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                    <FriendListItem tagName={"mock1234"} isOnline={true}></FriendListItem>
-                  </Row>
-                  <Row key="1412qgq606925t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                    <FriendListItem tagName={"mock3243"} isOnline={true}></FriendListItem>
-                  </Row>
-                  <Row key="14122346qgq25t" style={{ maxHeight: "65px" , backgroundColor: "#252525"}} className="friend-topbar">
-                    <FriendListItem tagName={"mock3421"} isOnline={true}></FriendListItem>
-                  </Row>
                 </Col>
               </Row>  
           </Container>
@@ -225,30 +274,7 @@ export function FriendsDropdown(){
 
 
   
-export function NotificationsDropdown(){
-
-
-
-    // const acceptFriendRequest = (id, recipientId) => {
-      //   console.log("Accept Friend Request Clicked", id, recipientId, account.id)
-      //   if(notificationSocket && account){
-      //     if(recipientId === account.id){
-      //       notificationSocket.emit("acceptFriendRequest", JSON.stringify({ friendRequestId: id }));
-      //     }
-      //   }
-      // }
-      // const sendAccept = (inviteId, userId, conversationId) => {
-      //   if(notificationSocket){
-      //     console.log("Accepting invite", { inviteId: inviteId, userId: userId, conversationId: conversationId }, receivedInvites);
-      //     notificationSocket.emit("acceptInvite", JSON.stringify({ inviteId: inviteId, userId: userId, conversationId: conversationId }))
-      //   }
-      //   const invite = JSON.parse(JSON.stringify(receivedInvites.filter(inv => inv.id === inviteId)[0]));
-      //   if(invite){
-      //     dispatch(removeReceivedInvite(inviteId));
-      //     dispatch(addAcceptedInvite(invite));
-      //     console.log("Invite accepted");
-      //   }
-      // }
+export function NotificationsDropdown() {
     const receivedInvites = useSelector(selectReceived);
     const friendRequests = useSelector(selectFriendRequests);
     const _acceptedInvites = useSelector(acceptedInvites);

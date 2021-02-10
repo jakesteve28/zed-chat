@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, InputGroup, Spinner, FormControl, Container, Row, Col } from 'react-bootstrap'
 import { Redirect, Link } from 'react-router-dom';
@@ -18,7 +18,6 @@ import {
   selectAccount
 } from '../account/accountSettingsSlice'
 import {
-  addSentInvite,
   addAcceptedInvite,
   addReceivedInvite
 } from '../topbar/inviteSlice'
@@ -28,20 +27,8 @@ import { addFriend,
 import {
   setTopbarMessage
 } from '../uiSlice';
-const getAccount = async (id, authToken) => {
-  const account = await fetch(`http://localhost:3000/api/users/${id}`, {
-    headers: {
-      "Authorization": `Bearer ${authToken}`
-    }
-  });
-  const bodyAcc = await account.json();
-  if(bodyAcc.statusCode === 401 || bodyAcc.statusCode === 500){
-        return false;
-  }
-  return bodyAcc;
-}
 
-const getAuthToken = async (username, password) => {
+const loginServer = async (username, password) => {
   const requestBody = JSON.stringify({
     tagName: `${username}`,
     password: `${password}`
@@ -59,51 +46,13 @@ const getAuthToken = async (username, password) => {
       console.log("Server error while attempting login!")
       return false;
   }
-  if(body.access_token && body.id){
-    return { authToken: body.access_token, id: body.id };
+  if(body.access_token && body.id && body.user && body.invites){
+    console.log("Successfully logging in user", body.user.tagName); 
+    return { user: body.user, authToken: body.access_token, id: body.id, invites: body.invites };
   } else {
     console.log("Error retrieving login token from server! Malformed body!", body);
     return false;
   }
-}
-
-const getFriendRequests = async (id, authToken) => {
-  const friendRequestsRes = await fetch(`http://localhost:3000/api/users/invites/${id}`, {
-      headers: {
-        "Authorization": `Bearer ${authToken}`,
-        "Content-Type": "application/json"
-      }
-    })
-    if(friendRequestsRes.status !== 200){
-      console.log("Error fetching sent invites from user")
-    }
-    const friendRequests = await friendRequestsRes.json();
-    return friendRequests;
-}
-
-const getInvitesReceived = async (id, authToken) => {
-  const receivedInvitesRes = await fetch(`http://localhost:3000/api/invite/user/${id}`, {
-    headers: {
-      "Authorization": `Bearer ${authToken}`,
-      "Content-Type": "application/json"
-    }
-  })
-  const receivedInvites = await receivedInvitesRes.json();
-  return receivedInvites;
-}
-
-const getInvitesSent = async (id, authToken) => {
-  const sentInvitesRes = await fetch(`http://localhost:3000/api/invite/sent/${id}`, {
-    headers: {
-      "Authorization": `Bearer ${authToken}`,
-      "Content-Type": "application/json"
-    }
-  })
-  if(sentInvitesRes.status !== 200){
-    throw Error("Error fetching sent invites from user");
-  }
-  const sentInvites = await sentInvitesRes.json();
-  return sentInvites;
 }
 
 function LoginScreen() {
@@ -114,6 +63,13 @@ function LoginScreen() {
   const dispatch = useDispatch();
   const account = useSelector(selectAccount);
   const [spinning, setSpinning] = useState(false);
+  const focusRef = useRef(null);
+
+  useEffect(() => {
+    if(focusRef.current) {
+      focusRef.current.focus();
+    }
+  }, [])
 
   const checkInput = () => {
     let passing = true;
@@ -142,84 +98,57 @@ function LoginScreen() {
       setSpinning(false);
       return;
     }
-    const { id, authToken } = await getAuthToken(userName, password);
-    const bodyAcc = await getAccount(id, authToken);
-    if( id && 
-        authToken && 
-        bodyAcc && 
-        bodyAcc.email && 
-        bodyAcc.tagName && 
-        Array.isArray(bodyAcc.conversations) &&
-        Array.isArray(bodyAcc.friends) &&
-        Array.isArray(bodyAcc.friendRequests)
-      ) {
-        dispatch(setToken(`${authToken}`))
-        dispatch(setEmail(bodyAcc.email))
-        dispatch(setTagName(bodyAcc.tagName))
-        dispatch(setId(id))
-        bodyAcc.conversations.map(conv => {
-          dispatch(addConversation({conversation: conv}))
-          return conv
-        })
-        const friends = []
-        bodyAcc.friends.map(friend => {
-          dispatch(addFriend(friend))
-          friends.push(friend)
-          return friend
-        })
-        console.log("Friends: ", friends)
-        bodyAcc.friendRequests.map(friendReq => {
-          dispatch(addFriendRequest(friendReq));
-          return null;
-        })  
-    } else {
-      setError(true);
-      setErrorMsgs(["Error retrieving user details from server!"]);
-      console.log("Error retrieving user details from server!");
-      setSpinning(false);
+    const result = await loginServer(userName, password);
+    if(!result || result === false) {
+        setError(true);
+        setSpinning(false);
+        setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
+        return;
     }
-    const friendRequests = await getFriendRequests(id, authToken);    
-    const requests = []
-    const sent = []
-    if(friendRequests && Array.isArray(friendRequests)){   
-      for(let request of friendRequests){
-        if(request.recipientId === bodyAcc.id){   
-          requests.push(request)
-          dispatch(addFriendRequest(request))
-        } else if(request.sender.id === bodyAcc.id) {
-          sent.push(request)
+    const  { id, authToken, user, invites } = result;
+    if( !id || 
+        !authToken || 
+        !user || 
+        !user.email || 
+        !user.tagName ||  
+        !Array.isArray(user.conversations) ||  
+        !Array.isArray(user.friends) || 
+        !Array.isArray(user.friendRequests) || 
+        !Array.isArray(invites)){
+          setError(true);
+          setSpinning(false);
+          setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
+          return;
+      }
+    dispatch(setToken(`${authToken}`));
+    dispatch(setEmail(user.email));
+    dispatch(setTagName(user.tagName));
+    dispatch(setId(id));
+    user.conversations.map(conv => {
+        if(conv.pending !== true){
+          dispatch(addConversation({ conversation: conv }));
         }
-      }
-    } else {
-      setError(true);
-      setErrorMsgs(["Error fetching received friend requests"]);
-      console.log("Error fetching received friend requests");
-      setSpinning(false);
-      return;
-    }
-    // console.log("Received Friend Requests: ", requests)
-    // console.log("Sent Friend Requests: ", sent)
-   // console.log("Friend Requests: ", bodyAcc.friendRequests, "Received: ", receivedFriendRequests)
-   // dispatch(setCurrentConversation(bodyAcc.conversations[0]))
-    dispatch(login())
-    const sentInvites = await getInvitesSent(id, authToken);
-    if(sentInvites && Array.isArray(sentInvites)){
-      console.log("Sent Invites: " + JSON.stringify(sentInvites))
-      for(let invite of sentInvites){
-        dispatch(addSentInvite(invite))
+    });
+    user.friends.map(friend => {
+      dispatch(addFriend(friend));
+    }); 
+    if(user.friendRequests && Array.isArray(user.friendRequests)){   
+      for(let request of user.friendRequests){
+        if(request.recipientId === user.id){   
+          dispatch(addFriendRequest(request))
+        } 
       }
     }
-    const receivedInvites = await getInvitesReceived(id, authToken);
-    if(receivedInvites && Array.isArray(receivedInvites)){
-      console.log("Received Invites: " + JSON.stringify(receivedInvites))
-      for(let invite of receivedInvites){
+    if(invites && Array.isArray(invites)){
+      for(let invite of invites){
         if(invite.accepted === true)
-          dispatch(addAcceptedInvite(invite))
+          dispatch(addAcceptedInvite(invite));
         else  
-          dispatch(addReceivedInvite(invite))
+          dispatch(addReceivedInvite(invite));
       }
     }
-    console.log("Successfully logged in, account fetched");
+    dispatch(login());
+    console.log("Successfully logged in user " + user.tagName);
     setSpinning(false);
   }
 
@@ -244,6 +173,7 @@ function LoginScreen() {
                     }
                 }
                   onChange={ e => _setUserName(e.target.value) }
+                  ref={focusRef}
                 />
               </InputGroup>
               <InputGroup className="mb-5">

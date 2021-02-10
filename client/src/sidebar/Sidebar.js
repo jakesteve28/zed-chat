@@ -20,7 +20,9 @@ import InfoIcon from '@material-ui/icons/Info';
 import { setTopbarMessage } from '../uiSlice';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import Tooltip from '@material-ui/core/Tooltip';
-import { setSidebarState, selectSidebarState } from '../uiSlice';
+import { selectSidebarState } from '../uiSlice';
+import { chatSocket } from '../socket/chatSocket';
+import regex from '../regex';
 
 const useStyles = makeStyles((theme) => ({
     animate_in: {
@@ -83,6 +85,7 @@ export default function Sidebar(){
     const classes = useStyles();
     const narrowScreen = size.width < 768;
     let conversations = useSelector(selectConversations);
+    let [filteredConversations, setFilteredConversations] = useState([]);
     const dispatch = useDispatch();
     const showConvList = useSelector(selectShowConvList);
     const account = useSelector(selectAccount);
@@ -91,26 +94,55 @@ export default function Sidebar(){
     const location = useLocation();
     const currentConversation = useSelector(selectCurrentConversation);
     const sidebarState = useSelector(selectSidebarState);
-    const cl = (el) => {
+    const [searchScreen, setSearchScreen] = useState(false);
+    const [error, setError] = useState(false);
+
+    const searchChatNames = () => {
+        setError(false);
+        if(searchBar.length > 4){
+            if(regex.conversationName.test(searchBar) === false) {
+                console.log("Input failed for searching a conversation name");
+                setError(true);
+                return; 
+            }
+            const anyConvs = conversations.filter(conv => conv.conversationName.includes(searchBar) || searchBar.includes(conv.conversationName));
+            if(anyConvs.length > 0) {
+                setFilteredConversations(anyConvs);
+                setSearchScreen(true);
+            } else {
+                setError(true);
+            }
+        } else setError(true);
+    }
+
+    const selectConversation = (el) => {
         if(!el.pending){
             console.log("Setting current conversation...", el);
             console.log(history, location);
             if(location.pathname !== '/home'){
                 history.push('/home');
             }
-            // if(currentConversation.conversationName === el.conversationName){
-            //     return;
-            // }
-            if(el && el.conversationName !== '' && size.width > 768){
+            if(currentConversation.conversationName === el.conversationName){
+                //dispatch(setCurrentConversation({conversation: el }));
+                dispatch(setView(false)); 
+                dispatch(setShowConvList(false));
+                return; //Speaks for itself
+            }
+            if(el && el.conversationName !== '' && size.width > 768 && (currentConversation.conversationName !== el.conversationName)){
                 //Wide screen shows name
-                dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon>&nbsp;{el.conversationName}</span>)));
+                dispatch(setTopbarMessage(el.conversationName));
             }  
-            if(el && el.conversationName !== '' && size.width <= 768) {
+            if(el && el.conversationName !== '' && size.width <= 768 && (currentConversation.conversationName !== el.conversationName)) {
                 //Narrow screen only icon
-                dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon></span>))); 
+                dispatch(setTopbarMessage("")); 
             }
             dispatch(setView(false)); //Set NOT default view
-            dispatch(setCurrentConversation(el)); //Speaks for itself
+            dispatch(setCurrentConversation({conversation: el })); //Speaks for itself
+            //Now that we set the current conv, we going to notify server
+            if(chatSocket){
+                chatSocket.emit('setCurrentConversation', { user: account, conversationId: el.id }, 
+                () => console.log("Emitted setCurrentConversation successfully"));
+            }
             dispatch(setShowConvList(false)); //Sidebar not showing or narrow
         } else {
             console.log(`Conversation is pending invite accept`, el);
@@ -144,9 +176,6 @@ export default function Sidebar(){
         } else {
             return classes.narrowPaper;
         }  
-    }
-    const handleSearch = () => {
-        alert("Searching!");
     }
     const getMinWidthListItem = () => {
         if(narrowScreen && showConvList){
@@ -200,31 +229,35 @@ export default function Sidebar(){
                                     autoComplete="new-password"
                                 />  
                                 <InputGroup.Append style={{ maxWidth: "30px" }}>
-                                    <Tooltip title="Search Chats">
-                                        <Button variant="dark" className="custom-sidebar-search-button" style={{ backgroundColor: "#404040", border: "none" }}><SearchOutlined style={{ color: "#EEEEEE" }}></SearchOutlined></Button>
+                                    <Tooltip title="Search Chat Names">
+                                        <Button variant="dark" onClick={() => searchChatNames()} className="custom-sidebar-search-button" style={{ backgroundColor: "#404040", border: "none" }}><SearchOutlined className={(error) ? "error-icon" : ""} style={{ color: "#EEEEEE" }}></SearchOutlined></Button>
                                     </Tooltip>
+                                    {
+                                      (searchScreen) ?  
+                                        <Tooltip title="Exit Search">
+                                            <Button variant="dark" onClick={() => setSearchScreen(false)} className="custom-sidebar-search-button" style={{ backgroundColor: "#404040", border: "none" }}>X</Button>
+                                        </Tooltip>
+                                        : ""
+                                    }
+                                    
                                 </InputGroup.Append>      
                         </InputGroup>
                    </Container>
                 </ListItem>
                     {                   
-                    conversations.map((el) => {
-                        // if(convMap.current){
-                        //     if(convMap.current[el.id]){
-                        //         return ""
-                        //     } else {
-                        //         convMap.current[el.id] = true;
-                        //     }
-                        // }
+                    
+                    (searchScreen) ? 
+                       filteredConversations.map((el) => {
                         if(el.pending === true){
                             return ""
                         }
+                        const selected = currentConversation.conversationName === el.conversationName; 
                         return (
-                            <ListItem onClick={() => cl(el)} key={el.id} className="sidebar-list-item light-hover" style={{ backgroundColor: "#222222" }} >
-                                <Container fluid style={{ backgroundColor: "#222222" }} className="light-hover" >
-                                    <Row style={{ backgroundColor: "#222222" }} className="light-hover">
-                                        <Col className="conv-info light-hover" style={{ minWidth: getMinWidthListItem() }}>
-                                            <Container fluid className="light-hover">
+                            <ListItem onClick={() => selectConversation(el)} key={el.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} style={{ backgroundColor: "#222222" }} >
+                                <Container fluid style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"} >
+                                    <Row style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"}>
+                                        <Col className={(selected) ? "conv-info light-selected" : "conv-info light-hover"} style={{ minWidth: getMinWidthListItem() }}>
+                                            <Container fluid className={(selected) ? "light-selected" : "light-hover"}>
                                                 <Row className="font-italic text-primary" style={{ fontSize: "11pt", minWidth: getMinWidthListItem()  }}>
                                                     {el ? el.conversationName : "Chat Name"}
                                                 </Row>
@@ -240,9 +273,96 @@ export default function Sidebar(){
                                                 </Row>
                                             </Container>
                                         </Col>
-                                        <Col className="hide-conv-info text-right light-hover" style={{ backgroundColor: "#222222", marginLeft: getButtonMargin() }}>
-                                            <Container className="light-hover" style={{ backgroundColor: "#222222" }} fluid>
-                                                <Dropdown className="light-hover" style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
+                                        <Col className={(selected) ? "hide-conv-info text-right light-selected" : "hide-conv-info text-right light-hover"}
+                                        style={{ backgroundColor: "#222222", marginLeft: getButtonMargin() }}>
+                                            <Container className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222" }} fluid>
+                                                <Dropdown className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
+                                                    <Dropdown.Toggle 
+                                                        className="dropdown-toggle-conv-info text-white"
+                                                        style={{ border:" none", backgroundColor: "#222222"}} 
+                                                        as={Button} variant="dark" id="dropdown-custom-components">
+                                                        <MoreVertIcon></MoreVertIcon>
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu style={{ backgroundColor: "#222222"}} className="my-dropdown shadow text-white text-center">        
+                                                        <Dropdown.Item  
+                                                                className="text-white shadow conv-dropdown-item" 
+                                                                as="button" onClick={ 
+                                                                    (e) =>
+                                                                    {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+
+                                                                    }}>
+                                                                Info&nbsp;<InfoIcon></InfoIcon>
+                                                            </Dropdown.Item>    
+                                                        <Dropdown.Item  
+                                                            className="text-white shadow conv-dropdown-item" 
+                                                            as="button" onClick={ 
+                                                                (e) =>
+                                                                {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleDelete(id);                                                      
+                                                                }}>
+                                                            Delete&nbsp;<DeleteOutlineIcon></DeleteOutlineIcon>
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item  
+                                                            className="text-white shadow conv-dropdown-item" 
+                                                            as="button" 
+                                                            onClick={ 
+                                                                (e) => {  
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleLeave(id);
+                                                                }}>
+                                                            Leave&nbsp;<ExitToAppIcon></ExitToAppIcon>
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </Container>
+                                        </Col>
+                                    </Row>
+                                </Container>
+                            </ListItem>
+                        ) })
+                    :
+                    conversations.map((el) => {
+                        // if(convMap.current){
+                        //     if(convMap.current[el.id]){
+                        //         return ""
+                        //     } else {
+                        //         convMap.current[el.id] = true;
+                        //     }
+                        // }
+                        if(el.pending === true){
+                            return ""
+                        }
+                        const selected = currentConversation.conversationName === el.conversationName; 
+                        return (
+                            <ListItem onClick={() => selectConversation(el)} key={el.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} style={{ backgroundColor: "#222222" }} >
+                                <Container fluid style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"} >
+                                    <Row style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"}>
+                                        <Col className={(selected) ? "conv-info light-selected" : "conv-info light-hover"} style={{ minWidth: getMinWidthListItem() }}>
+                                            <Container fluid className={(selected) ? "light-selected" : "light-hover"}>
+                                                <Row className="font-italic text-primary" style={{ fontSize: "11pt", minWidth: getMinWidthListItem()  }}>
+                                                    {el ? el.conversationName : "Chat Name"}
+                                                </Row>
+                                                <Row className="w-100" style={{ fontSize: "9pt" }}>
+                                                    <div className="ml-1 d-block text-truncate">
+                                                        {(el && el.messages && el.messages[0]) ? el.messages[0].body : ""}                  
+                                                    </div>
+                                                </Row>
+                                                <Row className="lead w-100 mt-1" style={{ fontSize: "8pt"}}>
+                                                    <div className="ml-1 d-block font-italic">
+                                                        {el ? new Date(Date.parse(el.createdAt)).toLocaleString('en-US'): ""}   
+                                                    </div>
+                                                </Row>
+                                            </Container>
+                                        </Col>
+                                        <Col className={(selected) ? "hide-conv-info text-right light-selected" : "hide-conv-info text-right light-hover"}
+                                        style={{ backgroundColor: "#222222", marginLeft: getButtonMargin() }}>
+                                            <Container className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222" }} fluid>
+                                                <Dropdown className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
                                                     <Dropdown.Toggle 
                                                         className="dropdown-toggle-conv-info text-white"
                                                         style={{ border:" none", backgroundColor: "#222222"}} 
