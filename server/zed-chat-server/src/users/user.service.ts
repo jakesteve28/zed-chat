@@ -26,7 +26,7 @@ export class UserService {
   async findOne(id: string): Promise<User> {
       const user = await this.usersRepository.findOne(id, { relations: ["conversations", "friends", "friendRequests"] });
       for(let conv of user.conversations){
-        conv.messages = await this.conversationService.getMessages(conv.id);
+        conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
         conv.users = await this.conversationService.getUsers(conv.id);
       }
       return user;
@@ -220,7 +220,7 @@ export class UserService {
     const user = await this.usersRepository.findOne(userId, { relations: ["conversations", "friends", "friendRequests"]});
     if(user){
       for(let conv of user.conversations){
-        conv.messages = await this.conversationService.getMessages(conv.id);
+        conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
       }
       if(user.loggedIn === true) {
          console.log("User already marked as logged in in database"); 

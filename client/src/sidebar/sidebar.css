@@ -171,7 +171,6 @@
 }
 
 .dropdown-toggle-conv-info {
-    margin-right: 100px !important;
     text-align: left;
 }
 
@@ -188,4 +187,8 @@
 
 .error-icon {
     color: red !important;
+}
+
+.conv-dropdown {
+    background-color: #222222 !important;
 }

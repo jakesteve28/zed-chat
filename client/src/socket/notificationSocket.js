@@ -195,7 +195,7 @@ const setupEventListeners = (notificationSocket, dispatch, account, friends, req
                     return;
                 } else {
                     dispatch(addFriendRequest(msg.friendRequest));
-                    toast.info(`Successfully sent friend request to ${msg.friendRequest.recipientId}`)
+                    toast.info(`Successfully sent friend request to ${msg.friendRequest.recipientId}`,  { position: "top-center", hideProgressBar: true, pauseOnHover: true})
                     console.log(`Successfully sent friend request with ID | ${msg.friendRequest.id} | and added to state`);
                     return;
                 }

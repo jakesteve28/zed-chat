@@ -67,6 +67,17 @@ export const conversationsSlice = createSlice({
         }
         state.conversations = produce(convs, draftState => {});
     },
+    removeMessage: (state, action) => {
+        const { conversationId, messageId } = action.payload;
+        if(state.currentConversation = conversationId) {
+            state.currentConversation.messages = state.currentConversation.messages.filter(msg => msg.id !== messageId);
+        } 
+        for(let conv of state?.conversations) {
+            if(conv.id === conversationId){
+                conv.messages = conv.messages.filter(msg => msg.id !== messageId); 
+            }
+        }
+    },
     setJoined: (state, action) => {
         state.currentConversation.joined = action.payload
     },
@@ -92,10 +103,31 @@ export const conversationsSlice = createSlice({
         if(state.currentConversation.messages.length > 1) 
             state.currentConversation.messages.sort((a, b) =>  Date.parse(a.createdAt) - Date.parse(b.createdAt));
     },
+    pinMessage: (state, action) => {
+        for(let conv of state.conversations) {
+            if(action.payload.conversation.id === conv.id) {
+                for(let msg of conv.messages) {
+                    if(msg.id === action.payload.id){
+                        msg.pinned = action.payload.pinned;
+                    }
+                }
+            }
+        }
+    },
+    batchAddMessages: (state, action) => {
+        const { messages, conversationId } = action.payload; 
+        for(let message of messages) {
+            if(message?.conversationId === conversationId){
+                if(state.currentConversation.id === conversationId) {
+                    state.currentConversation.messages.push(message); 
+                } 
+            }
+        }
+    }
   }
 });
 
-export const { sortMessages, setShowConvList, clearConversations, setView, setTyping, setRead, setJoined, addMessage, setCurrentConversation, addConversation, removeConversation } = conversationsSlice.actions;
+export const { batchAddMessages, removeMessage, sortMessages, setShowConvList, clearConversations, setView, setTyping, setRead, setJoined, addMessage, setCurrentConversation, addConversation, removeConversation, pinMessage } = conversationsSlice.actions;
 
 export const selectConversations = state => state.conversations.conversations;
 export const selectCurrentConversation = state => state.conversations.currentConversation;

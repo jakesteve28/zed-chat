@@ -10,6 +10,9 @@ export class Message {
   @Column()
   body: string;
 
+  @Column({ default: false })
+  pinned: boolean;
+
   @Column({
     default: false
   })

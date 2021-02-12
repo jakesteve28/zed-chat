@@ -263,6 +263,7 @@ export default function NewConversation(){
                 });
             }
         }
+        toast.info(`Successfully sent out conversation invites!`,  { position: "top-center", hideProgressBar: true, pauseOnHover: true});
     }
     useEffect(() => {
         if(newName && newName.current){

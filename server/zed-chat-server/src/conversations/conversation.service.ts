@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { cloneDeep } from 'lodash';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Conversation } from './conversation.entity';
@@ -77,7 +78,20 @@ export class ConversationService {
         }
         return conv.users;
     }
-    async getMessages(conversationId: string): Promise<Message[]> {
+    async getMessagesTruncated(conversationId: string): Promise<Message[]> {
+        const conversation = await this.conversationRepository.findOne({ where: {
+            id: conversationId
+        }, relations: ["messages"]});
+        if(conversation.messages.length > 1){
+            conversation.messages.sort((a, b) =>  Date.parse(a.createdAt) - Date.parse(b.createdAt));
+            const retMsgs = cloneDeep(conversation.messages); 
+            if(retMsgs.length > 25) {
+                retMsgs.slice(0, 25);
+                return retMsgs;
+            } else return retMsgs;
+        } else return conversation.messages;
+    }
+    async getAllMessages(conversationId: string): Promise<Message[]> {
         const conversation = await this.conversationRepository.findOne({ where: {
             id: conversationId
         }, relations: ["messages"]});

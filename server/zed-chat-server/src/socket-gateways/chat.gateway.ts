@@ -377,4 +377,30 @@ export class ChatGateway  {
             console.log(`Success: emitted "setCurrentConversationError" event to socket ${socketId}`);
         } 
     }
+
+    @UseGuards(ChatGuard)
+    @SubscribeMessage('pinMessage')
+    async handlePinMsg(@ConnectedSocket() client: Socket, @MessageBody() data ) {
+        try {
+            //const socketId = client.id;
+            const message = await this.messageService.pinMessage(data.messageId); 
+            if(message) {
+                const users = message.conversation.users; 
+                //const sender = message.user; 
+                if(Array.isArray(users)) {
+                    for(let user of users) {
+                        if(user.chatSocketId !== "disconnected") {
+                            this.wss.to(user.chatSocketId).emit("messagePinned", { message: message });
+                            console.log("Successfully emitted messagePinned to all chat users"); 
+                        }
+                    }
+                }
+            }
+        } catch(err) {
+            const socketId = client.id;
+            console.log(`Error: "messagePinned" event not sent | ${err} | with socket ${socketId}`);
+            this.wss.to(socketId).emit("messagePinnedError", { msg: err });
+            console.log(`Success: emitted "messagePinnedError" event to socket ${socketId}`);
+        } 
+    }
 }

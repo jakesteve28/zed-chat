@@ -33,7 +33,7 @@ export class MessageService {
         return this.messageRepository.save(message);
     }
     async setAllRead(conversationId: string, userId: string):  Promise<Message[]> {
-        const messages = await this.conversationService.getMessages(conversationId);
+        const messages = await this.conversationService.getAllMessages(conversationId);
         for(let msg of messages){
             if(msg.read !== true && msg.user.id !== userId){
                 msg.read = true;
@@ -41,5 +41,10 @@ export class MessageService {
             }
         }
         return messages;
+    }
+    async pinMessage(messageId: string): Promise<Message> {
+        const msg = await this.messageRepository.findOne(messageId); 
+        msg.pinned = !msg.pinned;
+        return this.messageRepository.save(msg); 
     }
 }

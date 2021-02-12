@@ -15,14 +15,41 @@ import { selectAccount } from '../account/accountSettingsSlice' ;
 import { SearchOutlined } from '@material-ui/icons';
 import { useHistory, useLocation } from 'react-router-dom';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import InfoIcon from '@material-ui/icons/Info';
 import { setTopbarMessage } from '../uiSlice';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import Tooltip from '@material-ui/core/Tooltip';
 import { selectSidebarState } from '../uiSlice';
 import { chatSocket } from '../socket/chatSocket';
 import regex from '../regex';
+
+const getMinWidthListItem = (narrowScreen, deleted, showConvList) => {
+    if((narrowScreen || deleted) && showConvList){
+        //Only show conversation list, aka sidebar
+        return "450px";
+    } else if(narrowScreen && !showConvList) {
+        //Only show current conversation, hide sidebar  
+        return "0px";
+    } else if(!narrowScreen && !showConvList) {
+        //Narrow sidebar for wider screens
+        return "200px";
+    } else {
+        return "200px";
+    } 
+}
+
+const getButtonMargin = (narrowScreen, showConvList) => {
+    if(narrowScreen && showConvList){
+        //Only show conversation list, aka sidebar
+        return "150px";
+    } else if(narrowScreen && !showConvList) {
+        //Only show current conversation, hide sidebar  
+        return "0px";
+    } else if(!narrowScreen && !showConvList) {
+        //Narrow sidebar for wider screens
+        return "-5px";
+    } else {
+        return "-5px";
+    } 
+}
 
 const useStyles = makeStyles((theme) => ({
     animate_in: {
@@ -78,7 +105,59 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: "20px",
       overflowX: "hide"
     },
-  }));
+}));
+
+export function ConversationListItem({ conversation, selectConversation, deleteConversation, selected, minWidth, buttonMargin }) {
+    return (<ListItem onClick={() => selectConversation(conversation)} key={conversation.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} style={{ backgroundColor: "#222222" }} >
+        <Container fluid style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"} >
+            <Row style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"}>
+                <Col className={(selected) ? "conv-info light-selected" : "conv-info light-hover"} style={{ minWidth: minWidth }}>
+                    <Container fluid className={(selected) ? "light-selected" : "light-hover"}>
+                        <Row className="font-italic text-primary" style={{ fontSize: "11pt", minWidth: minWidth  }}>
+                            {conversation.conversationName}
+                        </Row>
+                        <Row className="w-100" style={{ fontSize: "9pt" }}>
+                            <div className="ml-1 d-block text-truncate">
+                                {conversation.messages[0].body}            
+                            </div>
+                        </Row>
+                        <Row className="lead w-100 mt-1" style={{ fontSize: "8pt"}}>
+                            <div className="ml-1 d-block font-italic">
+                                {new Date(Date.parse(conversation.createdAt)).toLocaleString('en-US')}   
+                            </div>
+                        </Row>
+                    </Container>
+                </Col>
+                <Col className={(selected) ? "hide-conv-info text-right light-selected" : "hide-conv-info text-right light-hover"}
+                style={{ backgroundColor: "#222222", marginLeft: buttonMargin }}>
+                    <Container className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222" }} fluid>
+                        <Dropdown className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
+                            <Dropdown.Toggle 
+                                className="dropdown-toggle-conv-info text-white"
+                                style={{ border:" none", backgroundColor: "#222222"}} 
+                                as={Button} variant="dark" id="dropdown-custom-components">
+                                <MoreVertIcon></MoreVertIcon>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu style={{ backgroundColor: "#222222"}} className="my-dropdown shadow text-white text-center">        
+                                <Dropdown.Item  
+                                    className="text-white shadow conv-dropdown p-2" 
+                                    as="button" onClick={ 
+                                        (e) =>
+                                        {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if(deleteConversation) deleteConversation(conversation.id);
+                                        }}>
+                                    Delete&nbsp;<DeleteOutlineIcon></DeleteOutlineIcon>
+                                </Dropdown.Item>                                                    
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </Container>
+                </Col>
+            </Row>
+        </Container>
+    </ListItem>);
+}
 
 export default function Sidebar(){
     const size = useWindowSize();
@@ -96,6 +175,22 @@ export default function Sidebar(){
     const sidebarState = useSelector(selectSidebarState);
     const [searchScreen, setSearchScreen] = useState(false);
     const [error, setError] = useState(false);
+    const [deleted, setDeleted] = useState(false);
+
+    const getPaper = (narrowScreen, deleted, showConvList) => {
+        if((narrowScreen || deleted) && showConvList){
+            //Only show conversation list, aka sidebar
+            return classes.fullDrawerPaper;
+        } else if(narrowScreen && !showConvList) {
+            //Only show current conversation, hide sidebar  
+            return classes.hidePaper;
+        } else if(!narrowScreen && !showConvList) {
+            //Narrow sidebar for wider screens
+            return classes.narrowPaper;
+        } else {
+            return classes.narrowPaper;
+        }  
+    }
 
     const searchChatNames = () => {
         setError(false);
@@ -119,6 +214,7 @@ export default function Sidebar(){
         if(!el.pending){
             console.log("Setting current conversation...", el);
             console.log(history, location);
+            setDeleted(false);
             if(location.pathname !== '/home'){
                 history.push('/home');
             }
@@ -150,12 +246,14 @@ export default function Sidebar(){
         }
     }
 
-    const handleDelete = (convId) => {
+    const deleteConversation = (convId) => {
         console.log("Deleting Conversation " + convId);
+        if(currentConversation && (currentConversation.id === convId)){
+            dispatch(setShowConvList(true)); 
+            dispatch(setTopbarMessage(""));
+            setDeleted(true);
+        }
         dispatch(removeConversation({ id: convId }));
-    }
-    const handleLeave = (convId) => {
-        console.log("Leaving Conversation " + convId)
     }
 
     if(Array.isArray(conversations) && conversations.length > 1){
@@ -163,49 +261,9 @@ export default function Sidebar(){
             return self.indexOf(value) === index;
         })
     }
-    function getPaper(){
-        if(narrowScreen && showConvList){
-            //Only show conversation list, aka sidebar
-            return classes.fullDrawerPaper;
-        } else if(narrowScreen && !showConvList) {
-            //Only show current conversation, hide sidebar  
-            return classes.hidePaper;
-        } else if(!narrowScreen && !showConvList) {
-            //Narrow sidebar for wider screens
-            return classes.narrowPaper;
-        } else {
-            return classes.narrowPaper;
-        }  
-    }
-    const getMinWidthListItem = () => {
-        if(narrowScreen && showConvList){
-            //Only show conversation list, aka sidebar
-            return "450px";
-        } else if(narrowScreen && !showConvList) {
-            //Only show current conversation, hide sidebar  
-            return "0px";
-        } else if(!narrowScreen && !showConvList) {
-            //Narrow sidebar for wider screens
-            return "200px";
-        } else {
-            return "200px";
-        } 
-    }
-    const getButtonMargin = () => {
-        if(narrowScreen && showConvList){
-            //Only show conversation list, aka sidebar
-            return "150px";
-        } else if(narrowScreen && !showConvList) {
-            //Only show current conversation, hide sidebar  
-            return "0px";
-        } else if(!narrowScreen && !showConvList) {
-            //Narrow sidebar for wider screens
-            return "-5px";
-        } else {
-            return "-5px";
-        } 
-    }
-
+    
+    const listItemMinWidth = getMinWidthListItem(narrowScreen, deleted, showConvList);
+    const buttonMargin = getButtonMargin(narrowScreen, showConvList);
     return (
         <Drawer
             variant="permanent"
@@ -244,173 +302,33 @@ export default function Sidebar(){
                         </InputGroup>
                    </Container>
                 </ListItem>
-                    {                   
-                    
+                    {                           
                     (searchScreen) ? 
-                       filteredConversations.map((el) => {
-                        if(el.pending === true){
-                            return ""
-                        }
-                        const selected = currentConversation.conversationName === el.conversationName; 
-                        return (
-                            <ListItem onClick={() => selectConversation(el)} key={el.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} style={{ backgroundColor: "#222222" }} >
-                                <Container fluid style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"} >
-                                    <Row style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"}>
-                                        <Col className={(selected) ? "conv-info light-selected" : "conv-info light-hover"} style={{ minWidth: getMinWidthListItem() }}>
-                                            <Container fluid className={(selected) ? "light-selected" : "light-hover"}>
-                                                <Row className="font-italic text-primary" style={{ fontSize: "11pt", minWidth: getMinWidthListItem()  }}>
-                                                    {el ? el.conversationName : "Chat Name"}
-                                                </Row>
-                                                <Row className="w-100" style={{ fontSize: "9pt" }}>
-                                                    <div className="ml-1 d-block text-truncate">
-                                                        {(el && el.messages && el.messages[0]) ? el.messages[0].body : ""}                  
-                                                    </div>
-                                                </Row>
-                                                <Row className="lead w-100 mt-1" style={{ fontSize: "8pt"}}>
-                                                    <div className="ml-1 d-block font-italic">
-                                                        {el ? new Date(Date.parse(el.createdAt)).toLocaleString('en-US'): ""}   
-                                                    </div>
-                                                </Row>
-                                            </Container>
-                                        </Col>
-                                        <Col className={(selected) ? "hide-conv-info text-right light-selected" : "hide-conv-info text-right light-hover"}
-                                        style={{ backgroundColor: "#222222", marginLeft: getButtonMargin() }}>
-                                            <Container className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222" }} fluid>
-                                                <Dropdown className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
-                                                    <Dropdown.Toggle 
-                                                        className="dropdown-toggle-conv-info text-white"
-                                                        style={{ border:" none", backgroundColor: "#222222"}} 
-                                                        as={Button} variant="dark" id="dropdown-custom-components">
-                                                        <MoreVertIcon></MoreVertIcon>
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu style={{ backgroundColor: "#222222"}} className="my-dropdown shadow text-white text-center">        
-                                                        <Dropdown.Item  
-                                                                className="text-white shadow conv-dropdown-item" 
-                                                                as="button" onClick={ 
-                                                                    (e) =>
-                                                                    {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-
-                                                                    }}>
-                                                                Info&nbsp;<InfoIcon></InfoIcon>
-                                                            </Dropdown.Item>    
-                                                        <Dropdown.Item  
-                                                            className="text-white shadow conv-dropdown-item" 
-                                                            as="button" onClick={ 
-                                                                (e) =>
-                                                                {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    handleDelete(id);                                                      
-                                                                }}>
-                                                            Delete&nbsp;<DeleteOutlineIcon></DeleteOutlineIcon>
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item  
-                                                            className="text-white shadow conv-dropdown-item" 
-                                                            as="button" 
-                                                            onClick={ 
-                                                                (e) => {  
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    handleLeave(id);
-                                                                }}>
-                                                            Leave&nbsp;<ExitToAppIcon></ExitToAppIcon>
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </Container>
-                                        </Col>
-                                    </Row>
-                                </Container>
-                            </ListItem>
-                        ) })
+                            filteredConversations.map((conversation) => {
+                            if(conversation.pending === true){
+                                return ""
+                            }
+                            return ( <ConversationListItem
+                                        conversation={conversation}
+                                        selectConversation={selectConversation}
+                                        deleteConversation={deleteConversation}
+                                        buttonMargin={buttonMargin} 
+                                        selected={currentConversation.conversationName === conversation.conversationName} 
+                                        minWidth={listItemMinWidth}
+                                    />) })
                     :
-                    conversations.map((el) => {
-                        // if(convMap.current){
-                        //     if(convMap.current[el.id]){
-                        //         return ""
-                        //     } else {
-                        //         convMap.current[el.id] = true;
-                        //     }
-                        // }
-                        if(el.pending === true){
-                            return ""
-                        }
-                        const selected = currentConversation.conversationName === el.conversationName; 
-                        return (
-                            <ListItem onClick={() => selectConversation(el)} key={el.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} style={{ backgroundColor: "#222222" }} >
-                                <Container fluid style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"} >
-                                    <Row style={{ backgroundColor: "#222222" }} className={(selected) ? "light-selected" : "light-hover"}>
-                                        <Col className={(selected) ? "conv-info light-selected" : "conv-info light-hover"} style={{ minWidth: getMinWidthListItem() }}>
-                                            <Container fluid className={(selected) ? "light-selected" : "light-hover"}>
-                                                <Row className="font-italic text-primary" style={{ fontSize: "11pt", minWidth: getMinWidthListItem()  }}>
-                                                    {el ? el.conversationName : "Chat Name"}
-                                                </Row>
-                                                <Row className="w-100" style={{ fontSize: "9pt" }}>
-                                                    <div className="ml-1 d-block text-truncate">
-                                                        {(el && el.messages && el.messages[0]) ? el.messages[0].body : ""}                  
-                                                    </div>
-                                                </Row>
-                                                <Row className="lead w-100 mt-1" style={{ fontSize: "8pt"}}>
-                                                    <div className="ml-1 d-block font-italic">
-                                                        {el ? new Date(Date.parse(el.createdAt)).toLocaleString('en-US'): ""}   
-                                                    </div>
-                                                </Row>
-                                            </Container>
-                                        </Col>
-                                        <Col className={(selected) ? "hide-conv-info text-right light-selected" : "hide-conv-info text-right light-hover"}
-                                        style={{ backgroundColor: "#222222", marginLeft: getButtonMargin() }}>
-                                            <Container className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222" }} fluid>
-                                                <Dropdown className={(selected) ? "light-selected" : "light-hover"} style={{ backgroundColor: "#222222", marginLeft: "-20px"}}>              
-                                                    <Dropdown.Toggle 
-                                                        className="dropdown-toggle-conv-info text-white"
-                                                        style={{ border:" none", backgroundColor: "#222222"}} 
-                                                        as={Button} variant="dark" id="dropdown-custom-components">
-                                                        <MoreVertIcon></MoreVertIcon>
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu style={{ backgroundColor: "#222222"}} className="my-dropdown shadow text-white text-center">        
-                                                        <Dropdown.Item  
-                                                                className="text-white shadow conv-dropdown-item" 
-                                                                as="button" onClick={ 
-                                                                    (e) =>
-                                                                    {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-
-                                                                    }}>
-                                                                Info&nbsp;<InfoIcon></InfoIcon>
-                                                            </Dropdown.Item>    
-                                                        <Dropdown.Item  
-                                                            className="text-white shadow conv-dropdown-item" 
-                                                            as="button" onClick={ 
-                                                                (e) =>
-                                                                {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    handleDelete(id);                                                      
-                                                                }}>
-                                                            Delete&nbsp;<DeleteOutlineIcon></DeleteOutlineIcon>
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item  
-                                                            className="text-white shadow conv-dropdown-item" 
-                                                            as="button" 
-                                                            onClick={ 
-                                                                (e) => {  
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    handleLeave(id);
-                                                                }}>
-                                                            Leave&nbsp;<ExitToAppIcon></ExitToAppIcon>
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </Container>
-                                        </Col>
-                                    </Row>
-                                </Container>
-                            </ListItem>
-                        ) })
+                        conversations.map((conversation) => {
+                            if(conversation.pending === true){
+                                return ""
+                            }
+                            return ( <ConversationListItem
+                                conversation={conversation}
+                                selectConversation={selectConversation}
+                                deleteConversation={deleteConversation}
+                                buttonMargin={buttonMargin} 
+                                selected={currentConversation.conversationName === conversation.conversationName} 
+                                minWidth={listItemMinWidth}
+                            />) })
                     }
                 </List>
             </div>

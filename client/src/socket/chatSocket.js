@@ -5,11 +5,12 @@ import { selectToken } from '../auth/authSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectHost } from '../store/store';
 import {
-addMessage,
-selectConversations,
-selectCurrentConversation,
-setTyping,
-setRead
+    addMessage,
+    selectConversations,
+    selectCurrentConversation,
+    setTyping,
+    setRead,
+    pinMessage
 } from '../currentConversation/conversationsSlice';
 
 import {
@@ -34,7 +35,9 @@ const socketEvents = {
         currentConversationUpdate: "currentConversationUpdate",
         setCurrentConversationError: "setCurrentConversationError",
         refreshSuccess: "refreshSuccess",
-        refreshError: "refreshError"
+        refreshError: "refreshError",
+        messagePinned: "messagePinned",
+        messagePinnedError: "messagePinnedError"
     },
     sent: {
         connect: "connect",
@@ -45,6 +48,7 @@ const socketEvents = {
         listen: "listen",
         unlisten: "unlisten",
         setCurrentConversation: "setCurrentConversation",
+        pinMessage: "pinMessage"
     }
 }
 
@@ -167,6 +171,13 @@ export default function ChatSocket(){
             });
             chatSocket.on(socketEvents.received.refreshError, (msg) => {
                 console.log(`Handle error for refresh socket client ID with server error ${msg.msg}`);
+            });
+            chatSocket.on(socketEvents.received.messagePinned, data => {
+                console.log("Handle message pinned from server", data); 
+                dispatch(pinMessage(data.message)); 
+            });
+            chatSocket.on(socketEvents.received.messagePinnedError, data => {
+                console.log("Handle message pinned error from server", data); 
             });
             listenAllRooms(chatSocket);
             chatSocket.emit('refresh', { userId: account.id, refresh: true });
