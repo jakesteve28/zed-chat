@@ -20,7 +20,9 @@ export class MessageService {
         const message = new Message();
         message.body = createMessageDto.body || "";
         message.user = user;
-        message.conversation = conversation;
+        const conv = await this.conversationService.findOne(conversation.id);
+        const _conv = await this.conversationService.incrementNumberMessages(conv.id);
+        message.conversation = _conv;
         return this.messageRepository.save(message);
     }
     async remove(messageId: string): Promise<string> {

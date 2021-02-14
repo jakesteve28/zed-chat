@@ -315,6 +315,7 @@ export default function Sidebar(){
                                         buttonMargin={buttonMargin} 
                                         selected={currentConversation.conversationName === conversation.conversationName} 
                                         minWidth={listItemMinWidth}
+                                        key={conversation.id}
                                     />) })
                     :
                         conversations.map((conversation) => {
@@ -328,6 +329,7 @@ export default function Sidebar(){
                                 buttonMargin={buttonMargin} 
                                 selected={currentConversation.conversationName === conversation.conversationName} 
                                 minWidth={listItemMinWidth}
+                                key={conversation.id}
                             />) })
                     }
                 </List>

@@ -20,8 +20,13 @@ export class ConversationService {
     findAll(): Promise<Conversation[]> {
         return this.conversationRepository.find();
     }
-    findOne(id: string): Promise<Conversation> {
-        return this.conversationRepository.findOne(id, {relations: ["users", "messages"]});
+    async findOne(id: string): Promise<Conversation> {
+        const conv = await this.conversationRepository.findOne(id, {relations: ["users", "messages"]});
+        if(conv.numberOfMessages < conv.messages.length){
+            conv.numberOfMessages = conv.messages.length;
+            return this.conversationRepository.save(conv); 
+        }
+        return conv;
     }
     options(): any {
         return { availableMethods : ["GET", "POST", "PUT", "DELETE", "OPTIONS"]}
@@ -31,12 +36,6 @@ export class ConversationService {
         const user = await this.userService.findByTagName(userId);
         conversation.users = [];
         conversation.users.push(user);
-       // const _conversation = await this.conversationRepository.save(conversation);
-        //const _user = await this.userService.addConversation(__user.id, conversation.id);
-        //if(_user.conversations.filter((conv) => conv.id === _conversation.id).length < 1)
-         //   throw `User: ${_user.id} conversations[] unsuccessfully updated`
-        //if(_conversation.users.filter((user) => user.id === _user.id).length < 1)
-        //    throw `Conversation: ${_conversation.id} users[] unsuccessfully updated`
         conversation.conversationName = conversationName;
         return this.conversationRepository.save(conversation);
     }
@@ -82,12 +81,14 @@ export class ConversationService {
         const conversation = await this.conversationRepository.findOne({ where: {
             id: conversationId
         }, relations: ["messages"]});
+        if(!conversation) {
+            return [];
+        }
         if(conversation.messages.length > 1){
-            conversation.messages.sort((a, b) =>  Date.parse(a.createdAt) - Date.parse(b.createdAt));
+            conversation.messages.sort((a, b) =>  Date.parse(b.createdAt) - Date.parse(a.createdAt));
             const retMsgs = cloneDeep(conversation.messages); 
             if(retMsgs.length > 25) {
-                retMsgs.slice(0, 25);
-                return retMsgs;
+                return retMsgs.slice(0, 25);
             } else return retMsgs;
         } else return conversation.messages;
     }
@@ -96,5 +97,15 @@ export class ConversationService {
             id: conversationId
         }, relations: ["messages"]});
         return conversation.messages;
+    }
+    //I use number of messages attribute to check if we need to lazy load more messages for this conversation (25 at a time)
+    async incrementNumberMessages(conversationId: string): Promise<Conversation> {
+        const conversation = await this.conversationRepository.findOne(conversationId, { relations: ['messages']});
+        if(conversation.numberOfMessages < conversation.messages.length) {
+            conversation.numberOfMessages = conversation.messages.length; 
+            return this.conversationRepository.save(conversation); 
+        }
+        conversation.numberOfMessages++; 
+        return this.conversationRepository.save(conversation); 
     }
 }

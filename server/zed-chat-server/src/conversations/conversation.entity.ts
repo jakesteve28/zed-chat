@@ -14,6 +14,9 @@ export class Conversation {
   @Column({ default: true })
     pending: boolean;
 
+  @Column({ default: 0 })
+    numberOfMessages: number;
+
   @Column({ default: false })
     removed: boolean;
 

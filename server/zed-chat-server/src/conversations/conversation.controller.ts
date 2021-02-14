@@ -44,17 +44,18 @@ export class ConversationController {
   async options(){
       return this.conversationService.options()
   }
-  @Get('/messages/:id')
+  @Get('/messages/truncated/:id')
   @UseGuards(JwtAuthGuard)
   async getMessages(@Param('id') conversationId): Promise<Message[]> {
     return this.conversationService.getMessagesTruncated(conversationId)
   }
-  @Get('/messages/:id/range')
+  @Get('/messages/range')
   @UseGuards(JwtAuthGuard)
-  async getMessagesRange(@Param('id') conversationId, @Query('beforeDate') beforeDate, @Query('number') number): Promise<Message[]> {
+  async getMessagesRange(@Query('id') conversationId, @Query('beforeDate') beforeDate, @Query('number') number): Promise<Message[]> {
     let accum = 0, max = parseInt(number); 
     const dateBefore = new Date(beforeDate).getTime();
     const { messages } = await this.conversationService.findOne(conversationId); 
-    return messages.filter(message => (++accum <= max) && new Date(message.createdAt).getTime() < dateBefore); 
+    const messagesRet = messages.filter(message => (++accum <= max) && new Date(message.createdAt).getTime() < dateBefore);
+    return messagesRet;  
   }
 }

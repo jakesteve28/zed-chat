@@ -221,6 +221,9 @@ export class UserService {
     if(user){
       for(let conv of user.conversations){
         conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
+        if(conv.numberOfMessages < conv.messages.length) {
+            conv.numberOfMessages = conv.messages.length;
+        }
       }
       if(user.loggedIn === true) {
          console.log("User already marked as logged in in database"); 

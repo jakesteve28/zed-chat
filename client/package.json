@@ -76,7 +76,9 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "lint": "npx eslint src",
-    "test-vulnerabilities": "snyk test"
+    "test-vulnerabilities": "snyk test",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "browserslist": {
     "production": [
@@ -91,6 +93,10 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^6.1.17",
+    "@storybook/addon-essentials": "^6.1.17",
+    "@storybook/addon-links": "^6.1.17",
+    "@storybook/react": "^6.1.17",
     "eslint": "^7.18.0",
     "eslint-plugin-react": "^7.22.0",
     "redux-devtools": "^3.7.0"

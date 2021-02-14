@@ -41,6 +41,9 @@ export const conversationsSlice = createSlice({
                     console.log("Messages don't exist yet");
                     conv.messages = [];
                     conv.messages.push(action.payload.message);
+                    if(conv.numberOfMessages < conv.messages.length) {
+                        conv.numberOfMessages = conv.messages.length;
+                    }
                     break; 
                 }
                 if(conv.messages.filter(msg => msg.id === action.payload.message.id).length > 0) {
@@ -52,15 +55,16 @@ export const conversationsSlice = createSlice({
                         state.currentConversation.messages = []
                     } 
                     state.currentConversation.messages.push(action.payload.message);
-                    break;
-                }
-                if(!conv.messages) {
-                    conv.messages = [];
-                    conv.messages.push(action.payload.message);
+                    if(state.currentConversation.numberOfMessages <  state.currentConversation.messages.length) {
+                        state.currentConversation.numberOfMessages =  state.currentConversation.messages.length;
+                    }
                     break;
                 }
                 if(Array.isArray(conv.messages)){
                     conv.messages.push(action.payload.message);
+                    if(conv.numberOfMessages < conv.messages.length) {
+                        conv.numberOfMessages = conv.messages.length;
+                    }
                     break;
                 }
             }
@@ -117,11 +121,13 @@ export const conversationsSlice = createSlice({
     batchAddMessages: (state, action) => {
         const { messages, conversationId } = action.payload; 
         for(let message of messages) {
-            if(message?.conversationId === conversationId){
-                if(state.currentConversation.id === conversationId) {
-                    state.currentConversation.messages.push(message); 
-                } 
-            }
+            if(message.conversation.id === state.currentConversation.id && 
+                state.currentConversation.id === conversationId) {
+                state.currentConversation.messages.push(message); 
+                if(state.currentConversation.numberOfMessages <  state.currentConversation.messages.length) {
+                    state.currentConversation.numberOfMessages =  state.currentConversation.messages.length;
+                }
+            } 
         }
     }
   }

@@ -200,25 +200,30 @@ export default function CurrentConversationMessagesListView({ defaultView }){
 
     const lazyLoadMessages = async () => {
         console.log("Requesting more messages for conversation " + currentConversation.id)
-        const messageResult = await fetch(`${host}/conversation/messages/${currentConversation.id}/range?beforeDate=${currentConversation.messages[0]}&number=25`, {
+        const messageResult = await fetch(`http://localhost:3000/api/conversation/messages/range/?` + new URLSearchParams({
+            id: currentConversation.id,
+            beforeDate: currentConversation.messages[0].createdAt,
+            number: 25,
+        }), {
             headers: {
                 'Authorization': `Bearer ${token}`,
             }
         });
-        setLoadingMessages(false);
-        const { messages } = await messageResult.json(); 
+        const messages = await messageResult.json(); 
         if(Array.isArray(messages)) {
-            if(new Date(messages[messages.length - 1]?.createdAt).getTime() < new Date(currentConversation?.messages[0].createdAt).getTime()) {
-                dispatch(batchAddMessages({ messages: messages })); 
-            }
+            console.log(messages)
+            dispatch(batchAddMessages({ messages: messages, conversationId: currentConversation.id }));     
         }
     }
     const handleScroll = async () => {
         if(colRef.current){
-            if(colRef.current?.scrollHeight <= 100) {
-                if(currentConversation?.messages?.length >= 24){
-                    setLoadingMessages(true);
-                    await lazyLoadMessages();
+            if(colRef.current?.scrollTop <= 100 && loadingMessages !== true) {
+                if(currentConversation?.messages?.length < currentConversation?.numberOfMessages){
+                    if(loadingMessages === false) {
+                        setLoadingMessages(true);
+                        await lazyLoadMessages();
+                        setLoadingMessages(false);
+                    }
                 }
             }
         }
@@ -228,11 +233,11 @@ export default function CurrentConversationMessagesListView({ defaultView }){
             dispatch(sortMessages());
             setMessages(currentConversation.messages);
         }
-        if(colRef && colRef.current)
+        if(colRef && colRef.current && loadingMessages === false)
             colRef.current.scrollTop = colRef.current.scrollHeight
     }, [currentConversation.messages]);
     useEffect(() => {
-        if(colRef && colRef.current)
+        if(colRef && colRef.current && loadingMessages === false)
             colRef.current.scrollTop = colRef.current.scrollHeight
     }, [messages]);
     useEffect(() => {
@@ -256,14 +261,10 @@ export default function CurrentConversationMessagesListView({ defaultView }){
             <Col style={{ paddingLeft: (size.width > 768) ? "0%" : "3%" }}  >
                 <Container fluid>
                     <Row style={{ height: rowHeight}}>
-                        {
-                            (loadingMessages) ? (
-                                <Spinner animation="spin" variant="primary" className="mx-auto" />
-                            ) : ""
-                        }
                         <Col ref={colRef} onScroll={handleScroll} className="ul" style={{ 
                             bottom: 150, 
                             paddingBottom: 50, 
+                            paddingTop: 100,
                             height: rowHeight - 10, 
                             overflowY: "scroll",
                             position: "fixed", 
@@ -274,8 +275,8 @@ export default function CurrentConversationMessagesListView({ defaultView }){
                         >
                             {messages.map((message, idx) => {
                                 return (
-                                    <Row className="messages-list-item">
-                                        <MessageListItem message={message} isBottom={(idx >= (messages.length - 1))}></MessageListItem>
+                                    <Row  key={message.id + "row"} className="messages-list-item">
+                                        <MessageListItem key={message.id} message={message} isBottom={(idx >= (messages.length - 1))}></MessageListItem>
                                     </Row>
                                 )
                                 }
@@ -283,21 +284,34 @@ export default function CurrentConversationMessagesListView({ defaultView }){
                         </Col>
                     </Row>
                     {
-                    (isTyping) ? (
+                    (isTyping || loadingMessages) ? (
                     <Row>
                         <Container key={Math.random()} style={{ position: "fixed", bottom: 120 }} className="typing-list-item-container" fluid>
                                 <Row className="mt-1 mb-1">
                                 <Col xs="1"></Col>
                                 <Col xs="9" className="text-left">
-                                    <Typography className="p-2 m-1 text-white typing-list-item"
+                                    <div className="p-2 m-1 text-white typing-list-item"
                                         style={{ borderRadius: "18px", 
                                         display:"inline-block", 
                                         whiteSpace: "nowrap", 
                                         backgroundColor: "#1E3D64"}}>
-                                        <Spinner animation="grow" size="lg" />&nbsp;
-                                        <Spinner animation="grow" size="lg" />&nbsp;
-                                        <Spinner animation="grow" size="lg" />
-                                    </Typography>
+                                        {
+                                            (loadingMessages) ? (
+                                                <span>
+                                                    <span className='font-italic text-muted' style={{ fontSize: '18pt' }}>Loading Messages</span>
+                                                    &nbsp;&nbsp;<Spinner animation="grow" size="lg" />
+                                                </span>
+                                            ) : ""
+                                        } 
+                                        {
+                                            (isTyping) ? ( 
+                                                <span>
+                                                    <Spinner animation="grow" size="lg" />
+                                                    <Spinner animation="grow" size="lg" />
+                                                    <Spinner animation="grow" size="lg" />
+                                                </span>) : ""
+                                        }   
+                                    </div>
                                 </Col>
                                 <Col xs="3" className="text-center">
                                 </Col>

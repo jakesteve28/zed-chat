@@ -13,9 +13,7 @@ export class Message {
   @Column({ default: false })
   pinned: boolean;
 
-  @Column({
-    default: false
-  })
+  @Column({ default: false })
   read: boolean;
 
   @CreateDateColumn()
