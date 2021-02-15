@@ -119,7 +119,8 @@ function LoginScreen() {
           setSpinning(false);
           setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
           return;
-      }
+    }
+    setTimeout(() => { console.log("waiting"); }, 3000);
     dispatch(setToken(`${authToken}`));
     dispatch(setEmail(user.email));
     dispatch(setTagName(user.tagName));

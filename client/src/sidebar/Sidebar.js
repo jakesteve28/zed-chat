@@ -177,7 +177,7 @@ export default function Sidebar(){
     const [error, setError] = useState(false);
     const [deleted, setDeleted] = useState(false);
 
-    const getPaper = (narrowScreen, deleted, showConvList) => {
+    const getPaper = () => {
         if((narrowScreen || deleted) && showConvList){
             //Only show conversation list, aka sidebar
             return classes.fullDrawerPaper;

@@ -13,7 +13,6 @@ import SendIcon from '@material-ui/icons/Send';
 import { notificationSocket } from '../socket/notificationSocket';
 import { Modal } from '@material-ui/core';
 import PasswordModalBody from './SetPWModal';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import { setTopbarMessage } from '../uiSlice';
 
 function EnterChatName({ setConversationName, errorName }){
@@ -273,9 +272,9 @@ export default function NewConversation(){
 
     useEffect(() => {
         if(size.width > 768) {
-            dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon>&nbsp;New Conversation</span>)));
+            dispatch(setTopbarMessage((<span>New Conversation</span>)));
         } else {
-            dispatch(setTopbarMessage((<span><QuestionAnswerIcon></QuestionAnswerIcon></span>)));
+            dispatch(setTopbarMessage((<span>New Conversation</span>)));
         }
     }, [size.width]);
 
