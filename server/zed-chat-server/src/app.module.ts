@@ -53,7 +53,8 @@ export const optionsDev: TypeOrmModuleOptions = {
     }), 
     SocketGatewayModule, 
     FriendRequestModule,
-    StorageModule
+    StorageModule,
+
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -30,28 +30,34 @@ export class StorageController {
         },
         (err) => {
           if(err) {
-            console.log(err);
-            throw err;
+            console.error("Error while writing profile picture for user ", user?.id);
+            return;
           }
           console.log("New profile picture file written successfully for user @" + user?.tagName);
           console.log("User's new profile picture filename: " + user?.profilePicture)
           console.log("Now deleting temp file...", tmpFile);
           fs.unlink(tmpFile, (err) => {
-            if(err) throw err; 
+            if(err) {
+              console.error("Error while deleting temp profile picture for user ", user?.id);
+              return;
+            }
             console.log("Successfully deleted tmp file");
           })
       });
     }
     
-    private deleteOldPic = (oldPicName) => {
-      fs.stat(`./profile-pics/${oldPicName}`, (err, stats) => {
+    private deleteOldPic = (userId, oldPicName) => {
+      fs.stat(`./profile-pics/${userId}/${oldPicName}`, (err, stats) => {
         if(err) {
-          console.log("Old profile picture doesnt exist, not deleting");
+          console.error("Old profile picture doesnt exist, not deleting");
           return;
         }
         console.log("Old profile picture exists, now deleting");
-        fs.unlink(`./profile-pics/${oldPicName}`, (err) => {
-          if(err) throw err;
+        fs.unlink(`./profile-pics/${userId}/${oldPicName}`, (err) => {
+          if(err) {
+            console.error("Error while deleting old profile picture for user ", userId);
+            return;
+          }
           console.log("Successfully deleted old profile picture. Now copying new one");
         })
       });
@@ -63,17 +69,18 @@ export class StorageController {
         async (err, data) => {
           if(err) throw err;
           const ext = extname(`${file.filename}`); 
-          const fileName = `profile-pic-${uuid()}${ext}`
-          const fullPath = `./profile-pics/${userId}/${fileName}`
-          const _user = await this.userService.setProfilePic(userId, fileName); 
-          console.log("Checking for old profile picture with name ", _user.profilePicture);
-          this.deleteOldPic(_user.profilePicture);
+          const fileName = `profile-pic-${uuid()}${ext}`;
+          const fullPath = `./profile-pics/${userId}/${fileName}`;
+          const user = await this.userService.findOne(userId);
+          const _user = await this.userService.setProfilePic(userId, fileName);  
           if(!fs.existsSync(`./profile-pics/${userId}/`)){
             fs.mkdir(`./profile-pics/${userId}/`, {}, (err) => {
               if(err) throw err; 
               this.write(fullPath, data, _user, `./tmp/${file.filename}`); 
             });
           } else {
+            console.log("Checking for old profile picture with name ", user.profilePicture);
+            this.deleteOldPic(_user.id, user.profilePicture);
             this.write(fullPath, data, _user, `./tmp/${file.filename}`); 
           }
       });    

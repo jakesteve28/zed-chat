@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as fs from 'fs';
+import compression from 'compression';
 
 const httpsOptions = {
  // key: fs.readFileSync('../keys/key.pem'),
@@ -18,7 +19,8 @@ async function bootstrap() {
   );
   app.setGlobalPrefix('api');
   app.enableCors();
-  app.useStaticAssets(join(__dirname, '..', 'static'));
+  app.use(compression());
+  app.useStaticAssets(join(__dirname, '..', 'profile-pics'));
   const port = parseInt(process.env.PORT || `3000`);
   await app.listen(port);
   console.log("Server successfully started on port " + port);
