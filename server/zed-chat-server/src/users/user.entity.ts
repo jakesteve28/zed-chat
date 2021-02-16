@@ -65,4 +65,6 @@ export class User {
   @Column({ default: false })
   disabled: boolean;
 
+  @Column({ default: "" })
+  profilePicture: String;
 }

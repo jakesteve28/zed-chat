@@ -16,6 +16,7 @@ import { Message } from './messages/message.entity';
 import { Invite } from './invites/invite.entity';
 import { FriendRequest } from './friendRequest/friendRequest.entity';
 import { Conversation } from './conversations/conversation.entity';
+import { StorageModule } from './storage/storage.module';
 
 export const options: TypeOrmModuleOptions = {
   type: "mysql",
@@ -40,9 +41,20 @@ export const optionsDev: TypeOrmModuleOptions = {
 }
 
 @Module({
-  imports: [TypeOrmModule.forRoot(options), UserModule, AuthModule, ConversationModule,  InviteModule, MessageModule, ConfigModule.forRoot({
-    isGlobal: true,
-  }), SocketGatewayModule, FriendRequestModule],
+  imports: [
+    TypeOrmModule.forRoot(options), 
+    UserModule, 
+    AuthModule, 
+    ConversationModule,  
+    InviteModule, 
+    MessageModule, 
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }), 
+    SocketGatewayModule, 
+    FriendRequestModule,
+    StorageModule
+  ],
   controllers: [AppController],
   providers: [AppService]
 })

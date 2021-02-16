@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -10,7 +10,6 @@ import { FriendRequestService } from '../friendRequest/friendRequest.service';
 
 @Injectable()
 export class UserService {
-
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>, 
@@ -234,7 +233,6 @@ export class UserService {
       return this.usersRepository.save(user);
     }
   }
-
   async logout(userId: string): Promise<User> {
     const user = await this.usersRepository.findOne(userId);
     if(user){
@@ -244,6 +242,13 @@ export class UserService {
       }
       user.loggedIn = false;
       user.isOnline = true;
+      return this.usersRepository.save(user);
+    }
+  }
+  async setProfilePic(userId: string, profilePic: string): Promise<User> {
+    const user = await this.usersRepository.findOne(userId);
+    if(user){
+      user.profilePicture = profilePic;
       return this.usersRepository.save(user);
     }
   }
