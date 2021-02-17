@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { AppModule } from './app.module';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as fs from 'fs';
+import cookieParser from 'cookie-parser';
 import compression from 'compression';
 
 const httpsOptions = {
@@ -19,6 +19,7 @@ async function bootstrap() {
   );
   app.setGlobalPrefix('api');
   app.enableCors();
+  app.use(cookieParser(process.env.COOKIE_SIGNED_SECRET || "SecretSecret123"));
   app.use(compression());
   app.useStaticAssets(join(__dirname, '..', 'profile-pics'));
   const port = parseInt(process.env.PORT || `3000`);

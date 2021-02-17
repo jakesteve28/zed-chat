@@ -12,7 +12,7 @@ import { InviteModule } from 'src/invites/invite.module';
   imports: [forwardRef(() => UserModule), PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: {expiresIn: '24h'}
+      signOptions: {expiresIn: '15m'}
     }), InviteModule
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],

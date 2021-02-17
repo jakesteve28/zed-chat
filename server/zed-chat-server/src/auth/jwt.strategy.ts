@@ -22,7 +22,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return user;
     }
   }
-  async getUserAccountDetails(userId: string): Promise<any> {
-
-  }
 }

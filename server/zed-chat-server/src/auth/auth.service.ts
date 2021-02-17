@@ -19,30 +19,29 @@ export class AuthService {
     ) 
   {}
   async validateUser(tagName: string, pass: string): Promise<any> {
-    try 
-    {
-    const user = await this.userService.findByTagName(tagName);
-    if(!user){
-      throw "User not found";
+    try {
+      const user = await this.userService.findByTagName(tagName);
+      if(!user){
+        throw "User not found";
+      }
+      if(user.loggedIn === true) {
+        console.log("User @" + tagName  + " already logged in!");
+        console.warn("Allowing login for dev purposes only...");
+        //throw "User already logged in!";
+      }
+      const passwordMatching = await bcrypt.compare(
+          pass,
+          user.password
+      )
+      if (passwordMatching === true) {
+        console.log(`Logging in User: ${tagName}`);
+        const loggedInUser = await this.userService.login(user.id);
+        delete loggedInUser.password;
+        return loggedInUser;
+      }
+    } catch(err){
+      throw new HttpException('Wrong credentials provided ' + err, HttpStatus.BAD_REQUEST);
     }
-    if(user.loggedIn === true) {
-      console.log("User @" + tagName  + " already logged in!");
-      console.warn("Allowing login for dev purposes only...");
-      //throw "User already logged in!";
-    }
-    const passwordMatching = await bcrypt.compare(
-        pass,
-        user.password
-    )
-    if (passwordMatching === true) {
-      console.log(`Logging in User: ${tagName}`);
-      const loggedInUser = await this.userService.login(user.id);
-      delete loggedInUser.password;
-      return loggedInUser;
-    }
-  } catch(err){
-    throw new HttpException('Wrong credentials provided ' + err, HttpStatus.BAD_REQUEST);
-}
   }
   async login(user: any){
       const payload: jwtPayload = { 
@@ -52,7 +51,7 @@ export class AuthService {
       return {
           user: user,
           invites: await this.inviteService.getInvitesByUser(user.id),
-          access_token: this.jwtService.sign(payload),
+          token: this.jwtService.sign(payload),
           id: user.id
       }
   }
