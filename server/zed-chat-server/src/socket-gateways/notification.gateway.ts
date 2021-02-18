@@ -17,7 +17,7 @@ import { FriendRequestService } from '../friendRequest/friendRequest.service';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": "http://localhost:3003", //process.env.PROD_CLIENT_HOST || "http://localhost:3003",
+        "Access-Control-Allow-Origin": "*", //process.env.PROD_CLIENT_HOST || "http://localhost:3003",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);

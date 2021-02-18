@@ -27,6 +27,7 @@ import { addFriend,
 import {
   setTopbarMessage
 } from '../uiSlice';
+import cookie from 'react-cookies'
 
 const loginServer = async (username, password) => {
   const requestBody = JSON.stringify({
@@ -35,9 +36,13 @@ const loginServer = async (username, password) => {
   });
   const response = await fetch("http://localhost:3000/api/auth/login", {
       body: requestBody,
-      headers: { "content-type": "application/json" },
-      method: "POST"
+      headers: { "content-type": "application/json",
+                  "Access-Control-Allow-Origin": "localhost:3003"
+    },
+      method: "POST",
+      credentials: 'include'
   });
+  console.log(response);
   const body = await response.json();
   if(body.statusCode === 401 || body.statusCode === 400){
       return false;
@@ -46,13 +51,30 @@ const loginServer = async (username, password) => {
       console.log("Server error while attempting login!")
       return false;
   }
-  if(body.access_token && body.id && body.user && body.invites){
+  
+  if(body.id && body.user && body.invites){
     console.log("Successfully logging in user", body.user.tagName); 
-    return { user: body.user, authToken: body.access_token, id: body.id, invites: body.invites };
+    console.log(body);
+    return { user: body.user, id: body.id, invites: body.invites };
   } else {
     console.log("Error retrieving login token from server! Malformed body!", body);
     return false;
   }
+}
+
+const validateAccountDetails = (id, user, invites) => {
+  if(!id || 
+      !user || 
+      !user?.email || 
+      !user?.tagName ||  
+      !Array.isArray(user?.conversations) ||  
+      !Array.isArray(user?.friends) || 
+      !Array.isArray(user?.friendRequests) || 
+      !Array.isArray(invites))
+      {
+        return false 
+      }
+    else return true
 }
 
 function LoginScreen() {
@@ -99,31 +121,21 @@ function LoginScreen() {
       return;
     }
     const result = await loginServer(userName, password);
-    if(!result || result === false) {
+    if(result === false) {
         setError(true);
         setSpinning(false);
         setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
         return;
     }
-    const  { id, authToken, user, invites } = result;
-    if( !id || 
-        !authToken || 
-        !user || 
-        !user.email || 
-        !user.tagName ||  
-        !Array.isArray(user.conversations) ||  
-        !Array.isArray(user.friends) || 
-        !Array.isArray(user.friendRequests) || 
-        !Array.isArray(invites)){
+    const  { id, user, invites } = result;
+    if(false === validateAccountDetails(id, user, invites)){
           setError(true);
           setSpinning(false);
           setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
           return;
     }
-    setTimeout(() => { console.log("waiting"); }, 3000);
-    dispatch(setToken(`${authToken}`));
-    dispatch(setEmail(user.email));
-    dispatch(setTagName(user.tagName));
+    dispatch(setEmail(user?.email));
+    dispatch(setTagName(user?.tagName));
     dispatch(setId(id));
     user.conversations.map(conv => {
         if(conv.pending !== true){
@@ -133,28 +145,28 @@ function LoginScreen() {
     user.friends.map(friend => {
       dispatch(addFriend(friend));
     }); 
-    if(user.friendRequests && Array.isArray(user.friendRequests)){   
-      for(let request of user.friendRequests){
-        if(request.recipientId === user.id){   
+    if(user.friendRequests && Array.isArray(user?.friendRequests)){   
+      for(let request of user?.friendRequests){
+        if(request?.recipientId === user?.id){   
           dispatch(addFriendRequest(request))
         } 
       }
     }
     if(invites && Array.isArray(invites)){
       for(let invite of invites){
-        if(invite.accepted === true)
+        if(invite?.accepted === true)
           dispatch(addAcceptedInvite(invite));
         else  
           dispatch(addReceivedInvite(invite));
       }
     }
     dispatch(login());
-    console.log("Successfully logged in user " + user.tagName);
+    console.log("Successfully logged in user " + user?.tagName);
     setSpinning(false);
   }
 
   return (
-    (!account.loggedIn) ? (
+    (!account?.loggedIn) ? (
     <Container className="h-100 w-100" fluid>
       <Row className="p-3 mt-5 text-white lead text-center">
         <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow" style={{ borderRadius: "15px", backgroundColor: "#191919", opacity: 0.6, maxWidth: "500px"}}> 

@@ -3,6 +3,8 @@ import { UserService } from '../users/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { InviteService } from 'src/invites/invite.service';
+import { User } from 'src/users/user.entity';
+import { jwtConstants } from './constants';
 
 export interface jwtPayload {
    username: string,
@@ -18,41 +20,70 @@ export class AuthService {
       private inviteService: InviteService
     ) 
   {}
+  private enforceSingleClientConnection(user: User){
+    if(!user){
+      console.error("User not found");
+      return false;
+    } 
+    if(user.loggedIn === true) {
+      console.log("User @" + user.tagName  + " already logged in!");
+      console.warn("Allowing login for dev purposes only...");
+      //return false;
+    } 
+    return true;
+  }
+  //Called from LocalAuthGuard
   async validateUser(tagName: string, pass: string): Promise<any> {
     try {
       const user = await this.userService.findByTagName(tagName);
-      if(!user){
-        throw "User not found";
-      }
-      if(user.loggedIn === true) {
-        console.log("User @" + tagName  + " already logged in!");
-        console.warn("Allowing login for dev purposes only...");
-        //throw "User already logged in!";
-      }
-      const passwordMatching = await bcrypt.compare(
+      if(true === this.enforceSingleClientConnection(user)){
+        const passwordMatching = await bcrypt.compare(
           pass,
           user.password
-      )
-      if (passwordMatching === true) {
-        console.log(`Logging in User: ${tagName}`);
-        const loggedInUser = await this.userService.login(user.id);
-        delete loggedInUser.password;
-        return loggedInUser;
-      }
+        )
+        if (passwordMatching === true) {
+          console.log(`Logging in User: ${tagName}`);
+          await this.userService.markLoggedIn(user.id);
+          const loggedInUser = await this.userService.fetchMessages(user.id);
+          delete loggedInUser.password;
+          return loggedInUser;
+        }
+      } else throw 'No User With Given Username';
     } catch(err){
       throw new HttpException('Wrong credentials provided ' + err, HttpStatus.BAD_REQUEST);
     }
   }
+  //Called from Auth Controller
   async login(user: any){
-      const payload: jwtPayload = { 
-        username: user.tagName, 
-        sub: user.id,
-      } 
       return {
           user: user,
           invites: await this.inviteService.getInvitesByUser(user.id),
-          token: this.jwtService.sign(payload),
+          accessToken: this.accessToken(user),
+          refreshToken: this.refreshToken(user),
           id: user.id
       }
+  }
+  public accessToken(user: any) {
+    const payload: jwtPayload = { 
+      username: user?.tagName, 
+      sub: user?.id
+    } 
+    const token = this.jwtService.sign(payload, {
+      secret: jwtConstants.accessSecret,
+      expiresIn: '900s'
+    });
+    return `${token}`;
+  }
+
+  public refreshToken(user: any) {
+    const payload: jwtPayload = { 
+      username: user?.tagName, 
+      sub: user?.id
+    } 
+    const token = this.jwtService.sign(payload, {
+      secret: jwtConstants.refreshSecret,
+      expiresIn: '900s'
+    });
+    return `${token}`;
   }
 }

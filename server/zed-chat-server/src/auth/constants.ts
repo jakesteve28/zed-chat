@@ -1,3 +1,4 @@
 export const jwtConstants = {
-    secret: "tWebzRIbGhV4SL-6WLXitJkz6FUhN62Xd0iFhNp0eOBNBZFC_JvZJCW7TPJEMWDMpTJRSGEzCZFQOYOObrfq_VtbM-1Jhl1m02vtuKMN__MecM-6IXJT2a8oL32oQAVEYSkorD6RJlcQnyyihiGzWCdZIX9xVzduoxJqG9GxPjFtoL0BP3-NT77Z3GLZa5lLTHrYwcUL5gU0Dfw4HZf1Qln7mWcPEbDTNyT6yBbuthyeDoclBdZkgCyANXBO6XnsJoCT7Jzp299pz_usdK1_Rj406KgTPSX13IzV6MEQeds0lcpD1TD6eCnnhd2YX7XPse_zVgpFA5qef2nSTvF02Q"
+    accessSecret: process.env.ACCESS_COOKIE_SIGNED_SECRET,
+    refreshSecret: process.env.REFRESH_COOKIE_SIGNED_SECRET
 }

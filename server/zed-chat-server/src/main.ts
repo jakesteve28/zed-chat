@@ -22,6 +22,7 @@ async function bootstrap() {
   app.use(cookieParser(process.env.COOKIE_SIGNED_SECRET || "SecretSecret123"));
   app.use(compression());
   app.useStaticAssets(join(__dirname, '..', 'profile-pics'));
+  app.useStaticAssets(join(__dirname, '..', 'client/build'));
   const port = parseInt(process.env.PORT || `3000`);
   await app.listen(port);
   console.log("Server successfully started on port " + port);

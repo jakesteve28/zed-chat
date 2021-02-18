@@ -215,24 +215,34 @@ export class UserService {
     else return null;
   }
 
-  async login(userId: string): Promise<User> {
+  async markLoggedIn(userId: string) {
+    await this.usersRepository.update(userId, {
+      loggedIn: true, 
+      isOnline: true
+    });
+  }
+
+  async fetchMessages(userId: string): Promise<User> {
     const user = await this.usersRepository.findOne(userId, { relations: ["conversations", "friends", "friendRequests"]});
-    if(user){
+    if(Array.isArray(user?.conversations)){
       for(let conv of user.conversations){
         conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
         if(conv.numberOfMessages < conv.messages.length) {
             conv.numberOfMessages = conv.messages.length;
         }
       }
-      if(user.loggedIn === true) {
-         console.log("User already marked as logged in in database"); 
-         return user;
-      }
-      user.loggedIn = true;
-      user.isOnline = true;
-      return this.usersRepository.save(user);
-    }
+      return user;
+    } else return null;
   }
+
+  async checkRefreshTokenMatch(userId: string, refreshToken: string): Promise<boolean> {
+    return (await bcrypt.compare(
+                                  (await this.usersRepository.findOne(userId))
+                                    .refreshToken, 
+                                  refreshToken)
+                                  );
+  }
+
   async logout(userId: string): Promise<User> {
     const user = await this.usersRepository.findOne(userId);
     if(user){
@@ -252,5 +262,10 @@ export class UserService {
       return this.usersRepository.save(user);
     }
   }
-
+  async setCurrentRefreshToken(refreshToken: string, userId: string) {
+    const token = await bcrypt.hash(refreshToken, 10); 
+    await this.usersRepository.update(userId, {
+      refreshToken: token
+    });
+  }
  } 

@@ -80,8 +80,7 @@
     "test": "node scripts/test.js",
     "lint": "npx eslint src",
     "test-vulnerabilities": "snyk test",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-serve": "npm run build && Copy-Item ./build/ ../server/zed-chat-server/client/ -Recurse"
   },
   "browserslist": {
     "production": [
