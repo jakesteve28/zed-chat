@@ -235,12 +235,10 @@ export class UserService {
     } else return null;
   }
 
-  async checkRefreshTokenMatch(userId: string, refreshToken: string): Promise<boolean> {
-    return (await bcrypt.compare(
-                                  (await this.usersRepository.findOne(userId))
-                                    .refreshToken, 
-                                  refreshToken)
-                                  );
+  async checkRefreshTokenMatch(userTagname: string, refreshToken: string): Promise<boolean> {
+    const user = await this.findByTagName(userTagname); 
+    const res = await bcrypt.compare(refreshToken, user.refreshToken); 
+    return res;
   }
 
   async logout(userId: string): Promise<User> {

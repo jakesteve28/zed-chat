@@ -32,6 +32,14 @@ constructor(
     async login(@Req() req, @Res() res: Response) {
         const { user, id, invites, refreshToken } = await this.authService.login(req.user);
         res.cookie('Refresh', refreshToken,  { maxAge: 900000, httpOnly: true });
-        return res.send({ user, id, invites })
+        return res.send({ user, id, invites, refreshToken: true });
+    }
+
+    @UseGuards(JwtRefreshGuard)
+    @Get('refreshAccount')
+    async refreshAccount(@Req() req: Request, @Res() res: Response) {
+        console.log("Logging in using token!"); 
+        const { user, id, invites } = await this.authService.getUserForTokenLogin(req.user);
+        return res.send({user, id, invites, refreshToken: true }); 
     }
 }

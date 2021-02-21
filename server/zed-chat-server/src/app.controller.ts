@@ -17,11 +17,11 @@ export class AppController {
     return this.appService.getHello()
   }
   
-  @Get('client**')
-  getClient(@Res() res: Response) {
-    return res.sendFile(join(__dirname, '..', 'client/build/index.html')); 
-  }
- 
+  // @Get('client**')
+  // getClient(@Res() res: Response) {
+  //   return res.sendFile(join(__dirname, '..', '/static/client/')); 
+  // }
+
   @UseGuards(JwtRefreshGuard)
   @Get('profile')
   getProfile(@Request() req) {

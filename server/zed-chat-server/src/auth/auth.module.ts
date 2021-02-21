@@ -4,16 +4,16 @@ import { UserModule } from '../users/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
 import { InviteModule } from '../invites/invite.module';
 import { AuthController } from './auth.controller';
+import { JwtRefreshStrategy } from './jwt-refresh-strategy';
 
 @Module({
   imports: [forwardRef(() => UserModule), PassportModule,
     JwtModule.register({}), InviteModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtRefreshStrategy],
   exports: [AuthService]
 })
 export class AuthModule {}

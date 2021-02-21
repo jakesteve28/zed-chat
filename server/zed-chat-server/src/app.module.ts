@@ -57,8 +57,8 @@ export const optionsDev: TypeOrmModuleOptions = {
     FriendRequestModule,
     StorageModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static'), 
-      serveRoot: '' 
+      rootPath: join(__dirname, '..', 'static'),
+      exclude: ['/client**']
     })
   ],
   controllers: [AppController],

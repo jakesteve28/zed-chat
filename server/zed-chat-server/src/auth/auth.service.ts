@@ -58,20 +58,31 @@ export class AuthService {
       return {
           user: user,
           invites: await this.inviteService.getInvitesByUser(user.id),
-          // accessToken: this.accessToken(user),
-          refreshToken: this.refreshToken(user),
+          refreshToken: await this.refreshToken(user),
           id: user.id
       }
   }
-  public refreshToken(user: any) {
+
+  async getUserForTokenLogin(user: any) {
+    await this.userService.markLoggedIn(user.id);
+    const loggedInUser = await this.userService.fetchMessages(user.id);
+      return {
+        user: loggedInUser,
+        invites: await this.inviteService.getInvitesByUser(user.id),
+        id: user.id
+    }
+  }
+
+  public async refreshToken(user: any) {
     const payload: jwtPayload = { 
       username: user?.tagName, 
       sub: user?.id
     } 
-    const token = this.jwtService.sign(payload, {
+    const refreshToken = this.jwtService.sign(payload, {
       secret: jwtConstants.refreshSecret,
       expiresIn: '900s'
     });
-    return `${token}`;
+    await this.userService.setCurrentRefreshToken(refreshToken, user?.id); 
+    return refreshToken;
   }
 }

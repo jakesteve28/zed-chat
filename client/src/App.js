@@ -17,30 +17,33 @@ import {
   selectRefreshExpire, 
   setRefreshExpire
 } from './store/store'; 
+import { logout, clearAccount } from './account/accountSettingsSlice'; 
+import { clearAuth } from './auth/authSlice';
+import { clearConversations } from './currentConversation/conversationsSlice'; 
+import { clearInvites } from './topbar/inviteSlice';
+import { clearFriends } from './account/friendsSlice';
+import { CookiesProvider } from 'react-cookie';
 
 export default function App() {
   const account = useSelector(selectAccount);
   const dispatch = useDispatch(); 
   const refreshExpire = useSelector(selectRefreshExpire); 
+
   const now = Date.now(); 
   const history = useHistory();
+
   const refreshToken = async () => {
-  //   const response = await fetch("http://localhost:3000/api/auth/login", {
-  //     body: requestBody,
-  //     headers: { "content-type": "application/json",
-  //                 "Access-Control-Allow-Origin": "localhost:3003"
-  //   },
-  //     method: "POST",
-  //     credentials: 'include'
-  // });
-    const refreshResult = await fetch("http://localhost:3000/api/auth/refresh");
+    const refreshResult = await fetch("http://localhost:3000/api/auth/refresh", {
+      credentials: "include"
+    });
     const { successful } = await refreshResult.json(); 
-    if(successful === true){
-      console.log("Refresh token fetch successful"); 
+    if(account.loggedIn && successful === true){
+      console.success("Refresh token fetch successful"); 
       dispatch(setRefreshExpire(now + 900000)); 
       return true;
     } else {
-      console.log("Refresh token fetch failed. Logging out"); 
+      console.error("Not logged in, not going to attempt refresh. Logging out.")
+      console.error("Refresh token fetch failed. Logging out"); 
       dispatch(logout());
       dispatch(clearAccount());
       dispatch(clearAuth());
@@ -51,18 +54,21 @@ export default function App() {
       return false;
     }
   }
-  if(refreshExpire <= now) {
+  if(refreshExpire !== -1 && refreshExpire <= now) {
      refreshToken();
   }
+
   return (
-    <Switch>
-      <Route path="/login" component={LoginComponent}></Route>
-      <Route path="/forgotPassword" component={ForgotPW}></Route>
-      <Route path="/createAccount" component={CreateAcc}></Route>
-      <GuardedRoute path="/home" component={Home} auth={account.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/newConversation" component={NewConv} auth={account.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/settings" component={SettingScr} auth={account.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/" component={Home} auth={account.loggedIn}></GuardedRoute>
-    </Switch>
+    <CookiesProvider>
+      <Switch>
+        <Route path="/login" component={LoginComponent}></Route>
+        <Route path="/forgotPassword" component={ForgotPW}></Route>
+        <Route path="/createAccount" component={CreateAcc}></Route>
+        <GuardedRoute path="/home" component={Home} auth={account.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/newConversation" component={NewConv} auth={account.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/settings" component={SettingScr} auth={account.loggedIn}></GuardedRoute>
+        <GuardedRoute path="/" component={Home} auth={account.loggedIn}></GuardedRoute>
+      </Switch>
+    </CookiesProvider>
   )
 }

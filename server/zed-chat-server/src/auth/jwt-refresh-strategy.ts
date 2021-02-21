@@ -8,7 +8,7 @@ import { jwtConstants } from './constants';
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
-  'jwt-refresh-token'
+  'jwt'
 ) {
   constructor(
     private readonly userService: UserService,
@@ -25,8 +25,8 @@ export class JwtRefreshStrategy extends PassportStrategy(
  
   async validate(request: Request, payload: any) {
     const refreshToken = request.cookies?.Refresh;
-    if(await this.userService.checkRefreshTokenMatch(refreshToken, payload.userId)){
-        return this.userService.findOne(payload.userId)
+    if(await this.userService.checkRefreshTokenMatch(payload.username, refreshToken)){
+        return this.userService.findByTagName(payload.username)
     }
     return false;
   }

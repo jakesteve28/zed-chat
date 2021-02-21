@@ -17,7 +17,7 @@ import { FriendRequestService } from '../friendRequest/friendRequest.service';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": "*", //process.env.PROD_CLIENT_HOST || "http://localhost:3003",
+        "Access-Control-Allow-Origin": "localhost:3000", //process.env.PROD_CLIENT_HOST || "http://localhost:3003",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
@@ -25,9 +25,9 @@ const preflightCheck = (req: Request, res: Response) => {
 }
 
 /**
- * Gateway for socket.io running on port 3002 under namespace 'notifications'
+ * Gateway for socket.io running on port 3000 under namespace 'notifications'
  */
-@WebSocketGateway(parseInt(process.env.NOTIFICATION_GATEWAY_PORT) || 3002, { namespace: "notifications", handlePreflightRequest: preflightCheck })
+@WebSocketGateway({ namespace: "notifications", handlePreflightRequest: preflightCheck })
 export class NotificationsGateway  {
     constructor(
                 private userService: UserService,
@@ -47,14 +47,14 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage('connect')
-    async handleConnect(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleConnect(@ConnectedSocket() client: Socket): Promise<string | boolean> {
         try {
             console.log(`New user connected with client socket ID ${client.id}`);
         } catch(err) {
-            const socketId = client.id;
-            console.log(`Error: "connectSuccess" event not sent to client ID: ${socketId} notification socket connected request failed`);
-            this.wss.to(socketId).emit('connectError', { msg:  err });
-            console.log(`Success: emmitted "connectError" to client ID ${socketId}`);
+            const socketId = client.id; 
+            const errorMsg = `Error: "connectSuccess" event not sent to client ID: ${socketId} notification socket connected request failed`;
+            this.wss.to(socketId).emit('error', { msg:  errorMsg });
+            console.error(errorMsg, err?.message);
             return false;
         }
     }
@@ -74,14 +74,14 @@ export class NotificationsGateway  {
             if(!user) {
                 throw `Cannot find user with id: ${userId}, error logging in`;
             } else {
-                client.emit("refreshClientSocketSuccess", { clientId: `${client.id}` });
+                this.wss.to(socketId).emit("refreshClientSocketSuccess", { clientId: `${client.id}` });
                 console.log(`Success: emitted notification socket "refreshClientSocketSuccess" to User @${user.tagName}`);
             }
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "refreshClientSocket" event not sent to client ID: ${socketId} notification socket connected request failed`);
-            client.emit('refreshClientSocketError', { msg:  err });
-            console.log(`Success: emitted notification "refreshClientSocketError" to client ID ${socketId}`);
+            const errorMsg = `Error: "refreshClientSocket" event not sent to client ID: ${socketId} notification socket connected request failed`;
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
+            console.error(errorMsg, err?.message); 
             return false;
         }
     }
@@ -93,7 +93,7 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage('disconnect')
-    async handleDisconnect(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleDisconnect(@ConnectedSocket() client: Socket): Promise<string | boolean> {
         try {
             const socketId = client.id;
             const connectedUser = await this.userService.findByNotificationSocketId(socketId);
@@ -105,9 +105,9 @@ export class NotificationsGateway  {
             }
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "disconnected" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('disconnectError', { msg: err });
-            console.log(`Success: emitted "disconnectError" event to socket ${socketId}`);
+            const errorMsg = `Error: "disconnected" event not sent | ${err} | with socket ${socketId}`
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
+            console.error(errorMsg, err?.message);
             return false;
         }
     }
@@ -122,33 +122,32 @@ export class NotificationsGateway  {
     async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
             const socketId = client.id;
-            const msg = data;
+            const { sender, tagName, conversationName } = data;
             //Create conversation with sender, set pending to true
             //Pending convs dont show or are  greyed out
-            if(msg.sender && msg.tagName){
-                if(msg.sender.tagName === msg.tagName) throw "User cannot send invite to self"
-                const recipient = await this.userService.findByTagName(msg.tagName);
+            if(sender && tagName){
+                if(sender?.tagName === tagName) throw "User cannot send invite to self"
+                const recipient = await this.userService.findByTagName(tagName);
                 if(recipient) {
-                    const tag = msg.sender
-                    const user = await this.userService.findByTagName(tag.tagName);
-                    user.password = undefined;
-                    const conv = await this.conversationService.create(user.tagName, msg.conversationName);
-                    console.log("Handle invite from: " + JSON.stringify(tag.tagName) + " for conversation " + conv.id)
+                    const user = await this.userService.findByTagName(sender.tagName);
+                    delete user.password;
+                    const conv = await this.conversationService.create(user.tagName, conversationName);
+                    console.log(`Handle invite from: ${sender.tagName} for conversation ${conv.id}`);
                     const invite = await this.inviteService.create(user.id, recipient.id, conv.id)
-                    if(recipient.notificationSocketId !== 'disconnected'){
+                    if(recipient?.notificationSocketId !== 'disconnected'){
                         if(user && invite){
                             this.wss.to(recipient.notificationSocketId).emit('inviteReceived', { invite: invite, conv: conv, user: user });
                             this.wss.to(socketId).emit("inviteSent", { invite: invite, conv: conv });
                             console.log(`Conversation invite sent successfully from ${user.tagName} to ${recipient.tagName}`);
-                        } else throw `User with tagname ${msg.tagName} does not exist` 
+                        } else throw `User with tagname ${tagName} does not exist` 
                     } else throw `Recipient ${recipient.tagName} for invite ${invite.id} has connected no socket client; will receive invite on next login!`;  
-                } else throw `User with tagname ${msg.userId} does not exist`;
-            } else throw `Invite incorrect format ${msg}`;
+                } else return false;
+            } else throw `Invite incorrect format ${data}`;
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "inviteSent" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('inviteSentError', { msg: err });
-            console.log(`Success: emitted "inviteSentError" event to socket ${socketId}`);
+            const errorMsg = `Error: "inviteSent" event not sent | ${err} | with socket ${socketId}`; 
+            console.error(errorMsg, err?.message);
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
             return false;
         }
     }
@@ -163,11 +162,10 @@ export class NotificationsGateway  {
     @SubscribeMessage('acceptInvite')
     async handleAcceptInvite(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const msg = data;
             const socketId = client.id;
-            const inviteId = msg.inviteId;
+            const { inviteId, conversationId } = data;
             const invite = await this.inviteService.acceptInvite(inviteId);
-            let conv = await this.conversationService.findOne(msg.conversationId);
+            let conv = await this.conversationService.findOne(conversationId);
             if(conv){
                 conv = await this.conversationService.markAccepted(conv.id);
             } else {
@@ -178,7 +176,8 @@ export class NotificationsGateway  {
             const recipient = await this.userService.findOne(invite.recipientId);
             if(!sender) throw `Error: Sender ID ${invite.senderId} does not exist!`; 
             if(!recipient) throw `Error: Recipient ID ${invite.recipientId} does not exist!`
-            if(!invite) throw `Error: Invite creation failure!`;    
+            if(!invite) throw `Error: Invite creation failure!`; 
+
             if(sender.notificationSocketId !== 'disconnected') {
                 this.wss.to(sender.notificationSocketId).emit('acceptedInvite', { invite: invite, conv: conv });
                 console.log(`Success: emitted "acceptedInvite" event successfully to sender: | ${sender.tagName} | recipient: | ${recipient.tagName} |`);
@@ -189,9 +188,9 @@ export class NotificationsGateway  {
             } 
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "accepted" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('acceptInviteError', { msg: err });
-            console.log(`Success: emitted "acceptInviteError" event to socket ${socketId}`);
+            const errorMsg = `Error: "accepted" event not sent | ${err} | with socket ${socketId}`;
+            console.error(errorMsg, err?.message);
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
             return false;
         }
     }
@@ -206,38 +205,33 @@ export class NotificationsGateway  {
     async handleSendFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
             const msg = data;
-            let errmsg = '';
+            const { senderId, recipientId } = data;
             const socketId = client.id;
-            if(msg.senderId === msg.recipientId) throw "Cannot send friend requests to self";
-            const exists = await this.userService.getFriendRequests(msg.senderId);
+            if(senderId === recipientId) throw "Cannot send friend requests to self";
+            const exists = await this.userService.getFriendRequests(senderId);
             if(exists && exists.length > 0){
-                if(exists.filter(el => el.recipientId === msg.recipientId).length > 0){
+                if(exists.some(frReq => frReq.recipientId === recipientId)){
                     throw "Cannot send more than one friend request to this user";
                 }
             }
             const sender = await this.userService.findOne(msg.senderId);
             const recipient = await this.userService.findByTagName(msg.recipientId);
-            if(!sender){ 
-                errmsg = "Sender does not exist";
-                throw errmsg;
-            }
-            if(!recipient){
-                errmsg = "Recipient does not exist";
-                throw errmsg;
-            }
+            if(!sender) throw "Sender does not exist"; 
+            if(!recipient) throw "Recipient does not exist";
             const friendRequest = await this.friendRequestService.create(sender.id, recipient.id);
             if(friendRequest) {  
                 if(recipient.notificationSocketId !== 'disconnected')
                     this.wss.to(recipient.notificationSocketId).emit('friendRequestSent', { friendRequest: friendRequest });                       
                 this.wss.to(socketId).emit('friendRequestSent', { friendRequest: friendRequest });                       
-                console.log("Emmitted friend request successfully");
+                console.log(`Emmitted friend request to @${recipient.tagName} successfully`);
+                return `Emmitted friend request to @${recipient.tagName} successfully`;
             }
             throw "Cannot send friend request server error";
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "friendRequestSent" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('friendRequestSentError', { msg: err });
-            console.log(`Success: emitted "friendRequestSentError" event to socket ${socketId}`);
+            const errorMsg = `Error: "friendRequestSent" event not sent | ${err} | with socket ${socketId}`;
+            console.error(errorMsg, err?.message);
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
             return false;
         }
     }
@@ -249,11 +243,11 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage("declineFriendRequest")
-    async handleDeclineFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean>{
+    async handleDeclineFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean>{
         try {
-            const msg = JSON.parse(data);
             const socketId = client.id;
-            const friendRequest = await this.friendRequestService.declineFriendRequest(msg.friendRequestId);
+            const { friendRequestId } = data;
+            const friendRequest = await this.friendRequestService.declineFriendRequest(friendRequestId);
             const sender = await this.userService.findOne(friendRequest.sender.id);
             const recipient = await this.userService.findOne(friendRequest.recipientId);
             if(friendRequest && friendRequest.cancelled === true){     
@@ -267,9 +261,9 @@ export class NotificationsGateway  {
             }
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "friendRequestDeclined" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('friendRequestDeclinedError', { msg: err });
-            console.log(`Success: emitted "friendRequestDeclinedError" event to socket ${socketId}`);
+            const errorMsg = `Error: "friendRequestDeclined" event not sent | ${err} | with socket ${socketId}`;
+            console.error(errorMsg, err?.message)
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
             return false;
         } 
     }
@@ -284,9 +278,9 @@ export class NotificationsGateway  {
     @SubscribeMessage("acceptFriendRequest")
     async handleAcceptFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean>{
         try {
-            const msg = data;
+            const { friendRequestId } = data;
             const socketId = client.id;
-            const friendRequest = await this.friendRequestService.acceptFriendRequest(msg.friendRequestId);
+            const friendRequest = await this.friendRequestService.acceptFriendRequest(friendRequestId);
             const acceptorProfile = await this.userService.findOne(friendRequest.recipientId);
             const sender = await this.userService.findByTagName(friendRequest.sender.tagName);
             if(friendRequest){   
@@ -299,9 +293,9 @@ export class NotificationsGateway  {
             }
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "friendAdded" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('acceptFriendRequestError', { msg: err });
-            console.log(`Success: emitted "acceptFriendRequestError" event to socket ${socketId}`);
+            const errorMsg = `Error: "friendAdded" event not sent | ${err} | with socket ${socketId}`;
+            console.error(errorMsg, err?.message);
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
             return false;
         }
     }
@@ -313,10 +307,10 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage("removeFriend")
-    async handleRemoveFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleRemoveFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const msg = JSON.parse(data);
-            const [user, exFriend] = await this.userService.removeFriends(msg.userId, msg.exFriendId);
+            const { userId, exFriendId } = data;
+            const [user, exFriend] = await this.userService.removeFriends(userId, exFriendId);
             const socketId = client.id;
             if(user && exFriend && user.friends && exFriend.friends){
                 if(exFriend.notificationSocketId !== 'disconnected'){
@@ -328,9 +322,9 @@ export class NotificationsGateway  {
             }
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "friendRemoved" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit('friendRemovedError', { msg: err });
-            console.log(`Success: emitted "friendRemovedError" event to socket ${socketId}`);
+            const errorMsg = `Error: "friendRemoved" event not sent | ${err} | with socket ${socketId}`;
+            console.error(errorMsg, err?.message);
+            this.wss.to(socketId).emit('friendRemovedError', { msg: errorMsg });
             return false;
         }
     }

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import io from "socket.io-client";
 import { selectAccount } from '../account/accountSettingsSlice';
-import { selectToken } from '../auth/authSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectHost } from '../store/store';
 import {
@@ -12,13 +11,11 @@ import {
     setRead,
     pinMessage
 } from '../currentConversation/conversationsSlice';
-
 import {
     selectFriends
 } from '../account/friendsSlice';
-
 import {  toast } from 'react-toastify';
-
+import { useCookies } from 'react-cookie';
 let chatSocket = null;
 
 const socketEvents = {
@@ -55,12 +52,11 @@ const socketEvents = {
 export default function ChatSocket(){
     const account = useSelector(selectAccount);
     let currentConversation = useSelector(selectCurrentConversation);
-    const token = useSelector(selectToken);
     const conversations = useSelector(selectConversations);
     const dispatch = useDispatch();
     const host = useSelector(selectHost);
     const friends = useSelector(selectFriends);
-
+    const [token, setToken] = useCookies(['Refresh']);
     const listenAllRooms = (chatSocket) => {
         console.log("Listening to all rooms", conversations)
         if(conversations && Array.isArray(conversations)){
@@ -86,19 +82,20 @@ export default function ChatSocket(){
     }
 
     useEffect(() => {
-        if(currentConversation && currentConversation.id && token && account && currentConversation.id !== "0"){
+        if(currentConversation && currentConversation.id && account && currentConversation.id !== "0"){
+            if(!token) { console.log("!token"); return; }
             const socketOptions = {
                 transportOptions: {
                     polling: {
                         extraHeaders: {
-                            Authorization: `Bearer ${token}`
+                            credentials: "include"
                         }
                     }
                 },
                 forceNew: true
             }
             console.log("Setting up chat socket");
-            chatSocket = io.connect(`${host}/chat`, socketOptions);
+            chatSocket = io(`${host}/chat`, socketOptions);
             console.log("Setting up chat socket event listeners and listening to rooms");
             console.log("Setting up listeners");
             chatSocket.on(socketEvents.received.listening, (msg) => {

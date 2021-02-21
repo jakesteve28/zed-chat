@@ -42,16 +42,16 @@ import { MessageService } from '../messages/message.service';
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "localhost:3000",
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
     res.end();
 }
 /**
- * Gateway for socket.io running on port 3002 under namespace 'chat'
+ * Gateway for socket.io running on port 3000 under namespace 'chat'
  */
-@WebSocketGateway(parseInt(process.env.CHAT_GATEWAY_PORT) || 3002, { namespace: "chat", handlePreflightRequest: preflightCheck })
+@WebSocketGateway({ namespace: "chat", handlePreflightRequest: preflightCheck })
 export class ChatGateway  {
     constructor(
                 private userService: UserService,

@@ -10,9 +10,9 @@ import uiReducer from '../uiSlice';
 export const globalSlice = createSlice({
   name: 'globals',
   initialState: {
-    devHost: "http://localhost:3002",
-    prodHost: "https://zed-chat",
-    testHost: "http://localhost:3002",
+    devHost: "http://localhost:3000",
+    prodHost: "http://localhost:3000", //will add custom host soon
+    testHost: "http://localhost:3000",
     metadata: "",
     api: "http://localhost:3000",
     refreshExpire: -1,

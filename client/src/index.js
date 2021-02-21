@@ -11,7 +11,7 @@ ReactDOM.render(
   <div className="base-div" style={{backgroundColor: "#191919"}}>
     <React.StrictMode>
       <Provider store={store}>
-        <Router basename='/api/client/'>
+        <Router basename='/client/'>
           <Suspense fallback={null}>
             <TopBar></TopBar>
             <App />
