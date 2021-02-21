@@ -17,6 +17,8 @@ import { Invite } from './invites/invite.entity';
 import { FriendRequest } from './friendRequest/friendRequest.entity';
 import { Conversation } from './conversations/conversation.entity';
 import { StorageModule } from './storage/storage.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 export const options: TypeOrmModuleOptions = {
   type: "mysql",
@@ -54,7 +56,10 @@ export const optionsDev: TypeOrmModuleOptions = {
     SocketGatewayModule, 
     FriendRequestModule,
     StorageModule,
-
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'), 
+      serveRoot: '' 
+    })
   ],
   controllers: [AppController],
   providers: [AppService]

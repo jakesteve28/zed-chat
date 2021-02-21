@@ -14,16 +14,20 @@ export const globalSlice = createSlice({
     prodHost: "https://zed-chat",
     testHost: "http://localhost:3002",
     metadata: "",
-    api: "http://localhost:3000"
+    api: "http://localhost:3000",
+    refreshExpire: -1,
   },
   reducers: {
     setMetadata: (state, action) => {
       state.metadata = action.payload;
+    },
+    setRefreshExpire: (state, action) => {
+      state.refreshExpire = action.payload;
     }
   },
 });
 
-export const { setMetadata } = globalSlice.actions;
+export const { setMetadata, setRefreshExpire } = globalSlice.actions;
 
 export const selectHost = state => {
     if (process.env.NODE_ENV === "production") {
@@ -51,6 +55,10 @@ export const selectApi = state => {
   } else {
     return state.globals.api;
   }
+}
+
+export const selectRefreshExpire = state => {
+  return state.globals.refreshExpire;
 }
 
 export const reducer = globalSlice.reducer;

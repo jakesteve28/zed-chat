@@ -4,12 +4,13 @@ import { User } from './user.entity'
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FriendRequest } from '../friendRequest/friendRequest.entity';
+import JwtRefreshGuard from '../auth/jwt-refresh-guard';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async getUser(@Param('id') id): Promise<User> {
     try {
       const user = await this.userService.findOne(id);
@@ -23,7 +24,7 @@ export class UserController {
     }
   }
   @Get('/invites/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async getUserRecInvites(@Param('id') id): Promise<FriendRequest[]> {
     try {
       return this.userService.getFriendRequests(id);
@@ -35,7 +36,7 @@ export class UserController {
     }
   }
   @Options()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   @Header('content-type', 'application/json')
   getOptions(): any {
     try {
@@ -58,7 +59,7 @@ export class UserController {
     }
   }
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   remove(@Param('id') id: string): Promise<string> {
     try {
       return this.userService.remove(id);

@@ -5,9 +5,6 @@ import { Redirect, Link } from 'react-router-dom';
 import regex from '../regex';
 import './loginscreen.css';
 import {
-  setToken
-} from '../auth/authSlice';
-import {
   addConversation
 } from '../currentConversation/conversationsSlice'
 import {
@@ -27,7 +24,11 @@ import { addFriend,
 import {
   setTopbarMessage
 } from '../uiSlice';
-import cookie from 'react-cookies'
+import cookie from 'react-cookies';
+import {
+  setRefreshExpire
+} from '../store/store';
+
 
 const loginServer = async (username, password) => {
   const requestBody = JSON.stringify({
@@ -134,6 +135,7 @@ function LoginScreen() {
           setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
           return;
     }
+    dispatch(setRefreshExpire(Date.now() + 875000)); 
     dispatch(setEmail(user?.email));
     dispatch(setTagName(user?.tagName));
     dispatch(setId(id));

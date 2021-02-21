@@ -2,8 +2,8 @@ import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nest
 import { UserService } from '../users/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { InviteService } from 'src/invites/invite.service';
-import { User } from 'src/users/user.entity';
+import { InviteService } from '../invites/invite.service';
+import { User } from '../users/user.entity';
 import { jwtConstants } from './constants';
 
 export interface jwtPayload {
@@ -58,23 +58,11 @@ export class AuthService {
       return {
           user: user,
           invites: await this.inviteService.getInvitesByUser(user.id),
-          accessToken: this.accessToken(user),
+          // accessToken: this.accessToken(user),
           refreshToken: this.refreshToken(user),
           id: user.id
       }
   }
-  public accessToken(user: any) {
-    const payload: jwtPayload = { 
-      username: user?.tagName, 
-      sub: user?.id
-    } 
-    const token = this.jwtService.sign(payload, {
-      secret: jwtConstants.accessSecret,
-      expiresIn: '900s'
-    });
-    return `${token}`;
-  }
-
   public refreshToken(user: any) {
     const payload: jwtPayload = { 
       username: user?.tagName, 

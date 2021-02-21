@@ -7,12 +7,12 @@ import {
     UseGuards
   } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { UserService } from "../users/user.service";
 import { storage, limits, fileFilter } from "./storage.config";
 import * as fs from "fs"; 
 import { extname } from "path";
 import { v4 as uuid } from 'uuid';
+import JwtRefreshGuard from "../auth/jwt-refresh-guard";
 
 @Controller('storage')
 export class StorageController {
@@ -87,7 +87,7 @@ export class StorageController {
     }
 
     @Post("/:userId/uploadProfilePicture")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtRefreshGuard)
     @UseInterceptors(
       FileInterceptor(
         "file", // name of the field being passed

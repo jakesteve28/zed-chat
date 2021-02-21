@@ -7,7 +7,7 @@ import { NotificationsGateway } from './notification.gateway';
 import { InviteModule } from '../invites/invite.module';
 import { FriendRequestModule } from '../friendRequest/friendRequest.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/auth/constants';
+import { jwtConstants } from '../auth/constants';
 
 @Module({
     imports: [
@@ -17,7 +17,7 @@ import { jwtConstants } from 'src/auth/constants';
         InviteModule,
         FriendRequestModule,
         JwtModule.register({
-            secret: jwtConstants.accessSecret
+            secret: jwtConstants.refreshSecret
         })
     ],
     providers: [ChatGateway, NotificationsGateway],

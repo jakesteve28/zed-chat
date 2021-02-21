@@ -1,12 +1,10 @@
-import { Controller, Get, Next, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, Res, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { LocalAuthGuard } from './auth/local-auth.guard'
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Connection } from 'typeorm';
-import { Header } from '@nestjs/common/decorators/http/header.decorator';
 import { Response } from 'express';
 import { join } from 'path';
+import JwtRefreshGuard from './auth/jwt-refresh-guard';
 @Controller()
 export class AppController {
   constructor(
@@ -24,7 +22,7 @@ export class AppController {
     return res.sendFile(join(__dirname, '..', 'client/build/index.html')); 
   }
  
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

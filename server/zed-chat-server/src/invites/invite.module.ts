@@ -6,12 +6,12 @@ import { Invite } from './invite.entity';
 import { InviteService } from './invite.service';
 import { FriendRequestModule } from '../friendRequest/friendRequest.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/auth/constants';
+import { jwtConstants } from '../auth/constants';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: jwtConstants.accessSecret
+      secret: jwtConstants.refreshSecret
     }),
     UserModule,
     ConversationModule, 

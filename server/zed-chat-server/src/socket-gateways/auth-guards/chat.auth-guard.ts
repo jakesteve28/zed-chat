@@ -12,6 +12,7 @@ export class ChatGuard implements CanActivate {
     private conversationService: ConversationService) {
   }
   verifyJwt(context: any): Promise<User> {
+    console.log(context.args[0].handshake)
     const bearerToken = context.args[0].handshake.headers.authorization.split(' ')[1];
     const decoded = this.jwtService.verify(bearerToken) as any;
     const user = this.userService.findByTagName(decoded.username);

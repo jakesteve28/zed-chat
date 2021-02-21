@@ -5,8 +5,8 @@ import { UserService } from '../users/user.service';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from './message.entity';
-import { User } from 'src/users/user.entity';
-import { Conversation } from 'src/conversations/conversation.entity';
+import { User } from '../users/user.entity';
+import { Conversation } from '../conversations/conversation.entity';
 
 @Injectable()
 export class MessageService {

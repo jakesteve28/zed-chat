@@ -19,6 +19,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       }]),
       secretOrKey: jwtConstants.refreshSecret,
       passReqToCallback: true,
+      ignoreExpiration: false
     });
   }
  
@@ -27,6 +28,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
     if(await this.userService.checkRefreshTokenMatch(refreshToken, payload.userId)){
         return this.userService.findOne(payload.userId)
     }
-    return null;
+    return false;
   }
 }

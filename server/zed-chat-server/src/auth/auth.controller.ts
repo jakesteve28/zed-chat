@@ -22,20 +22,16 @@ constructor(
     @UseGuards(JwtRefreshGuard)
     @Get('refresh')
     refresh(@Req() request: Request, @Res() res: Response) {
-        const accessTokenCookie = this.authService.accessToken(request.user);
-        res.cookie('Authentication', accessTokenCookie, { maxAge: 900000, httpOnly: true })
-        //request.res.setHeader('Set-Cookie', accessTokenCookie);
-        return request.user;
+        const accessTokenCookie = this.authService.refreshToken(request.user);
+        res.cookie('Refresh', accessTokenCookie, { maxAge: 900000, httpOnly: true })
+        return res.send({ successful: true, user: request.user });
     }
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
     async login(@Req() req, @Res() res: Response) {
-        const { user, id, invites, accessToken, refreshToken } = await this.authService.login(req.user);
-        //req.res.setHeader('Set-Cookie', [accessToken, refreshToken]); 
-        res.cookie('Authentication', accessToken, { maxAge: 900000, httpOnly: true })
+        const { user, id, invites, refreshToken } = await this.authService.login(req.user);
         res.cookie('Refresh', refreshToken,  { maxAge: 900000, httpOnly: true });
         return res.send({ user, id, invites })
-        //return { user, id, invites }; 
     }
 }

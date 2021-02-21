@@ -1,9 +1,8 @@
 import { HttpException, Controller, Get, Post, Param, Body, Delete, Logger, Header, Options, HttpStatus, UseGuards, Request, Put, Query } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { Conversation } from './conversation.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Message } from '../messages/message.entity';
-import { BeforeUpdate } from 'typeorm';
+import JwtRefreshGuard from '../auth/jwt-refresh-guard';
 
 @Controller('conversation')
 export class ConversationController {
@@ -20,37 +19,37 @@ export class ConversationController {
     }
   }
   @Post('create')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async createConversation(@Body('tagName') tagName: string, @Body('conversationName') conversationName: string): Promise<Conversation> {
     return this.conversationService.create(tagName, conversationName);
   }
   @Delete('remove')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async removeConversation(@Body('conversationId') conversationId): Promise<string> {
       return this.conversationService.remove(conversationId);
   }
   @Put('addUser')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async addUser(@Request() req, @Body('conversationId') conversationId, @Body('userTagName') userTagName): Promise<Conversation> {
     return this.conversationService.addUser(conversationId, userTagName);
   }
   @Put('removeUser')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async removeUser(@Body('conversationId') conversationId, @Body('userTagName') userTagName): Promise<Conversation> {
     return this.conversationService.removeUser(conversationId, userTagName);
   }
   @Options('options')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async options(){
       return this.conversationService.options()
   }
   @Get('/messages/truncated/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async getMessages(@Param('id') conversationId): Promise<Message[]> {
     return this.conversationService.getMessagesTruncated(conversationId)
   }
   @Get('/messages/range')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshGuard)
   async getMessagesRange(@Query('id') conversationId, @Query('beforeDate') beforeDate, @Query('number') number): Promise<Message[]> {
     let accum = 0, max = parseInt(number); 
     const dateBefore = new Date(beforeDate).getTime();
