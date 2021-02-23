@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import io from "socket.io-client";
 import { selectAccount } from '../account/accountSettingsSlice';
-import { selectToken } from '../auth/authSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
 import {
@@ -42,7 +41,8 @@ const socketEvents = {
         friendAdded: "friendAdded",
         acceptFriendRequestError: "acceptFriendRequestError",
         friendRemoved: "friendRemoved",
-        friendRemovedError: "friendRemovedError"
+        friendRemovedError: "friendRemovedError",
+        refreshNotificationSuccess: "refreshNotificationSuccess"
     },
     sent: {
         connect: "connect",
@@ -349,11 +349,13 @@ const setupEventListeners = (notificationSocket, dispatch, account, friends, req
     notificationSocket.on(socketEvents.received.friendRemovedError, (msg) => {
         console.log(`Error: Friend removed server error | ${msg.msg}`);
     });
+    notificationSocket.on(socketEvents.received.refreshNotificationSuccess, (msg) => {
+        console.log(`Successfully refreshed notification socket and set client ID to ${msg.clientId}`);
+    });
 }
 
 export default function NotificationSocket(){
     const account = useSelector(selectAccount)
-    const token = useSelector(selectToken)
     const dispatch = useDispatch();
     const conversations = useSelector(selectConversations)
     const host = useSelector(selectHost);
@@ -372,21 +374,24 @@ export default function NotificationSocket(){
     }
 
     useEffect(() => {
+        console.log("Attemping to establish notifications socket");
         const notificationSocketOptions = {
             transportOptions: {
                 polling: {
                     extraHeaders: {
-                        Authorization: `Bearer ${token}`
+                        credentials: "include"
                     }
                 }
-            }
+            },
+            forceNew: true
         }
         if(account.loggedIn === true){
             try {
-                console.log("Attemping connection to notifications notificationSocket");
+                console.log("Attemping connection to notifications socket gateway");
                 notificationSocket = io(`${host}/notifications`, notificationSocketOptions);
-                notificationSocket.emit('refreshNotificationSocket', JSON.stringify({ userId: account.id }));
                 setupEventListeners(notificationSocket, dispatch, account, friends, requests, conversations, sentInvites, receivedInvites);
+                notificationSocket.emit('refreshNotificationSocket', { userId: account.id } );
+                console.log("Successfully setup notifications socket");
                 return () => {
                     teardownEventListeners(notificationSocket);
                 }
@@ -402,7 +407,7 @@ export default function NotificationSocket(){
             }
         }
         
-    }, []);
+    }, [account?.loggedIn]);
     return null;
 }
 

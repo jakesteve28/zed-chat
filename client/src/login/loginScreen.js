@@ -52,7 +52,7 @@ const loginServer = async (username, password) => {
         return false;
     }
     if(refreshToken === true) {
-       console.log("Refresh token successfully set and will timeout in");
+       console.log("Refresh token successfully set and will timeout in 15 mins or " + Date.now() + 900000);
     }
     console.log("Successfully logging in user", user.tagName); 
     return { user, id, invites, refreshToken };
@@ -105,7 +105,7 @@ function LoginScreen() {
         if(refreshResult) {
           const res = await refreshResult.json();
           if(res?.statusCode === 401){
-            console.log(res);
+           // console.log(res);
             console.log("No valid refresh token. User must login");
             setAllowLogin(true);
             setSpinning(false); 

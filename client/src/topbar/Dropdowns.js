@@ -21,7 +21,7 @@ import {
   clearFriends
 } from '../account/friendsSlice';
 import { useSelector, useDispatch } from 'react-redux'
-import { selectToken, clearAuth } from '../auth/authSlice';
+import { clearAuth } from '../auth/authSlice';
 import { selectReceived, acceptedInvites, clearInvites } from './inviteSlice';
 import regex from '../regex'
 import { notificationSocket } from '../socket/notificationSocket'
@@ -37,13 +37,10 @@ import GroupIcon from '@material-ui/icons/Group';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Tooltip from '@material-ui/core/Tooltip';
-import chatDisconnect from '../socket/chatSocket';
-import notificationsDisconnect from '../socket/notificationSocket';
 
 export function FriendsDropdown(){
     const dispatch = useDispatch();
     const history = useHistory();
-    const token = useSelector(selectToken);
     const account = useSelector(selectAccount);
     const friends = useSelector(selectFriends);
     const conversations = useSelector(selectConversations);
@@ -119,7 +116,7 @@ export function FriendsDropdown(){
         setAddError(true)
         return;
       }
-      if(token && account && notificationSocket){
+      if(account && notificationSocket){
           notificationSocket.emit('sendFriendRequest', {
             senderId: account.id,
             recipientId: addFriendInput
@@ -329,7 +326,10 @@ export function NotificationsDropdown() {
 
 export function SettingsDropdown(){
     const dispatch = useDispatch();
-    const logoutAccount = () => {
+    const logoutAccount = async () => {
+        await fetch("http://localhost:3000/api/auth/logout", {
+          credentials: "include"
+        });
         dispatch(logout());
         dispatch(clearAccount());
         dispatch(clearAuth());

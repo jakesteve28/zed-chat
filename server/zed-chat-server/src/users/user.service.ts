@@ -249,6 +249,10 @@ export class UserService {
          return user;
       }
       user.loggedIn = false;
+      user.chatSocketId = 'disconnected';
+      user.notificationSocketId = 'disconnected'; 
+      user.currentConversationId = '0';
+      user.refreshToken = ''; 
       user.isOnline = true;
       return this.usersRepository.save(user);
     }

@@ -43,7 +43,10 @@ export default function Settings(){
     const [resetPWOpened, setResetPWOpened] = useState(false);
     const [changeTagnameOpened, setChangeTagnameOpened] = useState(false);
 
-    const logoutAccount = () => {
+    const logoutAccount = async () => {
+        await fetch("http://localhost:3000/api/auth/logout", {
+            credentials: "include"
+        });
         dispatch(logout());
         dispatch(clearAccount());
         dispatch(clearAuth());

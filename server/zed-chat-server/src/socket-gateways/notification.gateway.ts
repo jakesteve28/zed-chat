@@ -66,15 +66,15 @@ export class NotificationsGateway  {
      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage('refreshNotificationSocket')
-    async handleRefreshNotificationSocket(@ConnectedSocket() client: Socket, @MessageBody() data: string): Promise<string | boolean> {
+    async handleRefreshNotificationSocket(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const { userId } = JSON.parse(data);
+            const { userId } = data;
             const socketId = client.id;
             const user = await this.userService.setNotificationSocketId(userId, socketId);
             if(!user) {
                 throw `Cannot find user with id: ${userId}, error logging in`;
             } else {
-                this.wss.to(socketId).emit("refreshClientSocketSuccess", { clientId: `${client.id}` });
+                this.wss.to(socketId).emit("refreshNotificationSuccess", { clientId: `${client.id}` });
                 console.log(`Success: emitted notification socket "refreshClientSocketSuccess" to User @${user.tagName}`);
             }
         } catch(err) {

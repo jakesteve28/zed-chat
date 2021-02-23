@@ -6,7 +6,7 @@ import store from './store/store'
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import TopBar from './topbar/TopBar';
-
+import NotificationSocket from './socket/notificationSocket';
 ReactDOM.render(
   <div className="base-div" style={{backgroundColor: "#191919"}}>
     <React.StrictMode>
@@ -14,6 +14,7 @@ ReactDOM.render(
         <Router basename='/client/'>
           <Suspense fallback={null}>
             <TopBar></TopBar>
+            <NotificationSocket></NotificationSocket>
             <App />
           </Suspense>
         </Router>

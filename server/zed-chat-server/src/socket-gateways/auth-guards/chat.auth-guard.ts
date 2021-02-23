@@ -31,7 +31,6 @@ export class ChatGuard implements CanActivate {
       console.error("Error: ChatGuard no Refresh token included in request!");
       return null;
     }
-    
   }
   checkUser(user: User): Boolean {
     if(user.flagged === true) {

@@ -73,6 +73,15 @@ export class AuthService {
     }
   }
 
+  async logout(user: any) {
+    const _user = await this.userService.logout(user.id); 
+    if(_user) {
+      console.log(`User @${_user.tagName} logged out`);
+      return true; 
+    }
+    return false;
+  }
+
   public async refreshToken(user: any) {
     const payload: jwtPayload = { 
       username: user?.tagName, 
