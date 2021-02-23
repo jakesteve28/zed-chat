@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import 'reflect-metadata';
-import { AppModule } from './app.module';
+import { AppModule } from './modules/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
