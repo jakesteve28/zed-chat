@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinTable, ManyToMany, OneToMany, CreateDateColumn, ManyToOne,  } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn  } from 'typeorm';
 
 @Entity()  
 export class Invite {

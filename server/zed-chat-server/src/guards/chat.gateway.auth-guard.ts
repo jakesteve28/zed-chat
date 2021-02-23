@@ -8,8 +8,10 @@ import { jwtConstants } from "../config/constants";
 
 @Injectable()
 export class ChatGuard implements CanActivate {
-  constructor(private userService: UserService, private jwtService: JwtService,
-  private conversationService: ConversationService) { }
+  constructor(private userService: UserService, 
+              private jwtService: JwtService,
+              private conversationService: ConversationService
+  ) { }
   async canActivate(context: any): Promise<any> {
     if(!context || context.contextType !== 'ws') throw `Context type of ${context.contextType} not allowed`;
     try {
@@ -60,7 +62,7 @@ export class ChatGuard implements CanActivate {
     // }
     if(context.args[1].body && context.args[1].sender && context.args[1].room){
         const conversation = await this.conversationService.findOne(context.args[1].room);
-        if(conversation.users.filter(_user => _user.id === user.id).length === 0){ console.log("Error: User doesn't exist in this conversation, cannot accept notification from them. Conversation ID: " + conversation.id)};
+        if(conversation.users.filter(_user => _user.id === user.id).length === 0){ console.log("Error: User doesn't exist in this conversation, cannot accept notification from them. Conversation ID: " + conversation.id)}
         // ^^ Iterates users in the conv, making sure requesting user is a member of the conversation
         console.log(`Success: ChatGuard passed for new message with sender @${user.tagName}> with conversation ID ${conversation.id}`);
         return context.args[1].sender === user.tagName;

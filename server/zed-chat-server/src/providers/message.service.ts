@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConversationService } from './conversation.service';
 import { UserService } from './user.service';
 import { Repository } from 'typeorm';
-import { CreateMessageDto } from '../entities/dto/create-message.dto';
 import { Message } from '../entities/message.entity';
 import { User } from '../entities/user.entity';
 import { Conversation } from '../entities/conversation.entity';
@@ -15,12 +14,11 @@ export class MessageService {
         @InjectRepository(Message)
         private messageRepository: Repository<Message>){
     }
-
     async create(messageBody: string, user: User, conversation: Conversation): Promise<Message> {
         const message = new Message();
         message.body = messageBody;
         message.user = user;
-        message.conversation = await this.conversationService.incrementNumberMessages(conversation.id);;
+        message.conversation = await this.conversationService.incrementNumberMessages(conversation.id);
         return this.messageRepository.save(message);
     }
     async remove(messageId: string): Promise<string> {
@@ -34,7 +32,7 @@ export class MessageService {
     }
     async setAllRead(conversationId: string, userId: string):  Promise<Message[]> {
         const messages = await this.conversationService.getAllMessages(conversationId);
-        for(let msg of messages){
+        for(const msg of messages){
             if(msg.read !== true && msg.user.id !== userId){
                 msg.read = true;
                 await this.messageRepository.save(msg);

@@ -35,8 +35,7 @@ export class NotificationsGateway  {
                 private inviteService: InviteService,
                 private friendRequestService: FriendRequestService
     ){
-        const port = parseInt(process.env.CHAT_GATEWAY_PORT) || 3002;
-        console.log(`\tEstablishing notification socket.io gateway on port ${port}`);
+        console.log(`Establishing notifications socket.io gateway event listeners`);
     }
     @WebSocketServer() wss: Server;
 
@@ -162,7 +161,6 @@ export class NotificationsGateway  {
     @SubscribeMessage('acceptInvite')
     async handleAcceptInvite(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const socketId = client.id;
             const { inviteId, conversationId } = data;
             const invite = await this.inviteService.acceptInvite(inviteId);
             let conv = await this.conversationService.findOne(conversationId);

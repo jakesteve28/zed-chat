@@ -1,4 +1,4 @@
-import { HttpException, Controller, Get, Post, Param, Body, Delete, Logger, Header, Options, HttpStatus, UseGuards } from '@nestjs/common';
+import { HttpException, Controller, Get, Post, Param, Body, Delete, Header, Options, HttpStatus, UseGuards } from '@nestjs/common';
 import { UserService } from '../providers/user.service';
 import { User } from '../entities/user.entity'
 import { CreateUserDto } from '../entities/dto/create-user.dto';
@@ -37,11 +37,7 @@ export class UserController {
   @UseGuards(JwtRefreshGuard)
   @Header('content-type', 'application/json')
   getOptions(): any {
-    try {
       return this.userService.options();
-    } catch(error) { 
-      
-    }
   }
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -49,19 +45,16 @@ export class UserController {
        const user = await this.userService.create(createUserDto);
        return user;
     } catch(error) {
+      console.error("Error: creation of user resulted in fatal server error. ", error);
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: "User Post Error"
-      }, HttpStatus.INTERNAL_SERVER_ERROR)
+        error: "User Creation Error" + error
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   @Delete(':id')
   @UseGuards(JwtRefreshGuard)
   remove(@Param('id') id: string): Promise<string> {
-    try {
-      return this.userService.remove(id);
-    } catch(error) {
-
-    }
+    return this.userService.remove(id);
   }
 }

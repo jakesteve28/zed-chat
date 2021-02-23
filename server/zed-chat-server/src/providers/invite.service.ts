@@ -71,7 +71,7 @@ export class InviteService {
         if(!conversation) throw "Cannot accept invite without a valid conversation"
         const users = conversation.users;
         if(users.filter((user) => user.id === newUser.id).length > 0) throw "Cannot accept invite if user is already part of conversation"
-        const _conversation = await this.conversationService.addUser(conversation.id, newUser.tagName)
+        this.conversationService.addUser(conversation.id, newUser.tagName)
         invite.accepted = true;
         return this.inviteRepository.save(invite);
     }

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -21,7 +21,7 @@ export class UserService {
   async findAll(): Promise<User[]> {
     const users = await this.usersRepository.find();
     if(Array.isArray(users)){
-      for(let user of users){
+      for(const user of users){
         delete user.password; 
         delete user.refreshToken; 
       }
@@ -42,7 +42,7 @@ export class UserService {
 
   async findOne(id: string): Promise<User> {
       const user = await this.usersRepository.findOne(id, { relations: ["conversations", "friends", "friendRequests"] });
-      for(let conv of user.conversations){
+      for(const conv of user.conversations){
         conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
         conv.users = await this.conversationService.getUsers(conv.id);
       }
@@ -68,7 +68,7 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-      let hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
       const user = new User();
       user.firstName = createUserDto.firstName;
       user.lastName = createUserDto.lastName;
@@ -241,7 +241,7 @@ export class UserService {
   async fetchMessages(userId: string): Promise<User> {
     const user = await this.findOne(userId);
     if(Array.isArray(user?.conversations)){
-      for(let conv of user.conversations){
+      for(const conv of user.conversations){
         conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
         if(conv.numberOfMessages < conv.messages.length) {
             conv.numberOfMessages = conv.messages.length;
@@ -286,5 +286,10 @@ export class UserService {
     await this.usersRepository.update(userId, {
       refreshToken: token
     });
+  }
+  async leaveConversation(tagName: string, convId: string): Promise<User> { 
+    const user = await this.findByTagName(tagName);
+    user.conversations = user.conversations.filter(conv => conv.id !== convId); 
+    return this.usersRepository.save(user);
   }
  } 

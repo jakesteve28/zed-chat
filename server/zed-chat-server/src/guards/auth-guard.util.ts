@@ -1,5 +1,3 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-
 export default function extractRefreshTokenFromCookie(cookies: string): string {
     if(cookies.includes('Refresh=')){
       const index = cookies.lastIndexOf('Refresh=') + 8;

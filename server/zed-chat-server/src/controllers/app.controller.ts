@@ -1,6 +1,5 @@
-import { Controller, Get, Request, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from '../providers/app.service';
-import JwtRefreshGuard from '../guards/jwt-refresh-guard';
 @Controller()
 export class AppController {
   constructor(

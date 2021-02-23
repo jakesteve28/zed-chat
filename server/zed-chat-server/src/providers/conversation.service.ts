@@ -53,7 +53,7 @@ export class ConversationService {
         const user = await this.userService.findByTagName(userTagName);
         conversation.users = [...conversation.users, user];
         let str = ``
-        for(let user of conversation.users) str += `@${user.tagName} `
+        for(const user of conversation.users) str += `@${user.tagName} `
         conversation.conversationName = `Chat with ${str}`
         return this.conversationRepository.save(conversation);
     }
@@ -61,18 +61,17 @@ export class ConversationService {
         const conversation = await this.conversationRepository.findOne({ where: {
             id: conversationId
         }, relations: ["users"]});
-        const user = await this.userService.findByTagName(userTagName);
-        conversation.users = conversation.users.filter((element) => {
-            return element.tagName != userTagName
-        });
-        let str = ``
-        for(let user of conversation.users) str += `@${user.tagName} `
-        conversation.conversationName = `Chat with ${str}`
+        const user = await this.userService.leaveConversation(userTagName, conversationId); 
+        if(user){
+            conversation.users = conversation.users.filter((element) => {
+                return element.tagName != userTagName
+            });
+        }
         return this.conversationRepository.save(conversation);
     }
     async getUsers(conversationId: string): Promise<User[]> {
         const conv = await this.conversationRepository.findOne(conversationId, { relations: ["users"]});
-        for(let us of conv.users){
+        for(const us of conv.users){
             delete us.password;
             delete us.refreshToken;
         }

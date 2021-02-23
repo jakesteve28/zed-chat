@@ -1,4 +1,4 @@
-import { HttpException, Controller, Get, Post, Param, Body, Delete, Logger, Header, Options, HttpStatus, UseGuards, Request, Put, Query } from '@nestjs/common';
+import { HttpException, Controller, Get, Post, Param, Body, Delete, Options, HttpStatus, UseGuards, Request, Put, Query } from '@nestjs/common';
 import { ConversationService } from '../providers/conversation.service';
 import { Conversation } from '../entities/conversation.entity';
 import { Message } from '../entities/message.entity';
@@ -51,7 +51,8 @@ export class ConversationController {
   @Get('/messages/range')
   @UseGuards(JwtRefreshGuard)
   async getMessagesRange(@Query('id') conversationId, @Query('beforeDate') beforeDate, @Query('number') number): Promise<Message[]> {
-    let accum = 0, max = parseInt(number); 
+    let accum = 0;
+    const max = parseInt(number); 
     const dateBefore = new Date(beforeDate).getTime();
     const { messages } = await this.conversationService.findOne(conversationId); 
     const messagesRet = messages.filter(message => (++accum <= max) && new Date(message.createdAt).getTime() < dateBefore);

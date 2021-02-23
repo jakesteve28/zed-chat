@@ -32,8 +32,7 @@ export class ChatGateway  {
                 private messageService: MessageService,
                 private conversationService: ConversationService
     ){
-        const port = parseInt(process.env.CHAT_GATEWAY_PORT) || 3002;
-        console.log(`\tEstablishing notification socket.io gateway on port ${port}`);
+        console.log(`Establishing chat socket.io gateway event listeners`);
     }
     @WebSocketServer() wss: Server;
     
@@ -87,7 +86,7 @@ export class ChatGateway  {
      */
     @UseGuards(ChatGuard)
     @SubscribeMessage('disconnect')
-    async handleDisconnect(@ConnectedSocket() client: Socket, @MessageBody() data: string){
+    async handleDisconnect(@ConnectedSocket() client: Socket){
         try {
             const socketId = client.id;
             const connectedUser = await this.userService.findByChatSocketId(socketId);
@@ -98,7 +97,6 @@ export class ChatGateway  {
                 client.disconnect();
             }
         } catch(err) {
-            const socketId = client.id;
             console.log(`Error: "disconnect" event failure | ${err} |`);
             return null;
         }
@@ -122,7 +120,7 @@ export class ChatGateway  {
                     const message = await this.messageService.create(body, user, conversation);
                     if(message){
                         console.log("Emitting delivered event to all users of conversation with ID " + room);
-                        for(let user of conversation.users){
+                        for(const user of conversation.users){
                             if(user.chatSocketId !== "disconnected"){
                                 this.wss.to(user.chatSocketId).emit('delivered', { message: message, from: user.tagName }, () => {
                                     console.log(`Delivered event sent to user @${user.tagName}`)
@@ -204,7 +202,7 @@ export class ChatGateway  {
             if(msg.room){
                 if(user){
                     const users = await this.conversationService.getUsers(msg.room);
-                    for(let _user of users){
+                    for(const _user of users){
                         if(_user.id === user.id) continue; 
                         if(_user.chatSocketId !== 'disconnected'){
                             this.wss.to(_user.chatSocketId).emit('typing', { conv: msg.room, user: user, typing: msg.typing })
@@ -278,7 +276,6 @@ export class ChatGateway  {
                 const convs = user.conversations;
                 const conv = this.conversationService.findOne(msg.room);
                 if(conv){
-                    const conv = this.conversationService.findOne(msg.room); 
                     if(convs.filter(cv => cv.id === msg.room).length < 1) throw "User not invited to conversation";
                     if(!user) throw "User does not exist";
                     client.leave(msg.room);
@@ -323,7 +320,7 @@ export class ChatGateway  {
                 const conversation = await this.conversationService.findOne(user.currentConversationId);
                 if(conversation.messages.length > 0) {
                     const msgs = await this.messageService.setAllRead(conversation.id, user.id); 
-                    for(let msg of msgs) {
+                    for(const msg of msgs) {
                         if(msg.user.tagName !== user.tagName) {
                             //other users in conversation 
                             if(msg.user.chatSocketId !== 'disconnected'){
@@ -356,7 +353,7 @@ export class ChatGateway  {
                 const users = message.conversation.users; 
                 //const sender = message.user; 
                 if(Array.isArray(users)) {
-                    for(let user of users) {
+                    for(const user of users) {
                         if(user.chatSocketId !== "disconnected") {
                             this.wss.to(user.chatSocketId).emit("messagePinned", { message: message });
                             console.log("Successfully emitted messagePinned to all chat users"); 

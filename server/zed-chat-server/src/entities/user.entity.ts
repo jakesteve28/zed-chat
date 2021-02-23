@@ -1,7 +1,7 @@
 import { Conversation } from './conversation.entity';
 import { FriendRequest } from './friendrequest.entity';
 import { Message } from './message.entity';
-import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany, CreateDateColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany, CreateDateColumn } from 'typeorm';
 
 @Entity()  
 export class User {

@@ -4,7 +4,7 @@ import { AppModule } from './modules/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-import open from 'open'; 
+//import open from 'open'; 
 const httpsOptions = {
  // key: fs.readFileSync('../keys/key.pem'),
  // cert: fs.readFileSync('../secrets/public.pem'),
