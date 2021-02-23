@@ -4,8 +4,7 @@ import {
     WebSocketServer,
     MessageBody,
     ConnectedSocket
-  } from '@nestjs/websockets';
-
+} from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { UserService } from '../users/user.service'
 import { ConversationService } from '../conversations/conversation.service';
@@ -13,31 +12,6 @@ import { UseGuards } from '@nestjs/common';
 import { ChatGuard } from './auth-guards/chat.auth-guard';
 import { Request, Response } from "express"
 import { MessageService } from '../messages/message.service';
-
-// const socketEvents = {
-//     sent: {
-//         connectSuccess: "connectSuccess",
-//         connectError: "connectError",
-//         delivered: "delivered",
-//         deliveryError: "deliveryError",
-//         readReceipt: "readReceipt",
-//         typing: "typing",
-//         unlistened: "unlistened",
-//         unlistenError: "unlistenError",
-//         currentConversationUpdate: "currentConversationUpdate",
-//         setCurrentConversationError: "setCurrentConversationError",
-//     },
-//     received: {
-//         connect: "connect",
-//         disconnect: "disconnect",
-//         chatToServer: "chatToServer",
-//         readMessage: "readMessage",
-//         typing: "typing",
-//         listen: "listen",
-//         unlisten: "unlisten",
-//         setCurrentConversation: "setCurrentConversation",
-//     }
-// }
 
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
@@ -98,9 +72,9 @@ export class ChatGateway  {
             return true;
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "refreshClientSocket" event not sent to client ID: ${socketId} notification socket connected request failed`);
-            client.emit('refreshError', { msg: err });
-            console.log(`Success: emmitted "refreshClientSocketError" to client ID ${socketId}`);
+            const errMsg = `Error: "refreshClientSocket" event not sent to client ID: ${socketId} notification socket connected request failed ${err?.message}`;
+            console.log(errMsg);
+            client.emit('error', { msg: errMsg });
             return false;
         }
     }
@@ -118,7 +92,7 @@ export class ChatGateway  {
             const socketId = client.id;
             const connectedUser = await this.userService.findByChatSocketId(socketId);
             if(connectedUser) {
-                const user = await this.userService.disconnect(connectedUser.id);
+                const user = await this.userService.logout(connectedUser.id);
                 if(!user) throw `Error: disconnecting chat socket failed with client ID ${socketId}!`;
                 client.leaveAll();
                 client.disconnect();
@@ -126,7 +100,7 @@ export class ChatGateway  {
         } catch(err) {
             const socketId = client.id;
             console.log(`Error: "disconnect" event failure | ${err} |`);
-            return undefined;
+            return null;
         }
     }
 
@@ -141,41 +115,40 @@ export class ChatGateway  {
     @SubscribeMessage('chatToServer')
     async handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data) {
         try {
-            const msg = data;
-            const tag = msg.sender
-            const user = await this.userService.findByTagName(tag);
-            const conversation = await this.conversationService.findOne(msg.room);
+            const { room, sender, body } = data;
+            const user = await this.userService.findByTagName(sender);
+            const conversation = await this.conversationService.findOne(room);
             if(conversation && user){
-                    user.password = undefined; 
-                    const message = await this.messageService.create(msg, user, conversation);
+                    const message = await this.messageService.create(body, user, conversation);
                     if(message){
-                        console.log("Emitting delivered event to all users of conversation with ID " + msg.room);
-                        const conv = await this.conversationService.findOne(message.conversation.id);
-                        for(let user of conv.users){
+                        console.log("Emitting delivered event to all users of conversation with ID " + room);
+                        for(let user of conversation.users){
                             if(user.chatSocketId !== "disconnected"){
-                                console.log(`Delivered event sent to user @${user.tagName}`)
-                                this.wss.to(user.chatSocketId).emit('delivered', { message: message, from: user.tagName });
+                                this.wss.to(user.chatSocketId).emit('delivered', { message: message, from: user.tagName }, () => {
+                                    console.log(`Delivered event sent to user @${user.tagName}`)
+                                });
                             }
                         }
                     }
                     else {
                         const socketId = client.id;
                         console.log(`Error: "delivered" event failed, unsuccessful message creation`);
-                        this.wss.to(socketId).emit('deliveryError', { delivered: false });             
+                        this.wss.to(socketId).emit('error', { delivered: false }); 
+                        return null;            
                     }
             } else if (!user) {
-                throw `Cannot find user with id ${msg.userId}`;
+                console.log(`Error: Cannot find user with tagname @${sender}`)
+                return null;
             } else if (!conversation) {
-                console.log("Error: conversation room does not exist for message " + msg.room )
-                return undefined
+                console.log(`Error: conversation room doesn't exist with ID ${room}`);
+                return null;
             } 
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "chatToServer" event handler failed with error | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit("deliveryError", { delivered: false }, () => {
-                console.log(`Success: emitted "deliveryError" event to message sender socket ${socketId}`);
-            });
-            return undefined;
+            const errMsg = `Error: "chatToServer" event handler failed with error | ${err} | with socket ${socketId}`;
+            console.log(errMsg);
+            this.wss.to(socketId).emit("error", { msg: errMsg }); 
+            return null;
         }
     }
 
@@ -193,7 +166,6 @@ export class ChatGateway  {
             const msg = data;
             const reader = await this.userService.findOne(msg.readBy);
             if(reader){
-                reader.password = undefined; 
                 if(msg.message.id && msg.message.conversation){
                     console.log("Handle Read Message: " + msg);
                     const message = await this.messageService.setRead(msg.message.id);
@@ -231,7 +203,6 @@ export class ChatGateway  {
             const user = await this.userService.findByTagName(tag);
             if(msg.room){
                 if(user){
-                    user.password = undefined; 
                     const users = await this.conversationService.getUsers(msg.room);
                     for(let _user of users){
                         if(_user.id === user.id) continue; 
@@ -275,7 +246,6 @@ export class ChatGateway  {
                     const convs = user.conversations;
                     if(convs.filter(cv => cv.id === msg.room).length < 1) throw "User not invited to conversation";
                     if(!user) throw "User does not exist";
-                    user.password = undefined;
                     client.join(msg.room);
                     this.wss.to(socketId).emit('listening', {  room: msg.room  }); 
                     console.log(`Success: emitted "listening" event to user @${user.tagName} for conversation ${msg.room}`);
@@ -311,7 +281,6 @@ export class ChatGateway  {
                     const conv = this.conversationService.findOne(msg.room); 
                     if(convs.filter(cv => cv.id === msg.room).length < 1) throw "User not invited to conversation";
                     if(!user) throw "User does not exist";
-                    user.password = undefined;
                     client.leave(msg.room);
                     this.wss.to(msg.room).emit('unlistened', {  room: msg.room  });   
                 } else {
@@ -342,7 +311,6 @@ export class ChatGateway  {
             const socketId = client.id;
             const user = await this.userService.setCurrentConversationId(msg.user.id, msg.conversationId);
             if(user && user.currentConversationId === msg.conversationId){
-                user.password = undefined;
                 const friends = await this.userService.getFriends(user.id);
                 friends.map((friend) => {
                     if(friend.chatSocketId !== 'disconnected'){

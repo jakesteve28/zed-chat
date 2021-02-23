@@ -14,7 +14,6 @@ export class UserController {
   async getUser(@Param('id') id): Promise<User> {
     try {
       const user = await this.userService.findOne(id);
-      user.password = undefined; 
       return user;
     } catch(error) {
       throw new HttpException({
@@ -49,7 +48,6 @@ export class UserController {
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     try {
        const user = await this.userService.create(createUserDto);
-       user.password = undefined;
        return user;
     } catch(error) {
       throw new HttpException({

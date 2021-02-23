@@ -324,7 +324,7 @@ export class NotificationsGateway  {
             const socketId = client.id;
             const errorMsg = `Error: "friendRemoved" event not sent | ${err} | with socket ${socketId}`;
             console.error(errorMsg, err?.message);
-            this.wss.to(socketId).emit('friendRemovedError', { msg: errorMsg });
+            this.wss.to(socketId).emit('error', { msg: errorMsg });
             return false;
         }
     }

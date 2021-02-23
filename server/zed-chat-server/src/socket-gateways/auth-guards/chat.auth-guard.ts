@@ -3,50 +3,57 @@ import { UserService } from "../../users/user.service";
 import { JwtService } from '@nestjs/jwt'
 import { ConversationService } from "../../conversations/conversation.service";
 import { User } from "../../users/user.entity";
+import extractRefreshTokenFromCookie from "./auth-guard.util";
+import { jwtConstants } from "../../auth/constants";
+
 @Injectable()
 export class ChatGuard implements CanActivate {
   constructor(private userService: UserService, private jwtService: JwtService,
-    private conversationService: ConversationService) {
+  private conversationService: ConversationService) { }
+  async canActivate(context: any): Promise<any> {
+    if(!context || context.contextType !== 'ws') throw `Context type of ${context.contextType} not allowed`;
+    try {
+      const user = await this.verifyJwt(context);
+      if(!user) { 
+        return false;
+      }
+      const userValid = this.checkUser(user); 
+      if(userValid === true) {
+        const result = await this.classify(context, user);
+        return result; 
+      }
+    } catch(err) {
+      console.error("Fatal Error in ChatGuard. Request blocked.");
+      return false;
+    } 
   }
   verifyJwt(context: any): Promise<User> {
-    const cookies = context.args[0]?.handshake?.headers?.cookie;
-    if(cookies.includes('Refresh=')){
-        const index = cookies.lastIndexOf('Refresh=') + 8;
-        let i = index;
-        let refreshToken = "";
-        while(cookies[i] !== ';' &&
-              cookies[i] !== ' ' &&
-              i < cookies.length) {
-          refreshToken += cookies[i++];
-        }
-        const decoded = this.jwtService.verify(refreshToken);
-
-        console.log(`Cookie/JWT Token Expires: ${decoded?.exp * 1000} | Now: ${Date.now()} | Diff: ${(decoded?.exp * 1000) - Date.now()}`);
-        if((decoded?.exp * 1000)  - Date.now() <= 0) {
-          return null;
-        }
-        const user = this.userService.findByTagName(decoded?.username);
-        return user;
-    } else {
-      console.error("Error: ChatGuard no Refresh token included in request!");
+    const refreshToken = extractRefreshTokenFromCookie(context.args[0]?.handshake?.headers?.cookie);
+    if(!refreshToken) {
+      console.error("Error: ChatGuard | No refresh token included in request!");
       return null;
     }
+    const decoded = this.jwtService.verify(refreshToken,{ secret: jwtConstants.refreshSecret });
+    if((decoded?.exp * 1000)  - Date.now() <= 0) {
+      console.error("Error: ChatGuard | JWT expiration time error");
+      return null;
+    }
+    console.log(`ChatGuard JWT verified successfully: Cookie/JWT Token Expires: ${decoded?.exp * 1000} | Now: ${Date.now()} | Diff: ${(decoded?.exp * 1000) - Date.now()}`);
+    const user = this.userService.findByTagName(decoded?.username);
+    return user;
   }
   checkUser(user: User): Boolean {
     if(user.flagged === true) {
       console.error(`Error: User @${user.tagName} failed ChatGuard. User is marked as flagged for suspicious activity`); 
       return false;
     }
-    // if(user.loggedIn === false) {
-    //   console.log(`User @${user.tagName} failed ChatGuard. User is labelled as NOT logged in`); 
-    //   return false;
-    // }
     if(user.disabled === true) {
       console.error(`Error: User @${user.tagName} failed ChatGuard. User is marked as disabled`); 
       return false;
     }
     return true;
   }
+
   async classify(context: any, user: User): Promise<Boolean> {
     // { 
     //    sender: string (tagName) 
@@ -84,23 +91,5 @@ export class ChatGuard implements CanActivate {
       return true;
     }
     return false;
-  }
-  async canActivate(context: any): Promise<any> {
-    if(!context || context.contextType !== 'ws') throw `Context type of ${context.contextType} not allowed`
-    try {
-      const user = await this.verifyJwt(context);
-      if(!user) { 
-        console.error('Error: Token not included or expired in cookie'); 
-        return false;
-      }
-      const userValid = this.checkUser(user); 
-      if(userValid === true) {
-        const result = await this.classify(context, user);
-        return result; 
-      }
-    } catch(err) {
-      console.error("Error: Token received does not pass any checks");
-      return false;
-    } 
   }
 }

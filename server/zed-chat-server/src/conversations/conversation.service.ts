@@ -74,6 +74,7 @@ export class ConversationService {
         const conv = await this.conversationRepository.findOne(conversationId, { relations: ["users"]});
         for(let us of conv.users){
             delete us.password;
+            delete us.refreshToken;
         }
         return conv.users;
     }

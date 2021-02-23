@@ -16,13 +16,11 @@ export class MessageService {
         private messageRepository: Repository<Message>){
     }
 
-    async create(createMessageDto: CreateMessageDto, user: User, conversation: Conversation): Promise<Message> {
+    async create(messageBody: string, user: User, conversation: Conversation): Promise<Message> {
         const message = new Message();
-        message.body = createMessageDto.body || "";
+        message.body = messageBody;
         message.user = user;
-        const conv = await this.conversationService.findOne(conversation.id);
-        const _conv = await this.conversationService.incrementNumberMessages(conv.id);
-        message.conversation = _conv;
+        message.conversation = await this.conversationService.incrementNumberMessages(conversation.id);;
         return this.messageRepository.save(message);
     }
     async remove(messageId: string): Promise<string> {

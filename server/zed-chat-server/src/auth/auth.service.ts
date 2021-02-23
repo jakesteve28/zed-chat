@@ -35,17 +35,17 @@ export class AuthService {
   //Called from LocalAuthGuard
   async validateUser(tagName: string, pass: string): Promise<any> {
     try {
-      const user = await this.userService.findByTagName(tagName);
+      const user =  await this.userService.findByTagName(tagName);
+      const userPW = await this.userService.getPW(tagName);
       if(true === this.enforceSingleClientConnection(user)){
         const passwordMatching = await bcrypt.compare(
           pass,
-          user.password
+          userPW
         )
         if (passwordMatching === true) {
           console.log(`Logging in User: ${tagName}`);
           await this.userService.markLoggedIn(user.id);
           const loggedInUser = await this.userService.fetchMessages(user.id);
-          delete loggedInUser.password;
           return loggedInUser;
         }
       } else throw 'No User With Given Username';
@@ -58,7 +58,7 @@ export class AuthService {
       return {
           user: user,
           invites: await this.inviteService.getInvitesByUser(user.id),
-          refreshToken: await this.refreshToken(user),
+          refreshToken: await this.newRefreshToken(user),
           id: user.id
       }
   }
@@ -82,7 +82,7 @@ export class AuthService {
     return false;
   }
 
-  public async refreshToken(user: any) {
+  public async newRefreshToken(user: any) {
     const payload: jwtPayload = { 
       username: user?.tagName, 
       sub: user?.id

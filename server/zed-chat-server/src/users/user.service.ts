@@ -18,8 +18,24 @@ export class UserService {
     private friendRequestService: FriendRequestService
   ) { }
 
-  findAll(): Promise<User[]> {
-      return this.usersRepository.find();
+  async findAll(): Promise<User[]> {
+    const users = await this.usersRepository.find();
+    if(Array.isArray(users)){
+      for(let user of users){
+        delete user.password; 
+        delete user.refreshToken; 
+      }
+      return users;
+    }
+    else return []; 
+  }
+
+  async getPW(userId: string): Promise<string> {
+      return (await this.usersRepository.findOne(userId)).password;
+  }
+
+  async getRefreshToken(userId: string): Promise<string>  {
+    return (await this.usersRepository.findOne(userId)).refreshToken;
   }
 
   async findOne(id: string): Promise<User> {
@@ -28,6 +44,8 @@ export class UserService {
         conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
         conv.users = await this.conversationService.getUsers(conv.id);
       }
+      delete user.password; 
+      delete user.refreshToken;
       return user;
   }
 
@@ -42,6 +60,8 @@ export class UserService {
 
   async findByTagName(tagName: string): Promise<User> {
     const user = await  this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends", "friendRequests"]});
+    delete user.password; 
+    delete user.refreshToken;
     return user;
   }
 
@@ -54,164 +74,158 @@ export class UserService {
       user.password = hashedPassword;
       user.session = createUserDto.session;
       user.tagName = createUserDto.tagName;
-      user.friendRequests = []
-      user.friends = []
-      createUserDto.password = undefined;
-      const us = await this.usersRepository.save(user);
-      us.password = undefined
-      return us
+      user.friendRequests = [];
+      user.friends = [];
+      delete createUserDto.password;
+      const _user = await this.usersRepository.save(user);
+      delete _user.password; 
+      delete _user.refreshToken;
+      return _user; 
   }
 
   async addConversation(userId: string, conversationId: string): Promise<User> {
-    const user = await this.usersRepository.findOne(userId, { relations: ["conversations"]});
+    const user = await this.findOne(userId); 
     const conversation = await this.conversationService.findOne(conversationId);
     user.conversations.push(conversation);
-    //user.password = undefined
-    return user
+    return this.usersRepository.save(user); 
   }
 
   async getFriendRequests(userId: string): Promise<FriendRequest[]> {
-    const user = await this.usersRepository.findOne(userId, { relations: ["friendRequests"]});
-    //user.password = undefined
+    const user = await this.findOne(userId);
     const received = await this.friendRequestService.getFriendRequestsReceivedByUser(userId);
-    console.log("User sent: ", user.friendRequests)
-    console.log("User received: ", received)
     if(user && user.friendRequests){
       return [...user.friendRequests, ...received]
-    } else console.log("Cannot find user or friend requests for user ")
+    } else console.log("Error: Cannot find user or friend requests for user ")
     return []
   }
 
   async getFriends(userId: string): Promise<User[]> {
-    const user = await this.usersRepository.findOne(userId, { relations: ["friends"]});
-    //user.password = undefined
-    if(user && user.friends){
+    const user = await this.findOne(userId);
+    if(user && Array.isArray(user.friends)){
       return user.friends
-    } else console.log("Cannot find user or friends for user ")
+    } else console.log("Error: Cannot find user or friends for user ")
     return []
   }
 
   async addFriends(userId: string, friendId: string): Promise<[User, User]> {
-    const user = await this.usersRepository.findOne(userId, { relations: ["friends"]});
-    //user.password = undefined
-    const newFriend = await this.usersRepository.findOne(friendId, { relations: ["friends"]});
-    newFriend.password = undefined
-    if(user && user.friends && newFriend && newFriend.friends){
-      if(user.friends.filter(fr => fr.id === newFriend.id).length > 0){
-        throw "Cannot add friend to user, already exists in user's friend's list";
-        return
+    const user = await this.findOne(userId);
+    const newFriend = await this.findOne(friendId);
+    if(user && Array.isArray(user?.friends) && 
+        newFriend && Array.isArray(newFriend?.friends)){
+      if(user.friends.some(fr => fr.id === newFriend.id)){
+        console.error(`Error: Cannot add friend to user, already exists in user's friend's list`);
+        return null;
       }
-      if(newFriend.friends.filter(fr => fr.id === user.id).length > 0){
-        throw "Cannot add friend to new friend, already exists in new friend's friend's list";
-        return
+      if(newFriend.friends.some(fr => fr.id === user.id)){
+        console.error(`Error: Cannot add friend to new friend, already exists in new friend's friend's list`);
+        return null;
       }
-      user.friends.push(newFriend)
-      newFriend.friends.push(user)
-      return [await this.usersRepository.save(user), await this.usersRepository.save(newFriend)]
+      user.friends.push(newFriend);
+      newFriend.friends.push(user);
+      return [await this.usersRepository.save(user), await this.usersRepository.save(newFriend)];
     }
   }
 
-  async removeFriends(userId: string, exFriendId: string) {
-    const user = await this.usersRepository.findOne(userId, { relations: ["friends"]});
-    const exFriend = await this.usersRepository.findOne(exFriendId, { relations: ["friends"]});
-    if(user && user.friends && exFriend && exFriend.friends){
-      if(user.friends.filter(fr => fr.id === exFriend.id).length < 1){
-        console.log("Cannot remove friend from user, doesn't exist in user's friend's list")
-        return
+  async removeFriends(userId: string, exFriendId: string): Promise<[User, User]> {
+    const user = await this.findOne(userId);
+    const exFriend = await this.findOne(exFriendId);
+    if(user && Array.isArray(user.friends) && 
+        exFriend && Array.isArray(exFriend.friends)) {
+      if(!user.friends.some(fr => fr.id === exFriend.id)){
+        console.error(`Cannot remove friend from user, doesn't actually exist in user's friend's list`);
+        return null;
       }
-      if(exFriend.friends.filter(fr => fr.id === user.id).length < 1){
-        console.log("Cannot remove friend from ex friend,  doesn't exist  in ex's friend's list")
-        return
+      if(!exFriend.friends.some(fr => fr.id === user.id)){
+        console.error(`Cannot remove friend from ex friend, doesn't actually exist in ex's friend's list`);
+        return null;
       }
-      user.friends = user.friends.filter((friend) => { return friend.id !== exFriend.id })
-      exFriend.friends = exFriend.friends.filter((friend) => { return friend.id !== user.id })
+      user.friends = user.friends.filter((friend) => { return friend.id !== exFriend.id });
+      exFriend.friends = exFriend.friends.filter((friend) => { return friend.id !== user.id });
       return [await this.usersRepository.save(user), await this.usersRepository.save(exFriend)]
     }
   }
 
-  async setCurrentConversationId(userId: string, conversationId: string) {
-    const user = await this.usersRepository.findOne(userId, { relations: ["conversations"]});
+  async setCurrentConversationId(userId: string, conversationId: string): Promise<User> {
+    const user = await this.findOne(userId); 
     if(user && Array.isArray(user.conversations)){
-      if(user.conversations.filter(conv => conv.id === conversationId).length > 0){
+      if(user.conversations.some(conv => conv.id === conversationId)){
          console.log("Setting current conversation ID for user | " + user.tagName + " | to | " + conversationId + " |");
          user.currentConversationId = conversationId;
-         const ret = await this.usersRepository.save(user);
-         if(ret){
-           ret.password = undefined;
-           return ret;
+         const _user = await this.usersRepository.save(user);
+         if(_user){
+           delete _user.password;
+           delete _user.refreshToken; 
+           return _user;
          }
-         console.log("Error saving current conversation for user | " + user.tagName + " |");
-         return false;
+         console.error("Error: can't set current conversation for user | " + user.tagName + " |");
+         return null;
       } 
-      console.log("Cannot find conversation with ID | " + conversationId + " |");
-      return false;
+      console.error("Error: cannot find conversation with ID | " + conversationId + " |");
+      return null;
     }
-    console.log("Cannot find user with ID | " + userId + " |");
-    return false;
+    console.error("Error: cannot find user with ID | " + userId + " |");
+    return null;
   }
 
-  async setNotificationSocketId(userId: string, notificationSocketId: string) {
-    const user = await this.usersRepository.findOne(userId);
-    if(!notificationSocketId || notificationSocketId === '' || notificationSocketId === '0' || notificationSocketId === 'disconnected'){
-       notificationSocketId = "disconnected";
-       user.loggedIn = false;
-       user.isOnline = false;
-    }
+  async setNotificationSocketId(userId: string, notificationSocketId: string): Promise<User> {
+    const user = await this.findOne(userId); 
     if(user){
-      console.log("Setting notification socket ID for user | " + user.tagName + " | to | " + notificationSocketId + " |");
-      user.notificationSocketId = notificationSocketId; 
-      const ret = await this.usersRepository.save(user);
-      if(ret){
-        ret.password = undefined;
-        return ret;
-      }
-      console.log(`Error saving current conversation for user | ${user.tagName} |`);
-      return false;
-    } else {
-      console.log("Cannot find user with ID | " + userId + " |");
-      return false;
-    }
+        console.log("Setting notification socket ID for user | " + user.tagName + " | to | " + notificationSocketId + " |");
+        user.notificationSocketId = notificationSocketId;
+        if(notificationSocketId === 'disconnected') {
+          user.loggedIn = false;
+          user.isOnline = false;
+          user.currentConversationId = '0'; 
+        }
+        const _user = await this.usersRepository.save(user);
+        if(_user){
+          delete _user.password;
+          delete _user.refreshToken; 
+          return _user;
+        }
+    } 
+    console.error("Error: cannot find user with ID | " + userId + " |");
+    return null;
   }
 
-  async setChatSocketId(userId: string, chatSocketId: string) {
-    const user = await this.usersRepository.findOne(userId);
-    user.chatSocketId = chatSocketId; 
+  async setChatSocketId(userId: string, chatSocketId: string): Promise<User> {
+    const user = await this.findOne(userId); 
     if(user){
-      console.log(`Setting chat socket ID for user | ${user.tagName} | to |  ${chatSocketId}  |`);
-      if(chatSocketId === 'disconnected') {
-        user.loggedIn = false;
-        user.isOnline = false;
-      }
-      const ret = await this.usersRepository.save(user);
-      if(ret){
-        ret.password = undefined;
-        return ret;
-      }
-      console.log(`Error saving current conversation for user | ${user.tagName} |`);
-      return false;
-    } else {
-      console.log(`Cannot find user with ID | ${userId} |`);
-      return false;
-    }
-  }
-
-  async disconnect(userId: string): Promise<User> {
-    const user = await this.usersRepository.findOne(userId);
-    user.chatSocketId = 'disconnected';
-    user.currentConversationId = '0';
-    user.loggedIn = false; 
-    return this.usersRepository.save(user);
+        console.log(`Setting chat socket ID for user | ${user.tagName} | to |  ${chatSocketId}  |`);
+        user.chatSocketId = chatSocketId;
+        if(chatSocketId === 'disconnected') {
+          user.loggedIn = false;
+          user.isOnline = false;
+          user.currentConversationId = '0'; 
+        }
+        const _user = await this.usersRepository.save(user);
+        if(_user){
+          delete _user.password;
+          delete _user.refreshToken; 
+          return _user;
+        }
+    } 
+    console.error("Error: cannot find user with ID | " + userId + " |");
+    return null;
   }
 
   async findByChatSocketId(chatSocketId: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { chatSocketId: chatSocketId }});
-    if(user) return user;
+    if(user){
+      delete user.password; 
+      delete user.refreshToken; 
+      return user;
+    } 
     else return null;
   }
 
   async findByNotificationSocketId(notificationSocketId: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { notificationSocketId: notificationSocketId }});
-    if(user) return user;
+    if(user){
+      delete user.password; 
+      delete user.refreshToken; 
+      return user;
+    }
     else return null;
   }
 
@@ -223,7 +237,7 @@ export class UserService {
   }
 
   async fetchMessages(userId: string): Promise<User> {
-    const user = await this.usersRepository.findOne(userId, { relations: ["conversations", "friends", "friendRequests"]});
+    const user = await this.findOne(userId);
     if(Array.isArray(user?.conversations)){
       for(let conv of user.conversations){
         conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
@@ -242,7 +256,7 @@ export class UserService {
   }
 
   async logout(userId: string): Promise<User> {
-    const user = await this.usersRepository.findOne(userId);
+    const user = await this.findOne(userId);
     if(user){
       if(user.loggedIn === false) {
          console.log("User already marked as logged out in database"); 
@@ -257,8 +271,9 @@ export class UserService {
       return this.usersRepository.save(user);
     }
   }
+
   async setProfilePic(userId: string, profilePic: string): Promise<User> {
-    const user = await this.usersRepository.findOne(userId);
+    const user = await this.findOne(userId);
     if(user){
       user.profilePicture = profilePic;
       return this.usersRepository.save(user);
