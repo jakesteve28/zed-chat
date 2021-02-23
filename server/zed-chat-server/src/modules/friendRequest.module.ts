@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user.module';
-import { FriendRequest } from '../entities/friendRequest.entity';
+import { FriendRequest } from '../entities/friendrequest.entity';
 import { FriendRequestService } from '../providers/friendRequest.service';
 
 @Module({

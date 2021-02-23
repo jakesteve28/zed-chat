@@ -10,36 +10,10 @@ import { MessageModule } from './message.module';
 import { ConfigModule } from '@nestjs/config';
 import { SocketGatewayModule } from './socket-gateway.module';
 import { FriendRequestModule } from './friendRequest.module';
-import { User } from '../entities/user.entity';
-import { Message } from '../entities/message.entity';
-import { Invite } from '../entities/invite.entity';
-import { FriendRequest } from '../entities/friendRequest.entity';
-import { Conversation } from '../entities/conversation.entity';
 import { StorageModule } from './storage.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-
-export const options: TypeOrmModuleOptions = {
-  type: "mysql",
-  host: "hcm4e9frmbwfez47.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
-  port: 3306,
-  username: "kug2zfxokj8n4t2j",
-  password: "ebogm84ggoq34204",
-  database: "elokhe5atpjpk6zz",
-  synchronize: true,
-  entities: [User, Message, Invite, FriendRequest, Conversation]
-}
-
-export const optionsDev: TypeOrmModuleOptions = {
-  type: "mysql",
-  host: "mysql",
-  port: 3306,
-  username: "root",
-  password: "root",
-  database: "zed-chat",
-  synchronize: true,
-  entities: [User, Message, Invite, FriendRequest, Conversation]
-}
+import { options } from '../config/constants';
 
 @Module({
   imports: [

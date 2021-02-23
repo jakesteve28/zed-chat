@@ -5,7 +5,7 @@ import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../entities/dto/create-user.dto';
 import * as bcrypt from 'bcrypt'
 import { ConversationService } from './conversation.service';
-import { FriendRequest } from '../entities/friendRequest.entity';
+import { FriendRequest } from '../entities/friendrequest.entity';
 import { FriendRequestService } from './friendRequest.service';
 
 @Injectable()

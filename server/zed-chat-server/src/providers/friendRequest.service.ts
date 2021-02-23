@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { Repository } from 'typeorm';
-import { FriendRequest } from '../entities/friendRequest.entity';
+import { FriendRequest } from '../entities/friendrequest.entity';
 
 @Injectable()
 export class FriendRequestService {

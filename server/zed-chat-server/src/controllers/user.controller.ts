@@ -2,7 +2,7 @@ import { HttpException, Controller, Get, Post, Param, Body, Delete, Logger, Head
 import { UserService } from '../providers/user.service';
 import { User } from '../entities/user.entity'
 import { CreateUserDto } from '../entities/dto/create-user.dto';
-import { FriendRequest } from '../entities/friendRequest.entity';
+import { FriendRequest } from '../entities/friendrequest.entity';
 import JwtRefreshGuard from '../guards/jwt-refresh-guard';
 
 @Controller('users')

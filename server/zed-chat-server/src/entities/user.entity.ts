@@ -1,5 +1,5 @@
 import { Conversation } from './conversation.entity';
-import { FriendRequest } from './friendRequest.entity';
+import { FriendRequest } from './friendrequest.entity';
 import { Message } from './message.entity';
 import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany, CreateDateColumn, OneToOne } from 'typeorm';
 
