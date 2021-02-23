@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from '../controllers/app.controller';
 import { AppService } from '../providers/app.service';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'; 
+import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { UserModule } from './user.module';
 import { AuthModule } from './auth.module'
 import { ConversationModule } from './conversation.module'
@@ -30,8 +30,7 @@ import { options } from '../config/constants';
     FriendRequestModule,
     StorageModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static'),
-      exclude: ['/client**']
+      rootPath: join(__dirname, '..', '..', 'static')
     })
   ],
   controllers: [AppController],

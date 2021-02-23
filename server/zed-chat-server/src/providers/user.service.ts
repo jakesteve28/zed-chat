@@ -30,12 +30,14 @@ export class UserService {
     else return []; 
   }
 
-  async getPW(userId: string): Promise<string> {
-      return (await this.usersRepository.findOne(userId)).password;
+  async getPW(tagName: string): Promise<string> {
+      const user = await this.usersRepository.findOne( { where: { tagName: tagName } } );
+      return user.password;
   }
 
-  async getRefreshToken(userId: string): Promise<string>  {
-    return (await this.usersRepository.findOne(userId)).refreshToken;
+  async getRefreshToken(tagName: string): Promise<string>  {
+    const user = await this.usersRepository.findOne( { where: { tagName: tagName } } );
+    return user.refreshToken;
   }
 
   async findOne(id: string): Promise<User> {
@@ -249,7 +251,7 @@ export class UserService {
     } else return null;
   }
 
-  async checkRefreshTokenMatch(userTagname: string, refreshToken: string): Promise<boolean> {
+  async checkHashedRefreshTokenMatch(userTagname: string, refreshToken: string): Promise<boolean> {
     const user = await this.findByTagName(userTagname); 
     const res = await bcrypt.compare(refreshToken, user.refreshToken); 
     return res;
@@ -279,7 +281,7 @@ export class UserService {
       return this.usersRepository.save(user);
     }
   }
-  async setCurrentRefreshToken(refreshToken: string, userId: string) {
+  async setHashedRefreshToken(refreshToken: string, userId: string) {
     const token = await bcrypt.hash(refreshToken, 10); 
     await this.usersRepository.update(userId, {
       refreshToken: token

@@ -5,7 +5,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import open from 'open'; 
-open('../static/activation.mp3');
 const httpsOptions = {
  // key: fs.readFileSync('../keys/key.pem'),
  // cert: fs.readFileSync('../secrets/public.pem'),
@@ -17,6 +16,7 @@ async function bootstrap() {
       logger: console,
     }
   );
+  //open('http://localhost:3000/static/activation.mp3');
   app.setGlobalPrefix('api');
   app.enableCors();
   app.use(cookieParser(process.env.COOKIE_SIGNED_SECRET || "SecretSecret123"));

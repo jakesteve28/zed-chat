@@ -91,7 +91,7 @@ export class AuthService {
       secret: jwtConstants.refreshSecret,
       expiresIn: '900s'
     });
-    await this.userService.setCurrentRefreshToken(refreshToken, user?.id); 
+    await this.userService.setHashedRefreshToken(refreshToken, user?.id); 
     return refreshToken;
   }
 }
