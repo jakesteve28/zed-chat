@@ -24,6 +24,7 @@ import { clearInvites } from '../../store/slices/inviteSlice';
 import { clearFriends } from '../../store/slices/friendsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
+import './settings.css';
 
 export default function Settings(){
     const account = useSelector(selectAccount);
@@ -70,14 +71,13 @@ export default function Settings(){
     }
     useEffect(() => {
         if(size.width > 768) {
-            dispatch(setTopbarMessage((<span><SettingsIcon></SettingsIcon>&nbsp;Account Settings | @{account.tagName}</span>)));
+            dispatch(setTopbarMessage((`Account Settings | @${account.tagName}`)));
         } else {
-            dispatch(setTopbarMessage((<span><SettingsIcon></SettingsIcon> <span className="text-primary">@{account.tagName}</span></span>)));
+            dispatch(setTopbarMessage(`Account Settings`));
         }
     }, [size.width]);
     return (
-        
-        <Container className="h-100 w-100" fluid  style={{ margin: "auto", paddingLeft: (wide) ?  "240px" : "0px" }}>
+        <Container className="h-100 w-100" fluid  style={{ margin: "auto" }}>
             <Row className="pt-3">
                 <Modal
                     open={aboutOpened}
@@ -121,8 +121,8 @@ export default function Settings(){
                 </Modal>
             </Row>
             <Row>
-                <Col className="mx-auto p-5" xs="8" style={{ opacity: 0.8, borderRadius: "10px", backgroundColor: "#191919", maxWidth: "500px" }}>
-                    <Container fluid>       
+                <Col className="mx-auto p-5" xs="8" style={{ opacity: 0.8, borderRadius: "10px", backgroundColor: "#191919", maxWidth: "500px", paddingTop: "75px" }}>
+                    <Container fluid style={{ marginTop: "50px" }}>       
                         <Row className="mb-2">
                             <Col className="pb-4 text-center lead mx-auto border-bottom border-dark" xs="8" style={{ opacity: 0.87, color: "#EEEEEE", fontSize: "16pt"}}>
                                 Your Account
@@ -135,11 +135,11 @@ export default function Settings(){
                         </Row>
                         <Row className="p-2">
                             <Col className="text-center justify-content-around">
-                                <Button onClick={() => resetPassword()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px", minWidth: "150px", maxWidth: "150px", minHeight: "125px", maxHeight: "125px" }} >Reset Password  <LockIcon></LockIcon></Button>
-                                <Button onClick={() => changeTagname()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px", minWidth: "150px", maxWidth: "150px", minHeight: "125px", maxHeight: "125px" }} >Change Tagname <TransferWithinAStationIcon></TransferWithinAStationIcon></Button>
-                                <Button onClick={() => aboutPage()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px", minWidth: "150px", maxWidth: "150px", minHeight: "125px", maxHeight: "125px" }} >About <InfoIcon></InfoIcon></Button>
-                                <Button onClick={() => privacyDisclaimer()} className="p-3 m-2 account-button text-warning" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px",  minWidth: "150px", maxWidth: "150px", minHeight: "125px", maxHeight: "125px" }} >Privacy / Security Disclaimer <SecurityIcon></SecurityIcon></Button>
-                                <Button onClick={() => deleteAccount()} className="p-3 m-2 account-button text-danger" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px", maxWidth: "150px", minHeight: "125px", maxHeight: "125px" }} >Delete Account <DeleteForeverIcon></DeleteForeverIcon></Button>
+                                <Button onClick={() => resetPassword()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Reset Password  <LockIcon></LockIcon></Button>
+                                <Button onClick={() => changeTagname()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Change Tagname <TransferWithinAStationIcon></TransferWithinAStationIcon></Button>
+                                <Button onClick={() => aboutPage()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >About <InfoIcon></InfoIcon></Button>
+                                <Button onClick={() => privacyDisclaimer()} className="p-3 m-2 account-button text-warning" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Privacy / Security Disclaimer <SecurityIcon></SecurityIcon></Button>
+                                <Button onClick={() => deleteAccount()} className="p-3 m-2 account-button text-danger" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Delete Account <DeleteForeverIcon></DeleteForeverIcon></Button>
                             </Col> 
                         </Row>
                     </Container>

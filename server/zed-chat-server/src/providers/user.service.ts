@@ -252,8 +252,8 @@ export class UserService {
   }
 
   async checkHashedRefreshTokenMatch(userTagname: string, refreshToken: string): Promise<boolean> {
-    const user = await this.findByTagName(userTagname); 
-    const res = await bcrypt.compare(refreshToken, user.refreshToken); 
+    const token = await this.getRefreshToken(userTagname); 
+    const res = await bcrypt.compare(refreshToken, token); 
     return res;
   }
 

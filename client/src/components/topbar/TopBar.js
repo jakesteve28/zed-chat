@@ -103,11 +103,11 @@ export default function TopBar(){
                     {
                       (account.loggedIn) ? 
                           (
-                            <div>
+                            <Row>
                               <StartChatButton></StartChatButton>
                               <NotificationsDropdown></NotificationsDropdown>
                               <FriendsDropdown></FriendsDropdown>              
-                            </div>
+                            </Row>
                        )
                       : ""
                     }
