@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../auth/authSlice';
-import conversationsReducer from '../currentConversation/conversationsSlice'
-import accountReducer from '../account/accountSettingsSlice'
-import friendsReducer from '../account/friendsSlice'
-import inviteReducer from '../topbar/inviteSlice'
 import { createSlice } from '@reduxjs/toolkit';
-import uiReducer from '../uiSlice';
+import uiReducer from './slices/uiSlice';
+import authReducer from './slices/authSlice';
+import conversationsReducer from './slices/conversationsSlice';
+import accountReducer from './slices/accountSettingsSlice';
+import friendsReducer from './slices/friendsSlice';
+import inviteReducer from './slices/inviteSlice';
 
 export const globalSlice = createSlice({
   name: 'globals',

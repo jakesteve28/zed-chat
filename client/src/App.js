@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import GuardedRoute from './login/loginGuard';
-import { selectAccount } from './account/accountSettingsSlice';
-import LoginComponent from './lazyModules/login';
-import ForgotPW from './lazyModules/forgotPassword';
-import CreateAcc from './lazyModules/createAccount';
-import Home from './lazyModules/home';
-import NewConv from './lazyModules/newConversation'; 
-import SettingScr from './lazyModules/settings';
-import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
-import './index.css';
-import 'react-pro-sidebar/dist/css/styles.css';
+import GuardedRoute from './components/loginScreen/loginGuard';
+import LoginComponent from './modules/login';
+import ForgotPW from './modules/forgotPassword';
+import CreateAcc from './modules/createAccount';
+import Home from './modules/home';
+import NewConv from './modules/newConversation'; 
+import SettingScr from './modules/settings';
 import {
   selectRefreshExpire, 
   setRefreshExpire
 } from './store/store'; 
-import { logout, clearAccount } from './account/accountSettingsSlice'; 
-import { clearAuth } from './auth/authSlice';
-import { clearConversations } from './currentConversation/conversationsSlice'; 
-import { clearInvites } from './topbar/inviteSlice';
-import { clearFriends } from './account/friendsSlice';
+import { logout, clearAccount, selectAccount } from './store/slices/accountSettingsSlice'; 
+import { clearAuth } from './store/slices/authSlice';
+import { clearConversations } from './store/slices/conversationsSlice'; 
+import { clearInvites } from './store/slices/inviteSlice';
+import { clearFriends } from './store/slices/friendsSlice';
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-pro-sidebar/dist/css/styles.css';
+import './App.css';
+import './index.css';
 
 export default function App() {
   const account = useSelector(selectAccount);
