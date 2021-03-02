@@ -75,3 +75,7 @@ code {
 ::-webkit-scrollbar-track-piece {
   height: 30px;
 }
+
+.dark-background {
+  background-color: #191919;
+}

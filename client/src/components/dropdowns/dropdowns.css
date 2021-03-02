@@ -1,0 +1,78 @@
+.dark-background {
+    background-color: #191919;
+}
+.topbar-dropdown-icon {
+    border: none; 
+    color: #EEEEEE;
+}
+.topbar-dropdown-menu {
+    min-width: 325px;
+}
+.friends-title-menu {
+    opacity: 0.87; 
+    color: #EEEEEE;
+}
+.send-friend-request-button {
+    display: block;
+    margin-right: auto;
+    margin-left: -15px;
+    color: #555555;
+    border: none;
+}
+.add-friend-icon {
+    height: 30px; 
+    width: 30px; 
+    color: #AAAAAA;
+}
+.friends-list-row {
+    max-width: 250px;
+    min-width: 250px;
+    overflow-y: scroll;
+    margin-right: auto;
+    margin-left: 15px;
+}
+.friends-list-column {
+    max-height: 190px;
+}
+.friend-list-item-row {
+    max-height: 65px; 
+    background-color: #505050;
+}
+.clearish {
+    opacity: 0.87;
+}
+.errors-label-row {
+    margin: 20px; 
+    border-bottom: 1px solid red;
+}
+.topbar-dropdown {
+    background-color: #191919 !important;
+    max-width: 325px;
+    opacity: 0.87;
+    position: relative; 
+    max-width: 100px;
+    opacity: 0.87;
+}
+.dropdown-button-icon {
+    background-color: #191919 !important;
+    border: none !important;
+    outline: none !important; 
+}
+.dropdown-menu-custom-bg-settings {
+    background-color: #191919 !important;
+    max-width: 100px;
+    box-shadow: #151515 2px 2px 5px 5px;
+}
+.dropdown-item-settings {
+    background-color: #191919 !important;
+    font-size: 16pt;
+    padding: 15px;
+}
+.dropdown-item-settings:hover {
+    background-color: #404040 !important;
+}
+/* style={{ textDecoration: 'none', color: "#AAAAAA" }} */
+.account-settings-link {
+    text-decoration: none;
+    color: #AAAAAA;
+}

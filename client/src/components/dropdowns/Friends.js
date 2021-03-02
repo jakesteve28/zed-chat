@@ -21,7 +21,7 @@ import {
 import regex from '../../util/regex'
 import { notificationSocket } from '../socket/notificationSocket';
 import '../topbar/topbar.css';
-
+import './dropdowns.css';
 export default function FriendsDropdown(){
     const dispatch = useDispatch();
     const history = useHistory();
@@ -109,20 +109,19 @@ export default function FriendsDropdown(){
     }
 
   return (
-    <Dropdown className="ml-3 p-1" style={{ backgroundColor: "#191919" }} >
+    <Dropdown className="ml-3 p-1 dark-background" >
       <Tooltip title="Friends List">
-        <Dropdown.Toggle as="button" style={{ border: "none", color: "white", backgroundColor: "#191919" }} className="top-dropdown-button font-weight-bold rounded-pill ml-2">
+        <Dropdown.Toggle as="button" className="topbar-dropdown-icon dark-background top-dropdown-button font-weight-bold rounded-pill ml-2">
             <PeopleAltIcon></PeopleAltIcon>
         </Dropdown.Toggle>
       </Tooltip>
-      <Dropdown.Menu style={{ backgroundColor: "#191919", minWidth: "325px"}} className="dropdown-menu-custom-bg">
-      <Dropdown.ItemText className="text-center font-weight-bold lead mb-1" style={{ backgroundColor: "#191919", opacity: 0.9, color: "#AAAAAA" }}><GroupIcon></GroupIcon>&nbsp;&nbsp;Friends</Dropdown.ItemText>
-        <Container fluid className="h-100" style={{ backgroundColor: "#191919", minWidth: "325px", paddingTop: "20px"}}>
+      <Dropdown.Menu className="topbar-dropdown-menu dark-background dropdown-menu-custom-bg">
+      <Dropdown.ItemText className="text-center font-weight-bold lead mb-1 dark-background friends-title-menu" ><GroupIcon></GroupIcon>&nbsp;&nbsp;Friends</Dropdown.ItemText>
+        <Container fluid className="h-100 pt-2 w-100">
           <Row className="m-1">
             <Col xs="10">
                 <InputGroup>
                   <FormControl
-                    style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
                     placeholder="Add Friend By Tagname"
                     aria-label="Add Friend By Tagname"
                     aria-describedby="basic-addon1"
@@ -132,14 +131,13 @@ export default function FriendsDropdown(){
               </InputGroup>
             </Col>
             <Col xs="2">
-              <Button variant="dark" className="mr-3 pr-2" style={{ display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => sendFriendRequest() } disabled={(addFriendInput.length < 8)}><PersonAddIcon className={(addError) ? "error-icon" : ""} style={{ height: 30, width: 30, color: "#AAAAAA" }}></PersonAddIcon></Button>
+              <Button variant="dark" className="mr-3 pr-2 send-friend-request-button dark-background" onClick={() => sendFriendRequest() } disabled={(addFriendInput.length < 8)}><PersonAddIcon className={(addError) ? "error-icon friend-icon" : "friend-icon"}></PersonAddIcon></Button>
             </Col>
           </Row> 
           <Row className="m-1 mt-2 mb-2 mb-1 pb-3">
               <Col xs="10">
                   <InputGroup>
                     <FormControl
-                      style={{marginLeft: "auto", maxWidth: "250px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#202020", border: 'none' }}
                       placeholder="Search Friends..."
                       aria-label="Search Friends..."
                       aria-describedby="basic-addon1"
@@ -149,11 +147,11 @@ export default function FriendsDropdown(){
                 </InputGroup>
               </Col>
               <Col xs="2">
-                <Button variant="dark" style={{  display: "block", marginRight: "auto", marginLeft: "-15px", backgroundColor: "#191919", border: "none", color: "#555555" }} onClick={() => searchFriends() }><SearchOutlined className={(searchError) ? "error-icon" : ""} style={{ height: 30, width: 30, color: "#AAAAAA" }}></SearchOutlined></Button>
+                <Button variant="dark" className="send-friend-request-button" onClick={() => searchFriends() }><SearchOutlined className={(searchError) ? "error-icon friend-icon" : "friend-icon"}></SearchOutlined></Button>
               </Col>
             </Row> 
-            <Row style={{ maxWidth: "250px", minWidth: "250px", overflowY: "scroll", marginRight: "auto", marginLeft: "15px"}} className="mt-1 pb-1">
-              <Col style={{ maxHeight: "190px" }}>
+            <Row className="friends-list-row mt-1 pb-1">
+              <Col className="friends-list-column">
               {
                 (Array.isArray(filteredFriends)) ?
                     filteredFriends.map((el) => {
@@ -172,7 +170,7 @@ export default function FriendsDropdown(){
                       }
                       if(el && el.tagName){
                         return (
-                          <Row key={el.tagName} style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
+                          <Row key={el.tagName} className="friend-topbar friend-list-item-row">
                             <FriendListItem 
                               account={account} 
                               currentConversation={currentConversation} 
@@ -204,7 +202,7 @@ export default function FriendsDropdown(){
                           }
                       }
                       return (
-                          <Row key={el.tagName} style={{ maxHeight: "65px" , backgroundColor: "#505050"}} className="friend-topbar">
+                          <Row key={el.tagName} className="friend-topbar friend-list-item-row">
                             <FriendListItem 
                               account={account} 
                               currentConversation={currentConversation} 
@@ -224,9 +222,9 @@ export default function FriendsDropdown(){
             </Row>  
         </Container>
         { (error) ? (
-        <Container fluid className="text-left lead" style={{ opacity: 0.9 }}>
-          <Row className="font-italic text-danger" style={{ margin: "20px", borderBottom: "1px solid red", opacity: 0.87 }}>
-              Errors:
+        <Container fluid className="text-left lead clearish">
+          <Row className="font-italic text-danger errors-label-row">
+              <span>Errors:</span>
           </Row>  
         <Row>
           <ul>

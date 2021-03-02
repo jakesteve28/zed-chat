@@ -36,3 +36,55 @@ input:focus {
 .button-outline-black:active {
     border: none !important;
 }
+.button-outline-black {
+    color: #EEEEEE;
+    background-color: #191919;
+    opacity: 0.87; 
+    border: none; 
+    outline: none;
+}
+.login-screen-column {
+    border-radius: 15px;
+    background-color: #191919;
+    opacity: 0.7; 
+    max-width: 500px;
+}
+.welcome-text {
+    opacity: 0.8; 
+    margin-bottom: 35px;
+}
+.welcome-subtext {
+    margin-bottom: 35px;
+}
+.login-spinner {
+    height: 100px;
+    width: 100px;
+}
+.login-screen-form {
+    margin-left: auto; 
+    margin-right: auto; 
+    color: #EEEEEE;
+    opacity: 0.87; 
+    max-width: 400px;
+    min-height: 50px;
+    border: none; 
+    outline: none; 
+    background-color: #404040;
+}
+.login-link-button {
+    text-decoration: none;
+    color: #EEEEEE;
+}
+.login-button {
+    /* style={{ opacity: 0.8, maxWidth: '200px', marginTop: "20px" }} */
+    opacity: 0.8; 
+    max-width: 200px;
+    margin-top: 20px;
+}
+.logging-in-spinner {
+    height: 60px;
+    width: 60px;
+}
+.logging-in-text {
+    font-size: 15pt;
+}

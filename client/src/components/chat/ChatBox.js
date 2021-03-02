@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react' 
-import { Row, Col, InputGroup, FormControl, Button, Spinner } from 'react-bootstrap';
+import { Row, Col, InputGroup, FormControl, Button, Spinner, Container } from 'react-bootstrap';
 import { SendRounded } from '@material-ui/icons';
 import {
     selectCurrentConversation
@@ -9,17 +9,17 @@ import {
 } from '../../store/slices/accountSettingsSlice';
 import { useSelector } from 'react-redux'
 import { chatSocket } from '../socket/chatSocket';
-import useWindowSize from '../../util/windowSize';
 import regex from '../../util/regex';
+import PropTypes from 'prop-types';
+import './chat.css';
 let searchTimeout;
 
-export default function ChatBox(){
+export default function ChatBox({ isTyping, isLazyLoading }){
     const [message, setMessage] = useState("");
     const account = useSelector(selectAccount);
     const currentConversation = useSelector(selectCurrentConversation);
     const formRef = useRef(null);
     const [typingTimeout, setTypingTimeout] = useState(null);
-    const size = useWindowSize();
     const [error, setError] = useState(false);
     const [errorMsgs, setErrorMsgs] = useState([]);
     const [spinning, setSpinning] = useState(false);
@@ -58,7 +58,11 @@ export default function ChatBox(){
             console.log("Error: no conversation to send typing to! Please refresh")
         }
     }
-
+    useEffect(() => {
+        if(currentConversation.messages && Array.isArray(currentConversation.messages)){
+            setSpinning(false);
+        }
+    }, [currentConversation.messages]);
     useEffect(() => {
         if(chatSocket && formRef && currentConversation && account){
             formRef.current.onkeypress = () => { 
@@ -70,25 +74,18 @@ export default function ChatBox(){
                 }, 1000);
             }
         }
-    }, [currentConversation.id])
-    useEffect(() => {
-        if(currentConversation.messages && Array.isArray(currentConversation.messages)){
-            setSpinning(false);
-        }
-    }, [currentConversation.messages])
+    }, [currentConversation.id]);
     return ( 
-        <div>
-            <Row className="w-100 text-center" style={{ position: "fixed", bottom: 40, left: 50 }}>
-                {(size.width > 768) ? (<Col style={{ minWidth: "240px", maxWidth: "240px" }}></Col>) : "" }
-                <Col className="mx-auto" style={{ paddingRight: "15px", paddingLeft: (size.width > 768) ? "2%" : "5%" }}>
-                {(error) ? (<div className="text-danger lead" style={{ opacity: 0.7 }}>{errorMsgs}</div>) : ""}
+        <Container fluid className="w-100 h-100">
+            <Row className="w-100 text-center fixed-chat-box">
+                <Col className="mx-auto fixed-chat-box-column">
+                {(error) ? (<div className="text-danger lead opaque">{errorMsgs}</div>) : ""}
                 <InputGroup className="pb-3 mx-auto">
                     <FormControl
-                        style={{ backgroundColor: "#404040", color: "white", border: "none" }}
-                        placeholder="Enter a Message"
-                        aria-label="Enter a Message"
+                        placeholder="Enter a message"
+                        aria-label="Enter a message"
                         aria-describedby="basic-addon2"
-                        className="rounded-pill p-4"
+                        className="rounded-pill p-4 chat-box-form"
                         ref={formRef}
                         onKeyPress={
                             async (e) => {
@@ -109,25 +106,34 @@ export default function ChatBox(){
                     <InputGroup.Append>
                     {
                         (spinning) ? <Spinner className="m-2 p-2" size="lg" variant="info" animation="border" /> :
-                            (<Button onClick={async () => { 
-                                await sendMessage() } } 
-                                    className="ml-1 rounded-pill text-right" 
+                            (<Button onClick={async () => { await sendMessage() } } 
+                                    className="ml-1 rounded-pill text-right send-message-button" 
                                     variant="outline-secondary" 
-                                    style={{ "border": "none", 
-                                    backgroundColor: "#404040", 
-                                    color: "#02a5ff" }} 
                                     id="basic-addon2">
                                 <SendRounded 
-                                    style={{ color: "white", opacity: "0.87"}}
+                                    className="send-message-button" 
                                 >
                                 </SendRounded>
                             </Button>)
                     }  
                     </InputGroup.Append>
+                    <InputGroup.Append>
+                    {
+                        (isLazyLoading) ? <Spinner className="m-2 p-2" size="lg" variant="info" animation="border" /> : ""
+                    }
+                    {
+                        (isTyping) ? <span><Spinner className="m-2 p-2" size="sm" variant="info" animation="grow" /></span> : ""
+                    }
+                    </InputGroup.Append>
                 </InputGroup>
                 </Col>
                 <Col xs="1"></Col>
             </Row>
-        </div>
+        </Container>
     );
+}
+
+ChatBox.propTypes = {
+    isTyping: PropTypes.bool,
+    isLazyLoading: PropTypes.bool
 }

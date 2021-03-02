@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {  Container, Row, Col, Button } from 'react-bootstrap';
-import SettingsIcon from '@material-ui/icons/Settings';
-import useWindowSize from '../../util/windowSize';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import TransferWithinAStationIcon from '@material-ui/icons/TransferWithinAStation';
 import LockIcon from '@material-ui/icons/Lock';
@@ -25,18 +23,14 @@ import { clearFriends } from '../../store/slices/friendsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
 import './settings.css';
-
 export default function Settings(){
     const account = useSelector(selectAccount);
     const dispatch = useDispatch();
-    const size = useWindowSize();
-    const wide = size.width > 768;
     const [aboutOpened, setAboutOpened] = useState(false);
     const [deleteAccOpened, setDeleteAccOpened] = useState(false);
     const [privacyOpened, setPrivacyOpened] = useState(false);
     const [resetPWOpened, setResetPWOpened] = useState(false);
     const [changeTagnameOpened, setChangeTagnameOpened] = useState(false);
-
     const logoutAccount = async () => {
         await fetch("http://localhost:3000/api/auth/logout", {
             credentials: "include"
@@ -49,35 +43,26 @@ export default function Settings(){
         dispatch(clearFriends());
         console.log("Successfully logged out");
     }
-
     const resetPassword = () => {
         setResetPWOpened(true);
     }
-
     const changeTagname = () => {
         setChangeTagnameOpened(true);
     }
-
     const deleteAccount = () => {
         setDeleteAccOpened(true);
     }
-
     const aboutPage = () => {
         setAboutOpened(true);
     }
-
     const privacyDisclaimer = () => {
         setPrivacyOpened(true);
     }
     useEffect(() => {
-        if(size.width > 768) {
-            dispatch(setTopbarMessage((`Account Settings | @${account.tagName}`)));
-        } else {
-            dispatch(setTopbarMessage(`Account Settings`));
-        }
-    }, [size.width]);
+        dispatch(setTopbarMessage(`Account Settings`));
+    }, []);
     return (
-        <Container className="h-100 w-100" fluid  style={{ margin: "auto" }}>
+        <Container className="h-100 w-100 account-settings-container" fluid>
             <Row className="pt-3">
                 <Modal
                     open={aboutOpened}
@@ -121,25 +106,25 @@ export default function Settings(){
                 </Modal>
             </Row>
             <Row>
-                <Col className="mx-auto p-5" xs="8" style={{ opacity: 0.8, borderRadius: "10px", backgroundColor: "#191919", maxWidth: "500px", paddingTop: "75px" }}>
-                    <Container fluid style={{ marginTop: "50px" }}>       
+                <Col className="mx-auto p-5 account-settings-button-column" xs="8">
+                    <Container fluid className="account-settings-button-container mt-3">       
                         <Row className="mb-2">
-                            <Col className="pb-4 text-center lead mx-auto border-bottom border-dark" xs="8" style={{ opacity: 0.87, color: "#EEEEEE", fontSize: "16pt"}}>
-                                Your Account
+                            <Col className="pb-4 text-left lead mx-auto border-bottom border-dark account-settings-title-col">
+                                <span className="mx-auto account-title-span">Your Account</span>
                             </Col>           
                         </Row>  
                         <Row className="mb-2 mt-1">
-                            <Col className="p-2 text-center" style={{ color: "#EEEEEE", opacity: 0.9, fontSize: "14pt" }}>
-                                <span className="text-muted font-italic">Email:</span>&nbsp;&nbsp;&nbsp;{account.email} 
+                            <Col className="p-2 text-left account-settings-email-col">
+                                <span className="mx-auto account-title-span"><span className="text-muted">Email:</span>&nbsp;&nbsp;&nbsp;{account.email}</span>
                             </Col>
                         </Row>
-                        <Row className="p-2">
-                            <Col className="text-center justify-content-around">
-                                <Button onClick={() => resetPassword()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Reset Password  <LockIcon></LockIcon></Button>
-                                <Button onClick={() => changeTagname()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Change Tagname <TransferWithinAStationIcon></TransferWithinAStationIcon></Button>
-                                <Button onClick={() => aboutPage()} className="p-3 m-2 account-button" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >About <InfoIcon></InfoIcon></Button>
-                                <Button onClick={() => privacyDisclaimer()} className="p-3 m-2 account-button text-warning" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Privacy / Security Disclaimer <SecurityIcon></SecurityIcon></Button>
-                                <Button onClick={() => deleteAccount()} className="p-3 m-2 account-button text-danger" variant="dark" style={{ border: "none", backgroundColor: "#202020", padding: "15px" }} >Delete Account <DeleteForeverIcon></DeleteForeverIcon></Button>
+                        <Row className="pt-2 account-button-row">
+                            <Col>
+                                <Button onClick={() => resetPassword()} className="p-3 m-2 account-button text-success" variant="dark">Reset Password  <LockIcon></LockIcon></Button>
+                                <Button onClick={() => changeTagname()} className="p-3 m-2 account-button text-info" variant="dark">Change Tagname <TransferWithinAStationIcon></TransferWithinAStationIcon></Button>
+                                <Button onClick={() => deleteAccount()} className="p-3 m-2 account-button text-danger" variant="dark">Delete Account <DeleteForeverIcon></DeleteForeverIcon></Button>
+                                <Button onClick={() => aboutPage()} className="p-3 m-2 account-button text-primary" variant="dark">About <InfoIcon></InfoIcon></Button>
+                                <Button onClick={() => privacyDisclaimer()} className="p-3 m-2 account-button text-warning" variant="dark">Privacy / Security Disclaimer <SecurityIcon></SecurityIcon></Button>
                             </Col> 
                         </Row>
                     </Container>

@@ -8,7 +8,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import TopBar from './components/topbar/TopBar';
 import NotificationSocket from './components/socket/notificationSocket';
 ReactDOM.render(
-  <div className="base-div" style={{backgroundColor: "#191919"}}>
+  <div className="base-div dark-background">
     <React.StrictMode>
       <Provider store={store}>
         <Router basename='/client/'>

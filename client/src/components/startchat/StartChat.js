@@ -8,13 +8,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import useWindowSize from '../../util/windowSize';
 import regex from '../../util/regex.js';
 import EnhancedEncryptionIcon from '@material-ui/icons/EnhancedEncryption';
-import SendIcon from '@material-ui/icons/Send';
+import SmsIcon from '@material-ui/icons/Sms';
 import { notificationSocket } from '../socket/notificationSocket';
 import { Modal } from '@material-ui/core';
 import PasswordModalBody from '../modals/SetPWModal';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
 import SelectFriendsListView from './SelectFriendsListView';
 import { toast } from 'react-toastify'; 
+import './startchat.css';
 
 export function EnterChatName({ setConversationName, errorName }){
     const enterChatRef = useRef(null);
@@ -24,25 +25,28 @@ export function EnterChatName({ setConversationName, errorName }){
         }
     }, [enterChatRef.current]);
     return (
-        <Container fluid style={{ maxWidth: "500px" }}>
-            <InputGroup className="mt-2 mx-auto">
-                <FormControl
-                    style={{ textAlign: "center", fontSize: "22pt", color: "#d9534f", minHeight: '50px', border: 'none', backgroundColor: "#191919" }}
-                    placeholder="Enter Chat Name"
-                    aria-label="Enter Chat Name"
-                    aria-describedby="basic-addon1"
-                    onChange={ e => setConversationName(e.target.value) }
-                    className={ (errorName) ? "mx-auto lead form-control-red" : "mx-auto lead form-control-custom"}
-                    autoComplete="new-password"
-                    name="setNameNewConv"
-                    ref={enterChatRef}
-                    />
-            </InputGroup>
-        </Container>
+        <Row>
+            <Col>
+                <Container fluid className="start-chat-enter-name">
+                    <InputGroup className="mt-2 mx-auto">
+                        <FormControl
+                            placeholder="Enter Chat Name"
+                            aria-label="Enter Chat Name"
+                            aria-describedby="basic-addon1"
+                            onChange={ e => setConversationName(e.target.value) }
+                            className={ (errorName) ? "mx-auto lead form-control-red placeholder-mod enter-chat-form" : "mx-auto lead form-control-custom placeholder-mod enter-chat-form"}
+                            autoComplete="new-password"
+                            name="setNameNewConv"
+                            ref={enterChatRef}
+                            />
+                    </InputGroup>
+                </Container>
+            </Col>
+        </Row>
     )
 }
 
-export default function NewConversation(){
+export default function StartChat(){
     const conversations = useSelector(selectConversations);
     const account = useSelector(selectAccount);
     const [conversationName, setConversationName] = useState("");
@@ -56,10 +60,8 @@ export default function NewConversation(){
     const errorMsgs = useRef([]);
     const [passwordOpened, setPasswordOpened] = useState(false);
     const [convPassword, setConvPassword] = useState("");
-   // const [backgroundImage, setBackgroundImage] = useState("");
     const dispatch = useDispatch();
     const friends = useSelector(selectFriends);
-    const wide = size.width > 768;
     const checkInput = () => {
         let passing = true;
         //First check if name is okay
@@ -132,35 +134,39 @@ export default function NewConversation(){
 
     useEffect(() => {
         if(size.width > 768) {
-            dispatch(setTopbarMessage((<span>New Conversation</span>)));
+            dispatch(setTopbarMessage(`Start a Chat`));
         } else {
-            dispatch(setTopbarMessage((<span>New Conversation</span>)));
+            dispatch(setTopbarMessage(`Start a Chat`));
         }
     }, [size.width]);
 
     return (
-        <Container className="h-100 w-100" fluid  style={{ margin: "auto", paddingLeft: (wide) ?  "240px" : "20px" }}>
+        <Container className="h-100 w-100 start-chat-super-container" fluid>
             <Row>
-                <Col className="mx-auto text-center" style={{ opacity: 0.8, borderRadius: "10px", backgroundColor: "#191919", maxWidth: "600px" }}>
-                    <Container fluid>       
-                        <Row className="mt-2 mb-2">
-                        <EnterChatName 
-                            setConversationName={setConversationName} 
-                            errorName={errorName}
-                        />
+                <Col className="start-column">
+                    <Container fluid className="start-chat-container">       
+                        <Row>
+                            <Col className="text-center start-chat-name">
+                                <EnterChatName 
+                                    setConversationName={setConversationName} 
+                                    errorName={errorName}
+                                />
+                            </Col>       
                         </Row>
-                        <Row className="mt-2 mb-2 pb-2">
-                            <SelectFriendsListView 
-                                errorSearch={errorSearch} 
-                                selectedFriends={selectedFriends}
-                                setSelectedFriends={setSelectedFriends}
-                                setErrorSearch={setErrorSearch}
-                                setError={setError}
-                                errorMsgs={errorMsgs}
-                                setButtonsDisabled={setButtonsDisabled}
-                            />
+                        <Row className="mt-2 mb-2 pb-2 start-chat-selection">
+                            <Col>
+                                <SelectFriendsListView 
+                                    errorSearch={errorSearch} 
+                                    selectedFriends={selectedFriends}
+                                    setSelectedFriends={setSelectedFriends}
+                                    setErrorSearch={setErrorSearch}
+                                    setError={setError}
+                                    errorMsgs={errorMsgs}
+                                    setButtonsDisabled={setButtonsDisabled}
+                                />
+                            </Col>
                         </Row>
-                        <Row className="pt-3">
+                        <Row className="edit-chat-row">
                             <Modal
                                 open={passwordOpened}
                                 onClose={() => setPasswordOpened(false)}
@@ -173,26 +179,22 @@ export default function NewConversation(){
                                 <Button 
                                     onClick={ () => setPasswordOpened(true) } 
                                     disabled={buttonsDisabled} 
-                                    className="rounded-pill p-2 mx-auto" 
-                                    variant="outline-info" 
+                                    className="set-pw-button" 
+                                    variant="outline-secondary" 
                                     size="lg"
-                                    style={{ opacity: (buttonsDisabled) ? 0.5 : 1.0, maxWidth: '200px', marginTop: "20px" }}
                                     >
-                                    Set&nbsp;Password&nbsp;<EnhancedEncryptionIcon style={{ width: 25, height: 25 }}></EnhancedEncryptionIcon>
+                                    Set&nbsp;Password&nbsp;<EnhancedEncryptionIcon className="chat-edit-icon"></EnhancedEncryptionIcon>
                                 </Button>
                             </Col>
-                        </Row>
-                        <Row>
                             <Col className="mx-auto">
                                 <Button 
                                     onClick={ () => submit()} 
                                     disabled={buttonsDisabled} 
-                                    className="rounded-pill p-2 mx-auto" 
+                                    className="send-invites-button" 
                                     variant="outline-success" 
                                     size="lg"
-                                    style={{ opacity: (buttonsDisabled) ? 0.5 : 1.0, maxWidth: '200px', marginTop: "20px" }}
                                     >
-                                    Sent Chat Invites <SendIcon style={{ width: 25, height: 25 }}></SendIcon>
+                                    Invite&nbsp;<SmsIcon className="chat-edit-icon"></SmsIcon>
                                 </Button>
                             </Col>
                         </Row>

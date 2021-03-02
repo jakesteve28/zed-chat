@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { notificationSocket } from '../socket/notificationSocket';
 import './listitems.css';
 import '../topbar/topbar.css';
-export function ReceivedInviteListItem({ sender, inviteId, convId }){
+export function ReceivedInviteListItem({ sender, inviteId, convId }) {
     const sendAccept = () => {
         if(notificationSocket){
             console.log(`Attempting to emit acceptInvite event to server for invite with id ${inviteId}`)
@@ -15,18 +15,17 @@ export function ReceivedInviteListItem({ sender, inviteId, convId }){
     }
     return (
         <Row className="p-3 invite-hover">
-            <Col className="text-small text-muted text-center my-auto" style={{ opacity: 0.67 }}>
+            <Col className="text-small text-muted text-center my-auto opaque">
                 Chat with {`${sender}`.length > 10 ? `${sender}`.substring(0,7) + '...' : `${sender}` }
             </Col>
 
-            <Col xs="5" className="text-center"  style={{ opacity: 0.67 }}>
-                <Button  className="btn-sm mb-1 rounded-pill" style={{ border: "none", color: "#97fa93", backgroundColor: "#191919", opacity: 0.9 }} onClick={() => { sendAccept() }}>Accept</Button> 
-                <Button className="btn-sm rounded-pill" style={{ border: "none", color: "#bf2700", backgroundColor: "#191919" }}>Decline</Button>
+            <Col xs="5" className="text-center opaque">
+                <Button  className="btn-sm mb-1 rounded-pill received-invite-button" onClick={() => { sendAccept() }}>Accept</Button> 
+                <Button className="btn-sm rounded-pill received-invite-button-decline">Decline</Button>
             </Col>  
         </Row>
     )
 }
-
 ReceivedInviteListItem.propTypes = {
     sender: PropTypes.string, 
     inviteId: PropTypes.string, 

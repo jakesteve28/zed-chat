@@ -18,6 +18,7 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import '../topbar/topbar.css';
+import './dropdowns.css';
 
 export default function SettingsDropdown(){
     const dispatch = useDispatch();
@@ -34,11 +35,11 @@ export default function SettingsDropdown(){
         console.log("Successfully logged out");
     }
     return (
-        <Dropdown className="topbar-dropdown" style={{ backgroundColor: "#191919", position: "relative", maxWidth: "100px", opacity: 0.9 }}>              
-            <Dropdown.Toggle className="dropdown-toggle text-white" style={{ border:" none", backgroundColor: "#191919"}} as="button" id="dropdown-custom-2"><MoreVertIcon></MoreVertIcon></Dropdown.Toggle>
-            <Dropdown.Menu className="dropdown-menu-custom-bg-settings" style={{ backgroundColor: "#191919", maxWidth: "100px" }}>
-                <Dropdown.Item  className="text-white text-center dropdown-item-settings" style={{ backgroundColor: "#404040", padding: "15px" }} as="button" onClick={() => document.querySelector("#accountSettings").click()}><Link id="accountSettings" as="button" style={{ textDecoration: 'none', color: "#AAAAAA" }} to="/settings">Account&nbsp;<AccountBoxIcon></AccountBoxIcon></Link></Dropdown.Item>
-                <Dropdown.Item  className="text-white text-center dropdown-item-settings" style={{ backgroundColor: "#404040", padding: "15px"}} as="button" onClick={() => { logoutAccount() }}><Link style={{ textDecoration: 'none', color: "#AAAAAA" }} to="/login">Logout&nbsp;<ExitToAppIcon></ExitToAppIcon></Link></Dropdown.Item>
+        <Dropdown className="topbar-dropdown">              
+            <Dropdown.Toggle className="dropdown-toggle dropdown-button-icon text-white" as="button" id="dropdown-custom-2"><MoreVertIcon></MoreVertIcon></Dropdown.Toggle>
+            <Dropdown.Menu className="dropdown-menu-custom-bg-settings">
+                <Dropdown.Item className="text-white text-center dropdown-item-settings" as="button" onClick={() => document.querySelector("#accountSettings").click()}><Link id="accountSettings" className="account-settings-link" as="button" to="/settings">Account&nbsp;<AccountBoxIcon></AccountBoxIcon></Link></Dropdown.Item>
+                <Dropdown.Item className="text-white text-center dropdown-item-settings" as="button" onClick={() => { logoutAccount() }}><Link className="account-settings-link" to="/login">Logout&nbsp;<ExitToAppIcon></ExitToAppIcon></Link></Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>
     )

@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { Button, InputGroup, Spinner, FormControl, Container, Row, Col } from 'react-bootstrap'
+import { Button, InputGroup, Spinner, FormControl, Container, Row, Col } from 'react-bootstrap';
 import { Redirect, Link } from 'react-router-dom';
 import {
   addConversation
-} from '../../store/slices/conversationsSlice'
+} from '../../store/slices/conversationsSlice';
 import {
   setId,
   setEmail,
   setTagName,
   login, 
   selectAccount
-} from '../../store/slices/accountSettingsSlice'
+} from '../../store/slices/accountSettingsSlice';
 import {
   addAcceptedInvite,
   addReceivedInvite
-} from '../../store/slices/inviteSlice'
+} from '../../store/slices/inviteSlice';
 import { addFriend, 
   addFriendRequest 
 } from '../../store/slices/friendsSlice';
@@ -125,6 +125,7 @@ function LoginScreen() {
     } catch(err) {
       console.log("No valid refresh token. User must login", err);
       setAllowLogin(true); 
+      setLoggingInCookie(false);
     }  
   }, [])
 
@@ -208,22 +209,21 @@ function LoginScreen() {
     (!account?.loggedIn) ? (
     <Container className="h-100 w-100" fluid>
       <Row className="p-3 mt-5 text-white lead text-center">
-        <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow" style={{ borderRadius: "15px", backgroundColor: "#191919", opacity: 0.6, maxWidth: "500px"}}> 
-          <h2 className="text-white" style={{ opacity: 0.8, marginBottom: "35px" }} >Welcome to <span className="text-danger">Project Zed</span></h2>
-          <h6 className="text-muted font-italic" style={{ marginBottom: "35px"  }}>Secured by you, for you</h6>
+        <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow login-screen-column"> 
+          <h2 className="text-white welcome-text" >Welcome to <span className="text-danger">Project Zed</span></h2>
+          <h6 className="text-muted font-italic welcome-subtext">Secured by you, for you</h6>
             {
               (loggingInCookie) 
                 ? (
                   <Container fluid className="text-center">
                      <Row className="text-center pb-2"><Col className="text-center"><h6>Welcome Back!</h6></Col></Row>
                      <Row className="text-center pb-2"><Col className="text-center"><span className="text-muted">Logging Back In!</span></Col></Row>
-                     <Row className="text-center pt-4 pb-2"><Col><Spinner animation="border" className="mb-4" style={{ height: 100, width: 100 }} variant="success" /></Col></Row>
+                     <Row className="text-center pt-4 pb-2"><Col><Spinner animation="border" className="mb-4 login-spinner" variant="success" /></Col></Row>
                   </Container>)
                 : (
                     <div>
                       <InputGroup className="mb-5 mt-3">
                         <FormControl
-                          style={{marginLeft: "auto", marginRight: "auto", color: "white", opacity: 0.87, maxWidth: '400px', minHeight: '50px', border: 'none', backgroundColor: "#404040" }}
                           placeholder="@Tagname"
                           aria-label="@Tagname"
                           aria-describedby="basic-addon1"
@@ -236,11 +236,11 @@ function LoginScreen() {
                         }
                           onChange={ e => _setUserName(e.target.value) }
                           ref={focusRef}
+                          className="login-screen-form"
                         />
                       </InputGroup>
                       <InputGroup className="mb-5">
                         <FormControl
-                          style={{marginLeft: "auto", marginRight: "auto", color: "white", opacity: 0.87, maxWidth: '400px', minHeight: '50px',border: 'none',  backgroundColor: "#404040" }}
                           type="password"
                           placeholder="Password"
                           aria-label="Password"
@@ -253,23 +253,24 @@ function LoginScreen() {
                               }
                           }
                           onChange={ e => _setPassword(e.target.value) }
+                          className="login-screen-form"
                         />
                       </InputGroup>
                       <Container fluid className="border-top border-dark pt-2">   
                         <Row className="mt-3">
                           <Col>               
-                            <Button style={{ marginRight: 30, backgroundColor: "#191919", color: "white", opacity: 0.87, border:"none"}} variant="dark" className="mx-auto button-outline-black" onClick={() => document.getElementById("link-create-account").click() }><Link id="link-create-account" style={{ textDecoration: 'none', color: "white" }} to="/createAccount">Create&nbsp;Account</Link></Button>
+                            <Button variant="dark" className="mx-auto button-outline-black" onClick={() => document.getElementById("link-create-account").click() }><Link id="link-create-account" className="login-link-button" to="/createAccount">Create&nbsp;Account</Link></Button>
                           </Col>
                         </Row>
                         <Row className="mt-3">
                           <Col>
-                              <Button style={{ color: "white", backgroundColor: "#191919", opacity: 0.87, border:"none"}} variant="dark" className="mx-auto button-outline-black " onClick={() => document.getElementById("link-forgot-password").click() }><Link id="link-forgot-password" style={{ textDecoration: 'none', color: "white" }} to="/forgotPassword">Forgot&nbsp;Password?</Link></Button>
+                              <Button  variant="dark" className="mx-auto button-outline-black " onClick={() => document.getElementById("link-forgot-password").click() }><Link id="link-forgot-password" className="login-link-button" to="/forgotPassword">Forgot&nbsp;Password?</Link></Button>
                           </Col>
                         </Row>
                         <Row className="mt-3 mb-2">
                           <Col>
                             {
-                              (spinning) ?  <Spinner animation="border" className="mb-4" style={{ height: 60, width: 60 }} variant="success" /> : <Button onClick={submit} size="lg" className="rounded-pill mb-4 mx-auto" variant="outline-success" style={{ opacity: 0.8, maxWidth: '200px', marginTop: "20px" }} block disabled={!allowLogin}>Login</Button>
+                              (spinning) ?  <Spinner animation="border" className="mb-4 logging-in-spinner" variant="success" /> : <Button onClick={submit} size="lg" className="rounded mb-4 mx-auto login-button" variant="outline-success" block disabled={!allowLogin}>Login</Button>
                             }
                           </Col>
                         </Row>
@@ -286,7 +287,7 @@ function LoginScreen() {
                             }
                             { 
                               (spinning) ? (<Col className="text-center">
-                                              <span className="text-success lead font-italic font-weight-bolder" style={{ opacity: 1.0, fontSize: "15pt" }}>Logging in...</span>
+                                              <span className="text-success lead font-italic font-weight-bolder logging-in-text">Logging in...</span>
                                             </Col>)
                                           : ""
                             }

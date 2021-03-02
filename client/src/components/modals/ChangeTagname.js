@@ -3,7 +3,7 @@ import { Row, Col, Container, InputGroup, FormControl, Button } from 'react-boot
 import PropTypes from 'prop-types';
 import regex from '../../util/regex';
 import './settings-modal.css';
-
+import './change-tagname.css';
 export default function ChangeTagname({ logoutAccount }) {
     const [newTagname, setNewTagname] = useState("");
     const [tagNameError, setTagnameError] = useState(false);
@@ -48,12 +48,12 @@ export default function ChangeTagname({ logoutAccount }) {
                     <Col className="mx-auto text-center text-white" xs="12">
                         <InputGroup>
                           <FormControl
-                            style={{marginLeft: "auto", maxWidth: "300px", marginRight: "auto", color: "white", opacity: 0.87, minWidth: "200px", minHeight: '50px', backgroundColor: "#212121", border: 'none' }}
                             placeholder="Enter desired Tagname"
                             aria-label="Enter desired Tagname"
                             aria-describedby="basic-addon1"
                             className={(tagNameError) ? "change-tagname-input error-placeholder" : "change-tagname-input"}
                             onChange={(e) => { setNewTagname(e.target.value) }}
+                            className="change-tagname-form"
                           />
                         </InputGroup>
                     </Col>
@@ -65,7 +65,7 @@ export default function ChangeTagname({ logoutAccount }) {
                 </Row>
                 <Row className="pt-2 mt-2">
                     <Col className="text-center">
-                        <Button onClick={() => submit()} variant="outline-success" size="lg" style={{ padding: "10px"}}>Submit</Button>
+                        <Button onClick={() => submit()} variant="outline-success p-2" size="lg">Submit</Button>
                     </Col>
                 </Row>
             </Container>

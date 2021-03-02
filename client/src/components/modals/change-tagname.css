@@ -1,0 +1,12 @@
+.change-tagname-form {
+    margin-left: auto;
+    max-width: 300px;
+    margin-right: auto;
+    color: #EEEEEE; 
+    opacity: 0.87; 
+    min-width: 200px;
+    min-height: 50px;
+    background-color: #212121;
+    border: none; 
+    outline: none;
+}

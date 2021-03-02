@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import regex from '../../util/regex.js';
 import { SearchOutlined } from '@material-ui/icons';
 import FriendListItemCheckBox from '../listItems/FriendCheckBox';
+import './startchat.css';
 
 export default function SelectFriendsListView({ 
         errorSearch, 
@@ -76,36 +77,26 @@ export default function SelectFriendsListView({
         }
     }
     return (
-        <Container fluid>
+        <Container fluid className="select-friend-container">
             <Row className="pb-3">
-                <Col xs="2"></Col>
-                <Col xs="8" className="border-bottom border-dark" style={{ maxWidth: "450px" }}>
+                <Col className="start-chat-search-name">
                     <InputGroup className="mb-3 mt-2 mx-auto">
                         <FormControl
-                            style={{ textAlign: "center", fontSize: "18pt", color: "#EEEEEE", opacity: 0.8, minHeight: '50px', border: 'none', backgroundColor: "#191919" }}
                             placeholder="Search friends"
                             aria-label="Search friends"
                             aria-describedby="basic-addon1"
                             onChange={ e => setSearchBar(e.target.value) }
-                            className={ (errorSearch) ? "mx-auto lead form-control-red font-italic" : "mx-auto lead form-control-custom font-italic"}
+                            className={ (errorSearch) ? "mx-auto lead form-control-red placeholder-search select-friend-search" : "mx-auto lead form-control-custom placeholder-search select-friend-search"}
                             value={searchBar}
                             autoComplete="new-password"
                             />
-                        </InputGroup>
-                </Col>
-                <Col xs="2" style={{ maxWidth: "50px" }}>
-                    <Button onClick={() => { filterList() }} variant="dark" style={{ marginTop: "10px", display: "block", backgroundColor: "#191919", border: "none" }}><span className="text-primary text-lg-center"><SearchOutlined style={{ color: "#BBBBBB", height: 35, width: 35, cursor: "pointer"}}></SearchOutlined></span></Button>
+                        <Button onClick={() => { filterList() }} variant="dark" className="search-friends"><span className="text-primary text-lg-center"><SearchOutlined className="search-friends-icon"></SearchOutlined></span></Button>
+                    </InputGroup>
                 </Col>
             </Row>
-            <Row className="mb-2">
-                <Col className="mx-auto">
-                    <span className="font-italic text-small" style={{ color: "dodgerblue"}}>Select Friends For Chat</span>
-                </Col>
-            </Row>
-            <Row>
-                <Col xs="2"></Col>
-                <Col xs="8" style={{ maxWidth: "500px" }}>
-                    <Container fluid style={{ minHeight: "225px", overflowY: "scroll", backgroundColor: "#191919"}}>
+            <Row className="mt-4">
+                <Col>
+                    <Container fluid className="checked-friends-list-container">
                         {
                             (filteredFriends && filteredFriends.length > 0) ?
                             (
@@ -124,12 +115,10 @@ export default function SelectFriendsListView({
                         }
                     </Container>
                 </Col>
-                <Col xs="2"></Col>
             </Row>
         </Container>
     )
 }
-
 SelectFriendsListView.propTypes = {
     errorSearch: PropTypes.bool,
     selectedFriends: PropTypes.array, 

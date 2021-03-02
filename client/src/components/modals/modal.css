@@ -10,3 +10,24 @@
     padding: 40px;
     margin-top: 150px;
 }
+.encryption-icon-pw-reset {
+    width: 45px; 
+    height: 45px;
+}
+.set-pw-form {
+    font-size: 18pt;
+    text-align: center;
+    color: #EEEEEE;
+    min-height: 50px;
+    border: none;
+    min-width: 80%; 
+    background-color: #252525;
+}
+.set-pw-submit-button {
+    background-color: #252525;
+    margin-left: auto;
+    margin-right: auto;
+}
+.set-pw-col {
+    border-bottom: 1px solid #303030;
+}

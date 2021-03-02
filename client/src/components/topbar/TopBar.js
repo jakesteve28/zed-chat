@@ -57,7 +57,7 @@ function StartChatButton(){
   const dispatch = useDispatch()
   return (
     <div>
-      <Link id="startChat" style={{ display: "none" }} to="/newConversation"></Link>
+      <Link id="startChat" className="hidden-link" to="/newConversation"></Link>
       <Button onClick={async () => { 
           if(showConvList){
             dispatch(setShowConvList(false));
@@ -68,7 +68,7 @@ function StartChatButton(){
             //Sets the default view to false
           }
           document.getElementById("startChat").click(); 
-        }} variant="primary" className="rounded-pill mx-auto my-form-control-button" style={{ opacity: 0.75, boxShadow: "black 5px 5px " }}>
+        }} variant="primary" className="rounded-pill mx-auto my-form-control-button start-chat-button">
         <ForumIcon></ForumIcon> Start chat
       </Button>
     </div>
@@ -91,27 +91,25 @@ export default function TopBar(){
             <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
             </IconButton>
             <Typography component={'span'} className={classes.title}>
-               <Container fluid>
-                  <Row className="text-center">
-                    {
-                      (account.loggedIn && screenSmall && !showConv) ?
-                        (
-                          <Button style={{backgroundColor: "#191919", border: "none"}} onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
-                        )
-                      : ""
-                    }   
+               <Container fluid>                   
                     {
                       (account.loggedIn) ? 
                           (
                             <Row>
+                              {
+                                (account.loggedIn && screenSmall && !showConv) ?
+                                  (
+                                    <Button className="back-button-topbar" onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
+                                  )
+                                : ""
+                              }   
                               <StartChatButton></StartChatButton>
                               <NotificationsDropdown></NotificationsDropdown>
                               <FriendsDropdown></FriendsDropdown>              
                             </Row>
-                       )
+                          )
                       : ""
                     }
-                  </Row>
                </Container>
             </Typography>
 
@@ -119,14 +117,14 @@ export default function TopBar(){
                 (size.width > 768)
                ?
                 <Typography component={'span'} variant="h4" className={classes.title}>
-                    <span style={{ opacity: 0.67 }} className="text-white lead">{topbarMessage}</span>
+                    <span className="text-white lead topbar-text-span">{topbarMessage}</span>
                 </Typography> 
                 :  ""
             }
             
             
             {
-              (account.loggedIn === false && location.pathname !== "/login") ? (<Link className="rounded-pill btn btn-outline-primary mr-5 rounded-pill" style={{ opacity: 0.67 }} renderas={Button} to="/login">
+              (account.loggedIn === false && location.pathname !== "/login") ? (<Link className="rounded-pill btn btn-outline-primary mr-5 rounded-pill topbar-text-span" renderas={Button} to="/login">
               Login
             </Link>) : ""
             }

@@ -1,11 +1,13 @@
 import React, { useState }  from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import PropTypes from 'prop-types'; 
-import { selectAccount } from '../../store/slices/accountSettingsSlice';
 import { Typography } from '@material-ui/core'; 
-import MessageDropdown from '../dropdowns/Message'; 
+import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import useWindowSize from '../../util/windowSize';
+import ScheduleIcon from '@material-ui/icons/Schedule';
+import { selectAccount } from '../../store/slices/accountSettingsSlice';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import Tooltip from '@material-ui/core/Tooltip';
 import './listitems.css';
 import '../topbar/topbar.css';
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -39,31 +41,38 @@ export function MessageMe({ message, isBottom }) {
         alert('message del');
     }
     return (
-        <Container key={Math.random()} className="mt-2 mb-2" style={{ marginTop: "auto", minHeight: "80px" }} fluid>
+        <Container key={`${message.id}`} className="mt-2 mb-2 msg-me-container" fluid>
             <Row onMouseLeave={() => setShowMenu(false) }>
-                <Col xs="12" className="text-right pr-2">
-                    <Container fluid className={(size.width > 768) ? "pr-5" : ""}>
-                        <Row>
-                            <Col className="text-right message-me-column" onMouseEnter={() => { setShowMenu(true)}} >
-                                <Typography className="p-2 m-1 text-white text-left message-from-me message-column" style={{ borderRadius: "18px 18px 5px 18px", display:"block", backgroundColor: "#3266a8", wordWrap: "break-word"}}>{message.body}</Typography>
-                            </Col>
-                            <Col xs="1" style={{maxWidth: "20px" }} className="text-right">
-                                {(showMenu) ? <MessageDropdown sentByMe={true} pinMessage={pinMessage} deleteMessage={deleteMessage}></MessageDropdown>: ""}
-                            </Col>
+                <Col xs="12">
+                    <Container fluid>
+                        <Row className="text-right">
+                            <span className="message-span">
+                                {
+                                    (showMenu) ? (
+                                        <div className="message-tooltips">
+                                            <Tooltip title="Delete Message">
+                                                <DeleteOutlineIcon className="delete-icon" onClick={() => alert("Deleting")}></DeleteOutlineIcon>
+                                            </Tooltip>                                
+                                            <Tooltip title="Save Message (Max 10)">
+                                                <ScheduleIcon className="schedule-icon" onClick={() => alert("Pinning")}></ScheduleIcon>
+                                            </Tooltip>
+                                        </div>
+                                    ) : ``
+                                }
+                                <Typography onMouseEnter={() => setShowMenu(true)} className="p-2 m-1 text-white text-left message-from-me message-column">{message.body}</Typography>
+                            </span>
                         </Row>
                     </Container>
                 </Col>
             </Row>
             {
                 (showMenu || isBottom) ? (
-                    <Row style={{ opacity: 0.8 }}>
+                    <Row className="opaque">
                         <Col xs="12" className="text-right pr-3">
-                            <Container fluid className={(size.width > 768) ? "pr-5" : ""}>
+                            <Container fluid className="message-me-metadata-container">
                                 <Row>
-                                    <Col xs={(size.width > 768 ? "8" : "6")} className="text-center">
-                                    </Col>
                                     <Col className="text-right">
-                                        <span style={{ opacity: 0.7, fontSize: "10pt" }} className="font-italic text-left text-white text-small">
+                                        <span className="font-italic text-left text-white text-small message-me-metadata-text">
                                             {`${(message.read === true ) ? "Read - " : " Delivered - "}`}
                                             {(date.minsAgo < 60) ? 
                                                 `${(date.minsAgo.toFixed() > 0) ? date.minsAgo.toFixed() + " mins ago" : "Now"}`  
@@ -88,36 +97,42 @@ export function MessageOther({ message }) {
         alert('message pinned');
     }
     return (
-        <Container key={Math.random()} className="mt-2 mb-2 p-1"  style={{ marginTop: "auto", minHeight: "80px" }} fluid>
-         <Row onMouseLeave={() => setShowMenu(false) }>
-                <Col xs="12" className="text-left">
+        <Container key={`${message.id}`} className="mt-2 mb-2 p-1 msg-otro-container" fluid>
+            <Row onMouseLeave={() => setShowMenu(false) }>
+                <Col xs="12">
                     <Container fluid>
-                        <Row>
-                            <Col xs="1" style={{maxWidth: "20px" }} className="text-left">
-                                {(showMenu) ? <MessageDropdown pinMessage={pinMessage} sentByMe={false}></MessageDropdown>: ""}
-                            </Col>
-                            <Col className="text-left message-me-column" onMouseEnter={() => { setShowMenu(true)}} >
-                                <Typography className="p-2 m-1 text-white text-left message-from-other message-column" style={{ borderRadius: "5px 18px 18px 18px", display:"block", backgroundColor: "#1E3D64", wordWrap: "break-word"}}>{message.body}</Typography>
-                            </Col>  
+                        <Row className="text-left">
+                            <span className="message-span-other">
+                                <Typography onMouseEnter={() => setShowMenu(true)} className="p-2 m-1 text-white text-left message-from-other message-column">{message.body}</Typography>
+                                {
+                                    (showMenu) ? (
+                                        <div className="message-tooltips">                             
+                                            <Tooltip title="Save Message (Max 10)">
+                                                <ScheduleIcon className="schedule-icon" onClick={() => pinMessage("Pinning")}></ScheduleIcon>
+                                            </Tooltip>
+                                        </div>
+                                    ) : ``
+                                }
+                            </span>
                         </Row>
                     </Container>
-                </Col>   
-        </Row>
-        <Row style={{ opacity: 0.8, maxHeight: "10px" }}>
-            <Col xs="9" className="text-left pl-4 pt-2" style={{ opacity: 0.7 }}>
-                <span className="font-italic text-left text-white">
-                <span style={{ opacity: 0.7, fontSize: "10pt" }}  className="text-white text-small">{`@${message.user.tagName} `}</span>
-                {(date.minsAgo < 60) ? `- ${(date.minsAgo.toFixed() > 0) ? 
-                    date.minsAgo.toFixed() + " mins ago" : "Now"}`  
-                    : `- ${(date.day) ? date.day + ", " : "Today, "}${date.hour}:${(date.min < 10) ? "0" + date.min : date.min} ${(date.pm) ? "PM" : "AM"}`}
-                </span>
-            </Col>
-            <Col xs="3" className="text-center">
-            </Col>
-       </Row>
-    </Container>)
+                </Col>
+            </Row>
+            <Row className="message-other-row opaque">
+                <Col xs="9" className="text-left pl-4 pt-2">
+                    <span className="font-italic text-left text-white">
+                    <span className="text-white text-small message-other-tagname">{`@${message.user.tagName} `}</span>
+                    {(date.minsAgo < 60) ? `- ${(date.minsAgo.toFixed() > 0) ? 
+                        date.minsAgo.toFixed() + " mins ago" : "Now"}`  
+                        : `- ${(date.day) ? date.day + ", " : "Today, "}${date.hour}:${(date.min < 10) ? "0" + date.min : date.min} ${(date.pm) ? "PM" : "AM"}`}
+                    </span>
+                </Col>
+                <Col xs="3" className="text-center">
+                </Col>
+            </Row>
+        </Container>
+    )
 }
-
 
 export default function MessageListItem({ message, isBottom }) {
     const account = useSelector(selectAccount);

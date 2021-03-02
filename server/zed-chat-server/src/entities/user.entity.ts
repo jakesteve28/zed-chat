@@ -71,4 +71,7 @@ export class User {
   @Column({ default: "" })
   refreshToken: string;
 
+  @Column({ default: "" })
+  backgroundPicture: string;
+
 }

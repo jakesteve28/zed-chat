@@ -6,7 +6,7 @@ import LoginComponent from './modules/login';
 import ForgotPW from './modules/forgotPassword';
 import CreateAcc from './modules/createAccount';
 import Home from './modules/home';
-import NewConv from './modules/newConversation'; 
+import StartChatScreen from './modules/startChat'; 
 import SettingScr from './modules/settings';
 import {
   selectRefreshExpire, 
@@ -85,7 +85,7 @@ export default function App() {
       <Route path="/forgotPassword" component={ForgotPW}></Route>
       <Route path="/createAccount" component={CreateAcc}></Route>
       <GuardedRoute path="/home" component={Home} auth={account.loggedIn}></GuardedRoute>
-      <GuardedRoute path="/newConversation" component={NewConv} auth={account.loggedIn}></GuardedRoute>
+      <GuardedRoute path="/newConversation" component={StartChatScreen} auth={account.loggedIn}></GuardedRoute>
       <GuardedRoute path="/settings" component={SettingScr} auth={account.loggedIn}></GuardedRoute>
       <GuardedRoute path="/" component={Home} auth={account.loggedIn}></GuardedRoute>
     </Switch>

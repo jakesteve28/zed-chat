@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-bootstrap';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
 import './createaccount.css';
 import regex from '../../util/regex';
-
+import Recaptcha from '../recaptcha/Recaptcha';
 function CreateAccount(){
     const [tagName, setTagName] = useState("");
     const [email, setEmail] = useState("");
@@ -19,8 +19,10 @@ function CreateAccount(){
     const [emailInvalid, setEmailInvalid] = useState(false);
     const [pw1Invalid, setPw1Invalid] = useState(false);
     const [pw2Invalid, setPw2Invalid] = useState(false);
+    const [recaptchaPassed, setRecaptchaPassed] = useState(false); 
+    const [recaptchaError, setRecaptchaError] = useState(false); 
     const dispatch = useDispatch();
-
+    const history = useHistory();
     const clearErr = () => {
         setPasswordNoMatch(false);
         setTagnameInvalid(false);
@@ -90,59 +92,74 @@ function CreateAccount(){
         dispatch(setTopbarMessage(""))
     }, []);
 
+    useEffect(() => {
+        if(recaptchaError === true) {
+            alert('You failed a Recaptcha or it expired. Taking you back to login screen');
+            history.push('/login');
+        }
+    }, [recaptchaError]);
+
     return (
         (!backToLogin) ? 
         <Container className="h-100 w-100" fluid>
             <Row className="p-3 mt-5 text-white lead text-center">
-                <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow" style={{ borderRadius: "15px", backgroundColor: "#191919", opacity: 0.6, maxWidth: "500px" }}> 
-                    <h4 className="text-white" style={{ opacity: 0.8, marginBottom: "55px" }}>Enter your account information</h4>
+                <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow create-account-column"> 
+                    <h4 className="text-white create-account-title">Enter your account information</h4>
                     <InputGroup className="mb-5 mt-3">
                         <FormControl
-                            style={{ marginLeft: "auto", marginRight: "auto", color: "white", opacity: 0.87, maxWidth: '400px', minHeight: '50px',border: 'none',  backgroundColor: "#404040" }}
                             placeholder="Email Address"
                             aria-label="Email Address"
                             aria-describedby="basic-addon1"
                             onChange={ (e) => setEmail(e.target.value) }
-                            className={(emailInvalid) ? "form-control-error" : "form-control-normal"}
+                            className={(emailInvalid) ? "form-control-error create-account-form-control" : "form-control-normal create-account-form-control"}
                         />
                     </InputGroup>
                     <InputGroup  className="mb-5 mt-3">
                         <FormControl
-                            style={{ marginLeft: "auto", marginRight: "auto", color:  "white", opacity: 0.87, maxWidth: '400px', minHeight: '50px',border: 'none',  backgroundColor: "#404040" }}
                             placeholder="Desired Tag Name"
                             aria-label="Desired Tag Name"
                             aria-describedby="basic-addon1"
                             onChange={ (e) => setTagName(e.target.value) }
-                            className={(tagnameInvalid) ? "form-control-error" : "form-control-normal"}
+                            className={(tagnameInvalid) ? "form-control-error create-account-form-control" : "form-control-normal create-account-form-control"}
                         />
                     </InputGroup>
                     <InputGroup className="mb-5 mt-3">
                         <FormControl
-                            style={{ marginLeft: "auto", marginRight: "auto", color: "white", opacity: 0.87, maxWidth: '400px', minHeight: '50px',border: 'none',  backgroundColor: "#404040" }}
                             type="password"
                             placeholder="Desired Password"
                             aria-label="Desired Password"
                             aria-describedby="basic-addon1"
                             onChange={ (e) => setPW1(e.target.value) }
-                            className={(pw1Invalid || passwordNoMatch) ? "form-control-error" : "form-control-normal"}
+                            className={(pw1Invalid || passwordNoMatch) ? "form-control-error create-account-form-control" : "form-control-normal create-account-form-control"}
                             />
                     </InputGroup>
                     <InputGroup  className="mb-5 mt-3">
                         <FormControl
-                            style={{ marginLeft: "auto", marginRight: "auto", color: "white", opacity: 0.87, maxWidth: '400px', minHeight: '50px',border: 'none',  backgroundColor: "#404040" }}
                             type="password"
                             placeholder="Confirm Password"
                             aria-label="Confirm Password"
                             aria-describedby="basic-addon1"
                             onChange={ (e) => setPW2(e.target.value) }
-                            className={(pw2Invalid || passwordNoMatch) ? "form-control-error" : "form-control-normal"}
+                            className={(pw2Invalid || passwordNoMatch) ? "form-control-error create-account-form-control" : "form-control-normal create-account-form-control"}
                             />
                     </InputGroup>
-                    <Button onClick={submit} size="lg" className="rounded-pill mb-4 mx-auto" variant="outline-success" style={{ opacity: 0.8, maxWidth: '200px' }} block>Sign Up</Button>
-                    <Container fluid style={{ opacity: 1.2 }}>
+                    <Container fluid className="pt-1 pb-1 mt-1 mb-1 p-3">
+                    <Row>
+                        <Col xs="8" className="mx-auto p-3 text-center">
+                            <Recaptcha
+                                recaptchaChanged={setRecaptchaPassed}
+                                recaptchaError={setRecaptchaError}
+                                recaptchaExpired={setRecaptchaError}
+                            >
+                            </Recaptcha>
+                        </Col>
+                    </Row>
+                    </Container>
+                    <Button onClick={submit} size="lg" className="rounded-pill mb-4 mx-auto create-account-button" variant={(!recaptchaPassed) ? "outline-dark" : "outline-success"} block disabled={!recaptchaPassed}>Sign Up</Button>
+                    <Container fluid>
                         <Row>
                           <Col className="mx-auto text-left">
-                            <ul style={{ listStyleType: "none", marginRight: "auto", marginLeft: "auto", paddingRight: "30px" }}>
+                            <ul className="create-account-error-list">
                               {(error) ?  <li><h6 className="border-bottom pb-2 border-danger text-danger font-weight-bold">Errors</h6></li> : ""}
                               {
                                 (error) ? errorMsgs.map(el => (<li key={el} className="font-italic lead text-danger">{el}</li>)) : ""

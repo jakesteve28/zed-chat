@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import EnhancedEncryptionIcon from '@material-ui/icons/EnhancedEncryption';
 import regex from '../../util/regex';
 import './modal.css';
+
 export default function PasswordModalBody({ handleSetConvPassword }) {
     const [pw, setPW] = useState("");
     const [error, setError] = useState(false);
@@ -38,7 +39,7 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
             <Container fluid>
                 <Row className="pt-2 pb-3">
                     <Col className="mx-auto text-center pt-3">
-                        <EnhancedEncryptionIcon style={{ width: 42, height: 42 }}></EnhancedEncryptionIcon>
+                        <EnhancedEncryptionIcon className="encryption-icon-pw-reset"></EnhancedEncryptionIcon>
                     </Col>
                 </Row>
                 <Row>
@@ -47,10 +48,9 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
                     </Col>
                 </Row>
                 <Row className="pt-2 pb-2">
-                    <Col style={{ borderBottom: "1px solid #303030"}} className="mx-auto text-center" xs="10">
+                    <Col className="mx-auto text-center set-pw-col" xs="10">
                         <InputGroup className="mb-3 mt-2 mx-auto">
                                 <FormControl
-                                    style={{ fontSize: "18pt", textAlign: "center", color: "white", minHeight: '50px', border: 'none', minWidth: "80%", backgroundColor: "#252525" }}
                                     placeholder="Enter Password"
                                     type="password"
                                     aria-label="Enter Password"
@@ -58,7 +58,7 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
                                     onChange={ e => {
                                         setPW(e.target.value);
                                     }}
-                                    className={ (error) ? "mx-auto lead form-control-red" : "mx-auto lead form-control-custom"}
+                                    className={ (error) ? "mx-auto lead form-control-red set-pw-form" : "mx-auto lead form-control-custom set-pw-form"}
                                     ref={setPwRef}
                                     autoComplete="new-password"
                                     name="setPWNewConv"
@@ -68,7 +68,7 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
                 </Row>
                 <Row className="pt-3 mt-2">
                     <Col className="mx-auto text-center" xs="10">
-                        <Button onClick={ () => submit() } variant="outline-success" size="lg" style={{ backgroundColor: "#252525", marginLeft: "auto", marginRight: "auto"}} className="p-3 rounded-pill">Set Password</Button>
+                        <Button onClick={ () => submit() } variant="outline-success" size="lg" className="p-3 rounded-pill set-pw-submit-button">Set Password</Button>
                     </Col>
                 </Row>
             </Container>

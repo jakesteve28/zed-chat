@@ -223,35 +223,34 @@ export default function Sidebar(){
         >
             <Toolbar />
             <div className={classes.drawerContainer}>
-                <List style={{ opacity: 0.8 }}>
-                <ListItem style={{ maxWidth: "500px", maxHeight: "120px" }} className="text-small text-center mx-auto" selected={false} key='sidebar-search'>
-                   <Container fluid>
-                        <InputGroup className="mx-auto">
-                                <FormControl
-                                    style={{ textAlign: "center" }}
-                                    placeholder="Search"
-                                    aria-label="Search"
-                                    aria-describedby="basic-addon1"
-                                    onChange={ e => setSearchBar(e.target.value) }
-                                    className="mx-auto lead form-control-custom"
-                                    autoComplete="new-password"
-                                />  
-                                <InputGroup.Append style={{ maxWidth: "30px" }}>
-                                    <Tooltip title="Search Chat Names">
-                                        <Button variant="dark" onClick={() => searchChatNames()} className="custom-sidebar-search-button" style={{ backgroundColor: "#404040", border: "none" }}><SearchOutlined className={(error) ? "error-icon" : ""} style={{ color: "#EEEEEE" }}></SearchOutlined></Button>
-                                    </Tooltip>
-                                    {
-                                      (searchScreen) ?  
-                                        <Tooltip title="Exit Search">
-                                            <Button variant="dark" onClick={() => setSearchScreen(false)} className="custom-sidebar-search-button" style={{ backgroundColor: "#404040", border: "none" }}>X</Button>
-                                        </Tooltip>
-                                        : ""
-                                    }
-                                    
-                                </InputGroup.Append>      
-                        </InputGroup>
-                   </Container>
-                </ListItem>
+                <List className="sidebar-list">
+                    <ListItem className="text-small text-center mx-auto sidebar-chat-list-item" selected={false} key='sidebar-search'>
+                        <Container fluid>
+                                <InputGroup className="mx-auto">
+                                        <FormControl
+                                            placeholder="Search"
+                                            aria-label="Search"
+                                            aria-describedby="basic-addon1"
+                                            onChange={ e => setSearchBar(e.target.value) }
+                                            className="mx-auto lead form-control-custom sidebar-search-form"
+                                            autoComplete="new-password"
+                                        />  
+                                        <InputGroup.Append className="sidebar-search-button-append">
+                                            <Tooltip title="Search Chat Names">
+                                                <Button variant="dark" onClick={() => searchChatNames()} className="custom-sidebar-search-button sidebar-search-button"><SearchOutlined className={(error) ? "error-icon sidebar-search-icon" : "sidebar-search-icon"}></SearchOutlined></Button>
+                                            </Tooltip>
+                                            {
+                                            (searchScreen) ?  
+                                                <Tooltip title="Exit Search">
+                                                    <Button variant="dark" onClick={() => setSearchScreen(false)} className="custom-sidebar-search-button sidebar-search-button">X</Button>
+                                                </Tooltip>
+                                                : ""
+                                            }
+                                            
+                                        </InputGroup.Append>      
+                                </InputGroup>
+                        </Container>
+                    </ListItem>
                     {                           
                     (searchScreen) ? 
                             filteredConversations.map((conversation) => {

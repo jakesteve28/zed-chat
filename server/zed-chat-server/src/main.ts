@@ -9,13 +9,14 @@ const httpsOptions = {
  // key: fs.readFileSync('../keys/key.pem'),
  // cert: fs.readFileSync('../secrets/public.pem'),
 };
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, 
     {
       ...httpsOptions,
       logger: console,
     }
-  );
+  );  
   //open('http://localhost:3000/static/activation.mp3');
   app.setGlobalPrefix('api');
   app.enableCors();

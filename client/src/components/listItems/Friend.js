@@ -61,11 +61,11 @@ export default function FriendListItem({
     return (
         <Container className="friend-list-item-row" fluid>
             <Row className="p-3">
-                <Col xs="8" className={`${(isOnline) ? "text-success" : "text-danger"} py-auto font-italic text-sm text-center my-auto`} style={{ opacity: 0.67 }}>
+                <Col xs="8" className={`${(isOnline) ? "text-success" : "text-danger"} py-auto font-italic text-sm text-center my-auto opaque`}>
                     <span className="">@{tagName}</span>
                 </Col>
                 <Col xs="4" className="text-left">
-                    <Button className="dropdown-toggle text-white hidden-dropdown-friend-list-item" variant="dark" style={{ maxWidth: "50px", border: "none", backgroundColor: "#303030"}} onClick={() => friendAction()}><ForumIcon></ForumIcon></Button>
+                    <Button className="dropdown-toggle text-white hidden-dropdown-friend-list-item" variant="dark" onClick={() => friendAction()}><ForumIcon></ForumIcon></Button>
                 </Col>
             </Row>
         </Container>

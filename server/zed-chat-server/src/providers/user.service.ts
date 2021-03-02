@@ -281,6 +281,15 @@ export class UserService {
       return this.usersRepository.save(user);
     }
   }
+
+  async setBackgroundPic(userId: string, fileName: string): Promise<User> {
+    const user = await this.findOne(userId);
+    if(user){
+      user.backgroundPicture = fileName;
+      return this.usersRepository.save(user);
+    }
+  }
+
   async setHashedRefreshToken(refreshToken: string, userId: string) {
     const token = await bcrypt.hash(refreshToken, 10); 
     await this.usersRepository.update(userId, {

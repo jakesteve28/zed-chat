@@ -1,15 +1,16 @@
 .friend-list-item-row {
     background-color: #222222;
 }
-
 .friend-list-item-row:hover {
     background-color: #303030;
 }
-
 .hidden-dropdown-friend-list-item {
     display: none !important;
+    background-color: #303030;
+    max-width: 50px;
+    border: none; 
+    outline: none;
 }
-
 .friend-list-item-row:hover .hidden-dropdown-friend-list-item {
     display: inline !important;
     margin-right: 85%;
@@ -38,11 +39,184 @@
     color: white !important;
     padding-top: 15px !important;
 }
-
 .friend-request-list-item:hover {
     background-color: #303030 !important;
 }
-
 .friend-request-list-item:hover .button-bg {
     background-color: #303030 !important;
+}
+.friend-button,
+.friend-button-checked {
+    min-width: fit-content !important;
+    width: stretch;
+    font-size: 24pt;
+    padding: 25px;
+    border-radius: 5px;
+    margin-right: auto;
+    color: #AAAAAA;
+    word-break:keep-all;
+    box-shadow: #151515 2px 2px 5px 5px;
+    text-align: left;
+    padding-left: 85px;
+}
+.friend-button:hover,
+.friend-button-checked:hover {
+    background-color: #303030 !important;
+    cursor: pointer;
+    color: lightcyan;
+}
+.friend-button-checked {
+    background-color: #555555;
+    color: cornflowerblue; 
+
+}
+.friend-button-checked:hover {
+    background-color: #555555 !important;
+    color: cornflowerblue;
+}
+.message-span {
+    margin-left: auto;
+    justify-content: flex-end !important;
+    display: inline-flex !important;
+    transition: all 0.25s;
+}
+.message-span-other {
+    margin-right: auto;
+    justify-content: flex-start !important;
+    display: inline-flex !important;
+    transition: all 0.25s;
+}
+.message-from-other {
+    border-radius: 18px 18px 18px 5px;
+    display: block;
+    background-color: #1E3D64;
+}
+.message-from-me {
+    border-radius: 18px 18px 5px 18px;
+    display: block; 
+    background-color: #3266a8;
+}
+.schedule-icon {
+    color: #AAAAAA;
+    margin: 20px;
+    cursor: pointer;
+    width: 30px; 
+    height: 30px;
+}
+.schedule-icon:hover {
+    color: #D3AA00
+}
+.delete-icon {
+    color: #AAAAAA;
+    margin: 20px;
+    cursor: pointer;
+    width: 30px; 
+    height: 30px;
+}
+.delete-icon:hover {
+    color: #D30000
+}
+.message-tooltips {
+    display: inline-flex !important;
+}   
+.opaque {
+    opacity: 0.7;
+}
+.delete-invite-button {
+    border: none; 
+    outline: none;
+    background-color: #191919;
+    opacity: 0.87;
+}
+.sidebar-list-item {
+    min-width: 350px !important;
+    width: stretch;
+    padding-top: 20px !important;
+    background-color: #222222; 
+}
+.sidebar-list-item .hide-conv-info {
+    display: none;
+}
+.sidebar-list-item:hover {
+    background-color: #404040 !important;
+    cursor: pointer;
+}
+.sidebar-list-item:hover .hide-conv-info {
+    display: block !important;
+    padding: 0px !important;
+}
+.sidebar-list-item:hover .dropdown-toggle {
+    background-color: #404040 !important;
+}
+.sidebar-list-item {
+    background-color: #404040 !important;
+}
+.darkish {
+    background-color: #222222;
+}
+.clearish {
+    opacity: 0.87;
+}
+.sidebar-list-item-conv-name {
+    font-size: 11pt;
+}
+.sidebar-list-item-conv-preview {
+    font-size: 9pt;
+}
+.sidebar-list-item-conv-date {
+    font-size: 8pt;
+}
+.dropdown-delete-conv {
+    margin-left: -15px;
+}
+.delete-chat-morevert {
+    border:none; 
+    outline: none; 
+}
+.friend-button-icon,
+.friend-button-icon {
+    width: 65; 
+    height: 65;
+    color: #333333;
+}
+.friend-button-icon-checked {
+    color: cornflowerblue !important;
+}
+.friend-request-button {
+    background-color: #191919;
+    border: none; 
+    outline: none; 
+}
+.friend-request-button:hover {
+    background-color: #121212;
+}
+.msg-me-container {
+    margin-top: auto;
+    min-height: 80px;
+}
+.message-other-tagname {
+    font-size: 10pt;
+}
+.message-other-row {
+    max-height: 10px;
+}
+.msg-otro-container {
+    margin-top: auto;
+    min-height: 80px;
+}
+.message-me-metadata-container {
+    padding-right: 5%;
+}
+.message-me-metadata-text {
+    font-size: 10pt;
+}
+.received-invite-button,
+.received-invite-button-decline {
+    border: none; 
+    outline: none; 
+    color: #97fa93;
+    background-color: #191919;
+}
+.received-invite-button-decline {
+    background-color: #bf2700;
 }

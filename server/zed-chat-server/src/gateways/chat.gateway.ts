@@ -360,12 +360,14 @@ export class ChatGateway  {
                         }
                     }
                 }
+            } else {
+                throw `Too many messages pinned, max is 10`;   
             }
         } catch(err) {
             const socketId = client.id;
-            console.log(`Error: "messagePinned" event not sent | ${err} | with socket ${socketId}`);
-            this.wss.to(socketId).emit("messagePinnedError", { msg: err });
-            console.log(`Success: emitted "messagePinnedError" event to socket ${socketId}`);
+            const errorMsg = `Error: "messagePinned" event not sent | ${err} | with socket ${socketId}`;
+            this.wss.to(socketId).emit("error", { msg: errorMsg });
+            console.log(errorMsg);
         } 
     }
 }

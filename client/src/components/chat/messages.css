@@ -32,19 +32,12 @@
     justify-content:center;
     flex-direction: column-reverse;
 }
-
 .message-from-me {
     transition: all 500ms 2ms;
     padding: 15px !important;
     margin-left: auto !important;
     max-width: 100%;
 }
-
-.message-column {
-    max-width: fit-content !important;
-    word-wrap:break-word !important;
-}
-
 .message-from-me:hover,
 .message-from-me:focus,
 .message-from-me:active {
@@ -52,13 +45,11 @@
     cursor: pointer !important;
     background-color: #2369ff !important;
 }
-
 .message-from-other {
     transition: all 500ms 2ms;
     padding: 15px !important;
     margin-left: 10px !important;
 }
-
 .message-from-other:hover,
 .message-from-other:focus,
 .message-from-other:active {
@@ -66,7 +57,6 @@
     cursor: pointer !important;
     background-color: #202020 !important;
 }
-
 .message-menu-button {
     text-align: center !important;
     background-color: transparent !important; 
@@ -76,7 +66,6 @@
     font-size: 14pt;    
     padding-right: 10px !important;
 }
- 
 .message-menu-button:hover,
 .message-menu-button:active,
 .message-menu-button:focus {
@@ -87,14 +76,11 @@
     color: white !important;
     max-width: 30px !important;
 }
-
 .message-menu-button::after,
 .message-menu-button::before {
     content: none !important; 
     display: none !important;
 }
-
-
 .message-dropdown-sender {
     border: none !important;
     outline: none !important;
@@ -103,7 +89,6 @@
     max-height: 40px !important;
     margin-left: auto;
 }
-
 .message-dropdown-received {
     border: none !important;
     outline: none !important;
@@ -112,18 +97,15 @@
     max-height: 40px !important;
     margin-right: auto !important;
 }
-
 .my-dropdown-message {
     background-color: #404040 !important;
     opacity: 0.87 !important;
     color: white !important;
 }
-
 .my-dropdown-message:hover {
     background-color: #202020 !important;
     color: red !important;
 }
-
 .msg-dropdown::before, 
 .msg-dropdown::after {
     display: none !important;
@@ -131,34 +113,27 @@
     border: none !important;
     overflow: hidden !important;
 }
-
 .dropdown-item-message {
     background-color: transparent !important;
 }
-
 .dropdown-item-message:hover {
     background-color: transparent !important;
 }
-
 .dropdown-item-message:focus, 
 .dropdown-item-message:active {
     border: none !important; 
     outline: none !important; 
     color: #FF3D3D  !important;
 }
-
 .message-info-show {
     display: inline; 
 }
-
 .message-me-column {
     width: min-content !important;
 }
-
 .typing-list-item-container {
     padding: 20px !important;
 }
-
 .typing-list-item {
     padding: 15px;
     background-color: transparent !important;
@@ -166,17 +141,41 @@
     opacity: 0.9 !important;
     font-size: 25pt !important;
 }
-
+.col-messages-list {
+    flex-direction: column !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    position: fixed;
+    bottom: 100px;
+    padding-right: 25px;
+    padding-left: 25px;
+    width: 65%;
+    transition: width 0.2s;
+}
 @media only screen and (max-width: 768px) {
     .typing-list-item-container {
         bottom: 120px !important;
         left: 0% !important;
     }
+    .col-messages-list {
+        width: 90%;
+    }
 }
-
 @media only screen and (min-width: 769px) {
     .typing-list-item-container {
         bottom: 120px !important;
         left: 220px !important;
     }
+}
+@media only screen and (min-width: 1200px) {
+    .col-messages-list {
+        width: 80%;
+    }
+}
+.default-view-column {
+    opacity: 0.87;
+    color: #404040;
+}
+.mt-auto {
+    margin-top: auto;
 }

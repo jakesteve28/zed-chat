@@ -1,76 +1,71 @@
 .my-dropdown {
-    border-radius: 20px !important;
-    background-color: #191919 !important; 
-    border: 1px solid #191919 !important;
-    box-shadow: 3px 3px 2px 2px black !important;
-    min-width: 325px;
-    padding: 20px !important;
-  }
-
-  .my-dropdown > button:hover {
-    background-color: #505050 !important; 
-  }
-
-  .dropdown-toggle:after { content: none;  }
-
-  .dropdown-toggle {
-    background-color: "#404040" !important;
-  }
-
-  .dropdown-toggle:active {
-    border: none;
-    box-shadow: none;
-  }
-
+  border-radius: 20px !important;
+  background-color: #191919 !important; 
+  border: 1px solid #191919 !important;
+  box-shadow: 3px 3px 2px 2px black !important;
+  min-width: 325px;
+  padding: 20px !important;
+}
+.my-dropdown > button:hover {
+  background-color: #505050 !important; 
+}
+.dropdown-toggle:after { content: none;  }
+.dropdown-toggle {
+  background-color: "#404040" !important;
+}
+.dropdown-toggle:active {
+  border: none;
+  box-shadow: none;
+}
 .my-form-control:focus {
     border-color: #202020;
     box-shadow: inset 0 1px 1px rgba(12, 12, 12, 0.075), 0 0 8px rgba(12, 12, 12, 0.6);
 }
-
 .my-form-control {
   border: none !important;
 }
-
 .my-form-control-button:focus {
   border-color: #202020;
   box-shadow: inset 0 1px 1px rgba(12, 12, 12, 0.075), 0 0 8px rgba(12, 12, 12, 0.6);
 }
-
 .friend-topbar:hover {
   background-color: #303030 !important;
   cursor: pointer !important;
 }
-
 .friend-topbar {
-  /* border-top: 2px #191919 solid !important;
-  border-bottom: 2px #191919 solid !important; */
   max-width: 200px !important;
   min-width: 200px !important;
   width: 200px !important;
   margin-right: 30px;
 }
-
 .friend-topbar:last-child {
   border-bottom: none !important;
 }
-
 .search-friend-bar:hover {
   background-color: #303030 !important;
   cursor: text;
 }
-
+.search-friend-bar {
+  margin-left: auto; 
+  margin-right: auto;
+  min-width: 200px;
+  max-width: 250px;
+  min-height: 50px;
+  color: #EEEEEE;
+  opacity: 0.87; 
+  background-color: #202020;
+  border: none;
+}
 .invite-hover:hover {
   background-color: #404040 !important;
   cursor: pointer;
 }
-
 .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
   color: #999999;
   background-color: #404040;
   border: none;
   margin-bottom: -5px;
 }
-
 .nav-tabs .nav-link.active {
   color: #999999;
   border: none;
@@ -79,12 +74,10 @@
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
 }
-
 .nav-tabs {
   border: none;
   margin: auto;
 }
-
 .nav-tabs:hover {
   color: #999999;
   border: none;
@@ -93,46 +86,23 @@
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
 }
-
 .nav-tabs .nav-link {
   color: #999999;
 }
-
 .tabs-notifications {
   padding-top: 20px;
 }
-
 .tabs-notifications:hover {
   background-color: transparent !important;
 }
-
 .friends-dropdown {
   background-color: #191919 !important;
 }
-
-.topbar-dropdown {
+.dropdown-menu-custom {
   background-color: #191919 !important;
-  max-width: 325px;
+  min-width: 300px;
+  box-shadow: #151515 2px 2px 5px 5px;
 }
-.dropdown-menu-custom-bg {
-  background-color: #191919 !important;
-  min-width: 250px;
-}
-
-.dropdown-menu-custom-bg-settings {
-  background-color: #191919 !important;
-  min-width: 190px;
-}
-
-.dropdown-item-settings {
-  background-color: #191919 !important;
-  font-size: 16pt;
-}
-
-.dropdown-item-settings:hover {
-  background-color: #404040 !important;
-}
-
 .top-dropdown-button, 
 .top-dropdown-button:active, 
 .top-dropdown-button:focus,
@@ -142,11 +112,10 @@
   color: #AAAAAA !important;
   opacity: 0.87 !important;
 }
-
 .top-dropdown-button {
+  background-color: #191919;
   margin: -10px;
 }
-
 .top-dropdown-button:active, 
 .top-dropdown-button:focus,
 .top-dropdown-button:hover {
@@ -154,17 +123,42 @@
   outline: none !important;
   color: #3db8ff !important;
 }
-
 .error-placeholder {
   color:red !important;
   font-weight: bold;
 }
-
-
 .error-placeholder::placeholder {
   color:red !important;
 }
-
 .error-icon { 
   color: darkred !important;
+}
+.my-dropdown-message {
+    background-color: #222222;
+    min-width: 80px;
+}
+.notifications-label {
+  opacity: 0.87; 
+  color: #AAAAAA;
+}
+.notifications-menu-tabs-container {
+  max-height: 250px;
+  min-height: 250px;
+  min-width: 250px;
+  overflow-y: scroll;
+}
+.start-chat-button {
+  opacity: 0.8;
+  box-shadow: 2px 2px 5px 5px #121212;
+}
+.back-button-topbar {
+  background-color: #191919; 
+  border: none; 
+  outline: none;
+}
+.topbar-text-span {
+  opacity: 0.7;
+}
+.hidden-link {
+  display: none;
 }

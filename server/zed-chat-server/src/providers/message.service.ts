@@ -42,7 +42,21 @@ export class MessageService {
     }
     async pinMessage(messageId: string): Promise<Message> {
         const msg = await this.messageRepository.findOne(messageId); 
-        msg.pinned = !msg.pinned;
-        return this.messageRepository.save(msg); 
+        if(msg.pinned === false){
+            if(msg.conversation){
+                const messages = await this.conversationService.getAllMessages(msg.conversation.id);
+                if(messages.filter(message => 
+                message.pinned === true && message.user.id === msg.user.id )
+                .length < 10) {
+                    msg.pinned = true; 
+                    return this.messageRepository.save(msg); 
+                } else {
+                    return null;
+                }
+            }
+        } else {
+             msg.pinned = false;
+             return this.messageRepository.save(msg); 
+        }
     }
 }

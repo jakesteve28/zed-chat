@@ -1,0 +1,104 @@
+@media only screen and (max-width: 768px) {
+    .start-chat-container {
+        padding-left: 10px;
+    }
+}
+@media only screen and (min-width: 769px) {
+    .start-chat-container {
+        padding-left: 240px;
+    }
+}
+.start-chat-container {
+    padding-right: 10%;
+}
+.select-friend-container {
+    padding-top: 50px;
+    text-align: center;
+}
+.start-chat-enter-name {
+    padding-top: 100px;
+}
+.start-chat-name, 
+.start-chat-search-name {
+    border-bottom: 1px solid #404040;
+    padding-bottom: 20px;
+    min-width: 400px;
+    margin-left: 50px !important;
+}
+.start-chat-search-name {
+    padding-bottom: 0 !important;
+    margin-left: 35px !important;
+}
+.placeholder-mod::placeholder {
+    font-size: 20pt !important;
+    text-align: left !important;
+}
+.placeholder-mod {
+    text-align: left !important;
+    color: red;
+}
+
+.placeholder-search::placeholder {
+    font-size: 16pt !important;
+    text-align: left !important;
+}
+.send-invites-button,
+.set-pw-button {
+    max-width: 300px;
+    width: 200px;
+    min-height: 85px;
+    box-shadow: #151515 2px 2px 5px 5px;
+    padding: 15px !important;
+    outline: none !important;
+    border: none !important;
+    margin-left: 60px  !important;
+}
+.select-friend-search {
+    text-align: left;
+    font-size: 18pt;
+    color: #EEEEEE; 
+    opacity: 0.8;
+    min-height: 50px;
+    border: none; 
+    background-color: #191919;
+    outline: none;
+}
+.search-friends {
+    display: block; 
+    background-color: #191919; 
+    border: none;
+    outline: none;
+}
+.search-friends-icon {
+    color: #EEEEEE;
+    height: 50px; 
+    width: 50px;
+    cursor: pointer;
+}
+.checked-friends-list-container {
+    overflow-y: scroll;
+    background-color: #191919;
+}
+.enter-chat-form {
+    font-size: 22pt; 
+    color: #d9534f;
+    min-height: 50px;
+    border: none; 
+    outline: none; 
+    background-color: #191919;
+}
+.start-chat-super-container {
+    margin: auto; 
+}
+.start-column {
+    opacity: 0.8;
+    border-radius: 10px;
+    background-color: #191919;
+}
+.chat-edit-icon {
+    height: 35px;
+    width: 35px;
+}
+.edit-chat-row {
+    margin-top: 200px;
+}
