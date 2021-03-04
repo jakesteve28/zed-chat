@@ -33,7 +33,7 @@
     border-radius: 10px;
     background-color: #191919;
     max-width: 550px;
-    padding-top: 75px;
+    padding-top: 90px !important;
 }
 .account-settings-title-col {
     opacity: 0.87; 
@@ -44,4 +44,8 @@
     color: #EEEEEE; 
     opacity: 0.9; 
     font-size: 14pt;
+}
+.settings-screen-button {
+    width: 60px !important;
+    height: 60px !important;
 }

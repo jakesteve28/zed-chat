@@ -3,9 +3,22 @@
     transition: padding-left 0.25s;
 }
 .send-message-button {
-    border: none;
-    background-color: #404040;
-    color: #02a5ff;
+    border: none !important;
+    outline: none !important;
+    background-color: #404040 !important;
+    color: #EEEEEE !important;
+    opacity: 0.87 !important;
+}
+.send-message-button:hover,
+.send-message-button:active,
+.send-message-button:focus,
+.send-message-button:focus-visible {
+    background-color: #505050 !important;
+    outline: none !important; 
+    border: none !important;
+}
+.send-message-button:hover .send-message-icon {
+    background-color: #505050 !important;
 }
 .chat-container-row-form {
     max-height: 60px !important;
@@ -55,8 +68,4 @@
 }
 .opaque {
     opacity: 0.7;
-}
-.send-message-button {
-    color: "#EEEEEE";
-    opacity: 0.87;
 }

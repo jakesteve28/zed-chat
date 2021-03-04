@@ -18,6 +18,7 @@
     margin-left: -15px;
     color: #555555;
     border: none;
+    background-color: #191919 !important;
 }
 .add-friend-icon {
     height: 30px; 
@@ -31,12 +32,9 @@
     margin-right: auto;
     margin-left: 15px;
 }
-.friends-list-column {
-    max-height: 190px;
-}
 .friend-list-item-row {
     max-height: 65px; 
-    background-color: #505050;
+    background-color: #191919;
 }
 .clearish {
     opacity: 0.87;
@@ -75,4 +73,30 @@
 .account-settings-link {
     text-decoration: none;
     color: #AAAAAA;
+}
+.account-settings-link:hover,
+.account-settings-link:focus,
+.account-settings-link:active,
+.account-settings-link:focus-visible {
+    text-decoration: none;
+    color: #AAAAAA;
+}
+.search-friend-bar {
+    margin-left: auto; 
+    margin-right: auto;
+    min-width: 200px;
+    max-width: 250px;
+    min-height: 50px;
+    color: #EEEEEE;
+    opacity: 0.87; 
+    background-color: #202020;
+    border: none;
+}
+.search-friend-bar:hover,
+.search-friend-bar:active
+.search-friend-bar:focus,
+.search-friend-bar:focus-visible {
+    background-color: #303030 !important;
+    cursor: text;
+    color: #EEEEEE;
 }

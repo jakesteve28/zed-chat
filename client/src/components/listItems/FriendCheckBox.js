@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row  } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import './listitems.css';
 import '../topbar/topbar.css';
@@ -13,12 +13,13 @@ export default function FriendCheckBoxListItem({ tagName, onCheck }){
         onCheck(tagName, checked);
     }, [checked]);
     return (
-        <Row className="p-2">
-            <span onClick={() => check()} className={(checked) ? "friend-button-checked" : "friend-button"}>         
-                    <DoneIcon className={(checked) ? "friend-button-icon-checked" : "friend-button-icon"}></DoneIcon>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    @{tagName}
-            </span>
+        <Row className="p-2" onClick={() => check()} className={(checked) ? "friend-button-checked" : "friend-button"}>
+            <Col className="checkbox-column">
+                <DoneIcon className={(checked) ? "friend-button-icon-checked" : "friend-button-icon"}></DoneIcon>
+            </Col>
+            <Col className="tagname-column">
+                @{tagName}
+            </Col>        
         </Row>    
     )
 }

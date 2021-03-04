@@ -3,6 +3,7 @@ import { Button, Container, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
+import Tooltip from '@material-ui/core/Tooltip';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -99,7 +100,9 @@ export default function TopBar(){
                               {
                                 (account.loggedIn && screenSmall && !showConv) ?
                                   (
-                                    <Button className="back-button-topbar" onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
+                                    <Tooltip title="Show Chat Rooms">
+                                      <Button className="back-button-topbar" onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
+                                    </Tooltip>
                                   )
                                 : ""
                               }   

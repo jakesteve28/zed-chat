@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Row, Col, Button, Dropdown, Container } from 'react-bootstrap';
-import { ListItem } from '@material-ui/core';
+import { ListItem, Tooltip } from '@material-ui/core';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PropTypes from 'prop-types'; 
@@ -10,9 +10,8 @@ import '../topbar/topbar.css';
 export default function ChatListItem({  conversation, 
                                         selectConversation, 
                                         deleteConversation, 
-                                        selected, 
-                                        minWidth, 
-                                        buttonMargin }) {
+                                        selected }) {
+    const [showDropdown, setShowDropdown] = useState(false);                                   
     return (
         <ListItem onClick={() => selectConversation(conversation)} key={conversation.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} >
             <Container fluid className={(selected) ? "darkish light-selected" : "darkish light-hover"} >
@@ -36,12 +35,19 @@ export default function ChatListItem({  conversation,
                     </Col>
                     <Col className={(selected) ? "darkish hide-conv-info text-right light-selected" : "darkish hide-conv-info text-right light-hover"}>
                         <Container className={(selected) ? "darkish light-selected" : "darkish light-hover"} fluid>
-                            <Dropdown className={(selected) ? "darkish light-selected dropdown-delete-conv" : "darkish light-hover dropdown-delete-conv"}>              
-                                <Dropdown.Toggle 
+                            <Tooltip title="Chat Actions">
+                                <Button onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setShowDropdown(!showDropdown);
+                                    }}
                                     className="dropdown-toggle-conv-info text-white darkish delete-chat-morevert"
-                                    as={Button} variant="dark" id="dropdown-custom-components">
+                                    variant="dark"
+                                >
                                     <MoreVertIcon></MoreVertIcon>
-                                </Dropdown.Toggle>
+                                </Button>
+                            </Tooltip>  
+                            <Dropdown className={(selected) ? "darkish light-selected dropdown-delete-conv" : "darkish light-hover dropdown-delete-conv"} show={showDropdown}>                      
                                 <Dropdown.Menu className="my-dropdown shadow text-white text-center darkish">        
                                     <Dropdown.Item  
                                         className="text-white shadow conv-dropdown p-2" 
@@ -65,15 +71,8 @@ export default function ChatListItem({  conversation,
 }
 
 ChatListItem.propTypes = {
-    conversation: {
-        id: PropTypes.string, 
-        conversationName: PropTypes.string, 
-        messages: PropTypes.arrayOf({ body: PropTypes.string }),
-        createdAt: PropTypes.string 
-    }, 
+    conversation: PropTypes.object,
     selectConversation: PropTypes.func, 
     deleteConversation: PropTypes.func, 
-    selected: PropTypes.bool, 
-    minWidth: PropTypes.number,
-    buttonMargin: PropTypes.number
+    selected: PropTypes.bool
 }

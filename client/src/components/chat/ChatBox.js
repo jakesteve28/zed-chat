@@ -26,7 +26,7 @@ export default function ChatBox({ isTyping, isLazyLoading }){
     const checkInput = () => {
         let passing = true;
         if(regex.messageBody.test(message) === false){
-            setErrorMsgs(["Invalid message body. Must be 1-200 characters.", ...errorMsgs]);
+            setErrorMsgs(["Invalid message body. Must be 1-200 characters."]);
             passing = false;
         }
         if(!passing) setError(true);
@@ -34,6 +34,8 @@ export default function ChatBox({ isTyping, isLazyLoading }){
     }
 
     const sendMessage = async () => {
+        setError(false);
+        setErrorMsgs([]);
         if(!checkInput()){
             console.log("Error with sending message", errorMsgs);
             return;
@@ -108,10 +110,10 @@ export default function ChatBox({ isTyping, isLazyLoading }){
                         (spinning) ? <Spinner className="m-2 p-2" size="lg" variant="info" animation="border" /> :
                             (<Button onClick={async () => { await sendMessage() } } 
                                     className="ml-1 rounded-pill text-right send-message-button" 
-                                    variant="outline-secondary" 
-                                    id="basic-addon2">
+                                    id="basic-addon2"
+                                    variant="dark">
                                 <SendRounded 
-                                    className="send-message-button" 
+                                    className="send-message-icon" 
                                 >
                                 </SendRounded>
                             </Button>)

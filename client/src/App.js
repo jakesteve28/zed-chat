@@ -29,7 +29,7 @@ export default function App() {
   const now = Date.now(); 
   const history = useHistory();
   const [refreshing, setRefreshing] = useState(false);
-
+  const [refreshFailed, setRefreshFailed] = useState(false);
   const logoutAccount = async () => {
     try {
       await fetch("http://localhost:3000/api/auth/logout", {
@@ -49,27 +49,32 @@ export default function App() {
 
   const refreshToken = async () => {
     let refreshResult = null;
-    try {
-      refreshResult = await fetch("http://localhost:3000/api/auth/refresh", {
-        credentials: "include"
-      });
-    } catch(err) {
-      console.log("Error: fetching refresh token unauthorized, please login"); 
-      setRefreshing(false);
-      return false;
-    }
-    const { successful } = await refreshResult.json(); 
-    if(account.loggedIn && successful === true){
-      console.success("Refresh token fetch successful"); 
-      dispatch(setRefreshExpire(now + 900000)); 
-      setRefreshing(false); 
-      return true;
-    } else {
-      console.error("Not logged in, not going to attempt refresh. Logging out.")
-      console.error("Refresh token fetch failed. Logging out"); 
-      await logoutAccount();
-      setRefreshing(false); 
-      return false;
+    if(!refreshing && !refreshFailed){
+      setRefreshing(true);
+      try {
+        refreshResult = await fetch("http://localhost:3000/api/auth/refresh", {
+          credentials: "include"
+        });
+      } catch(err) {
+        console.log("Error: fetching refresh token unauthorized, please login"); 
+        setRefreshing(false);
+        setRefreshFailed(true);
+        return false;
+      }
+      const { successful } = await refreshResult.json(); 
+      if(account.loggedIn && successful === true){
+        console.success("Refresh token fetch successful"); 
+        dispatch(setRefreshExpire(now + 900000)); 
+        setRefreshing(false); 
+        return true;
+      } else {
+        console.error("Not logged in, not going to attempt refresh. Logging out.")
+        console.error("Refresh token fetch failed. Logging out"); 
+        await logoutAccount();
+        setRefreshing(false); 
+        setRefreshFailed(true);
+        return false;
+      }
     }
   }
   if(refreshExpire !== -1 && refreshExpire <= now) {

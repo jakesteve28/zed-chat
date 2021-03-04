@@ -145,28 +145,13 @@ export default function MessageListItem({ message, isBottom }) {
 }
 
 MessageMe.propTypes = {
-    message: {
-        read: PropTypes.bool, 
-        createdAt: PropTypes.string,
-        body: PropTypes.string, 
-        user: PropTypes.object
-    }, 
+    message: PropTypes.object,
     isBottom: PropTypes.bool
 }
 MessageOther.propTypes = {
-    message: {
-        read: PropTypes.bool, 
-        createdAt: PropTypes.string,
-        body: PropTypes.string, 
-        user: PropTypes.object
-    }, 
+    message: PropTypes.object
 }
 MessageListItem.propTypes = {
-    message: {
-        read: PropTypes.bool, 
-        createdAt: PropTypes.string,
-        body: PropTypes.string, 
-        user: PropTypes.object
-    }, 
+    message: PropTypes.object,
     isBottom: PropTypes.bool
 }

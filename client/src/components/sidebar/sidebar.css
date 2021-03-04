@@ -17,7 +17,10 @@
     opacity: 0.8;
 }
 .conv-info {
-    min-width: 350px !important;
+    min-width: 160px !important;
+    display: flex;
+    justify-content: flex-start;
+    max-width: 350px;
 }
 .hide-conv-info {
     max-width: 30px !important;
@@ -113,10 +116,6 @@
     cursor: pointer !important;
     margin-left: 50px !important;
     border: 1px solid #333333 !important;
-}
-.conv-info {
-    max-width: 180px !important;
-    min-width: 180px !important;
 }
 .dropdown-toggle-conv-info {
     text-align: left;

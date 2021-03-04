@@ -79,3 +79,6 @@ code {
 .dark-background {
   background-color: #191919;
 }
+ul {
+  list-style: none !important;
+}

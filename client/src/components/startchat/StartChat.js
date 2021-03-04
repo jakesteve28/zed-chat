@@ -140,18 +140,24 @@ export default function StartChat(){
         }
     }, [size.width]);
 
+    const modal = (
+        <PasswordModalBody handleSetConvPassword={setConvPassword} className="FancyButton">
+        </PasswordModalBody>
+    );
+
+
     return (
         <Container className="h-100 w-100 start-chat-super-container" fluid>
             <Row>
                 <Col className="start-column">
                     <Container fluid className="start-chat-container">       
-                        <Row>
-                            <Col className="text-center start-chat-name">
+                        <Row className="mt-2 mb-2 pb-2 start-chat-selection">
+                            <Col>
                                 <EnterChatName 
                                     setConversationName={setConversationName} 
                                     errorName={errorName}
                                 />
-                            </Col>       
+                            </Col>
                         </Row>
                         <Row className="mt-2 mb-2 pb-2 start-chat-selection">
                             <Col>
@@ -173,9 +179,9 @@ export default function StartChat(){
                                 aria-labelledby="simple-modal-title"
                                 aria-describedby="simple-modal-description"
                             >
-                                <PasswordModalBody handleSetConvPassword={handleSetConvPassword} ></PasswordModalBody>
+                            {modal}
                             </Modal>
-                            <Col className="mx-auto">
+                            <Col xs="6" className="mx-auto">
                                 <Button 
                                     onClick={ () => setPasswordOpened(true) } 
                                     disabled={buttonsDisabled} 
@@ -186,7 +192,7 @@ export default function StartChat(){
                                     Set&nbsp;Password&nbsp;<EnhancedEncryptionIcon className="chat-edit-icon"></EnhancedEncryptionIcon>
                                 </Button>
                             </Col>
-                            <Col className="mx-auto">
+                            <Col xs="6" className="mx-auto">
                                 <Button 
                                     onClick={ () => submit()} 
                                     disabled={buttonsDisabled} 

@@ -17,6 +17,7 @@
 }
 .start-chat-enter-name {
     padding-top: 100px;
+    padding-left: 50px;
 }
 .start-chat-name, 
 .start-chat-search-name {
@@ -30,14 +31,13 @@
     margin-left: 35px !important;
 }
 .placeholder-mod::placeholder {
-    font-size: 20pt !important;
+    font-size: 18pt !important;
     text-align: left !important;
 }
 .placeholder-mod {
     text-align: left !important;
     color: red;
 }
-
 .placeholder-search::placeholder {
     font-size: 16pt !important;
     text-align: left !important;
@@ -45,13 +45,12 @@
 .send-invites-button,
 .set-pw-button {
     max-width: 300px;
-    width: 200px;
-    min-height: 85px;
-    box-shadow: #151515 2px 2px 5px 5px;
-    padding: 15px !important;
+    width: stretch;
+    min-width: 200px;
+    min-height: 100px;
     outline: none !important;
     border: none !important;
-    margin-left: 60px  !important;
+    font-size: 19pt;
 }
 .select-friend-search {
     text-align: left;
@@ -62,6 +61,13 @@
     border: none; 
     background-color: #191919;
     outline: none;
+}
+.select-friend-search:hover,
+.select-friend-search:active,
+.select-friend-search:focus,
+.select-friend-search:focus-visible {
+    background-color: #191919;
+    color: cornflowerblue !important;
 }
 .search-friends {
     display: block; 
@@ -77,15 +83,25 @@
 }
 .checked-friends-list-container {
     overflow-y: scroll;
+    overflow-x: hidden;
     background-color: #191919;
+    min-height: 200px;
+    padding: 25px;
 }
 .enter-chat-form {
     font-size: 22pt; 
-    color: #d9534f;
+    color: cornflowerblue !important;
     min-height: 50px;
     border: none; 
     outline: none; 
     background-color: #191919;
+}
+.enter-chat-form:active, 
+.enter-chat-form:hover,
+.enter-chat-form:focus,
+.enter-chat-form:focus-visible {
+    background-color: #191919;
+    color: cornflowerblue !important;
 }
 .start-chat-super-container {
     margin: auto; 
@@ -96,9 +112,8 @@
     background-color: #191919;
 }
 .chat-edit-icon {
-    height: 35px;
-    width: 35px;
+    height: 75px;
+    width: 75px;
 }
 .edit-chat-row {
-    margin-top: 200px;
 }

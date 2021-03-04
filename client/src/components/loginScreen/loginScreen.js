@@ -172,9 +172,9 @@ function LoginScreen() {
           return;
     }
     addAccountToStore({ user: user, invites: invites });
-    dispatch(login());
     console.log("Successfully logged in user " + user?.tagName);
     setSpinning(false);
+    dispatch(login());
   }
 
   const addAccountToStore = ({ user, invites }) => {

@@ -79,5 +79,5 @@ FriendListItem.propTypes = {
     tagName: PropTypes.string, 
     conversations: PropTypes.arrayOf(PropTypes.object),
     history: PropTypes.object, 
-    dispatch: PropTypes.object
+    dispatch: PropTypes.func
 }

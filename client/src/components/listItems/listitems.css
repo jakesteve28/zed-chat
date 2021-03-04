@@ -8,9 +8,19 @@
     display: none !important;
     background-color: #303030;
     max-width: 50px;
-    border: none; 
-    outline: none;
+    border: none !important; 
+    outline: none !important;
 }
+.hidden-dropdown-friend-list-item:hover,
+.hidden-dropdown-friend-list-item:active,
+.hidden-dropdown-friend-list-item:focus-visible,
+.hidden-dropdown-friend-list-item:focus {
+    background-color: #303030 !important;
+    border: none !important; 
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .friend-list-item-row:hover .hidden-dropdown-friend-list-item {
     display: inline !important;
     margin-right: 85%;
@@ -57,7 +67,7 @@
     word-break:keep-all;
     box-shadow: #151515 2px 2px 5px 5px;
     text-align: left;
-    padding-left: 85px;
+    padding-left: 5px;
 }
 .friend-button:hover,
 .friend-button-checked:hover {
@@ -129,21 +139,26 @@
     opacity: 0.87;
 }
 .sidebar-list-item {
-    min-width: 350px !important;
-    width: stretch;
+    min-width: 240px !important;
     padding-top: 20px !important;
     background-color: #222222; 
+    cursor: pointer !important; 
+    transition: width 0.5s !important;
+}
+.sidebar-list-item:hover {
+    background-color: #404040;
 }
 .sidebar-list-item .hide-conv-info {
     display: none;
 }
-.sidebar-list-item:hover {
-    background-color: #404040 !important;
-    cursor: pointer;
-}
 .sidebar-list-item:hover .hide-conv-info {
     display: block !important;
     padding: 0px !important;
+    margin: auto;
+    background-color: #404040;
+}
+.sidebar-list-item:hover .delete-chat-morevert {
+    background-color: #404040 !important;
 }
 .sidebar-list-item:hover .dropdown-toggle {
     background-color: #404040 !important;
@@ -170,17 +185,31 @@
     margin-left: -15px;
 }
 .delete-chat-morevert {
-    border:none; 
-    outline: none; 
+    border: none !important; 
+    outline: none !important;
+    box-shadow: none !important; 
+    background-color: #222222;
+    margin-right: auto;
+    margin-left: -15px;
+}
+.delete-chat-morevert:hover,
+.delete-chat-morevert:focus,
+.delete-chat-morevert:focus-visible,
+.delete-chat-morevert:active {
+    border:none !important; 
+    outline: none !important;
+    box-shadow: none !important; 
 }
 .friend-button-icon,
 .friend-button-icon {
-    width: 65; 
-    height: 65;
+    width: 50px !important; 
+    height: 50px !important;
     color: #333333;
 }
 .friend-button-icon-checked {
     color: cornflowerblue !important;
+    width: 50px !important; 
+    height: 50px !important;
 }
 .friend-request-button {
     background-color: #191919;
@@ -219,4 +248,27 @@
 }
 .received-invite-button-decline {
     background-color: #bf2700;
+}
+.checkbox-column {
+    max-width: 55px;
+}
+.tagname-column {
+    min-width: 100px;
+}
+@media only screen and (max-width: 768px) {
+    .sidebar-list-item {
+        width: stretch !important;
+    }
+}
+@media only screen and (min-width: 769px) {
+    .sidebar-list-item {
+        min-width: 240px !important;
+        width: 240px;
+    }
+}
+.light-hover:hover {
+    background-color: #404040 !important;
+}
+.conv-info {
+    max-width: 150px !important;
 }

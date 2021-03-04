@@ -78,22 +78,26 @@ export default function SelectFriendsListView({
     }
     return (
         <Container fluid className="select-friend-container">
-            <Row className="pb-3">
-                <Col className="start-chat-search-name">
-                    <InputGroup className="mb-3 mt-2 mx-auto">
-                        <FormControl
-                            placeholder="Search friends"
-                            aria-label="Search friends"
-                            aria-describedby="basic-addon1"
-                            onChange={ e => setSearchBar(e.target.value) }
-                            className={ (errorSearch) ? "mx-auto lead form-control-red placeholder-search select-friend-search" : "mx-auto lead form-control-custom placeholder-search select-friend-search"}
-                            value={searchBar}
-                            autoComplete="new-password"
-                            />
-                        <Button onClick={() => { filterList() }} variant="dark" className="search-friends"><span className="text-primary text-lg-center"><SearchOutlined className="search-friends-icon"></SearchOutlined></span></Button>
-                    </InputGroup>
-                </Col>
-            </Row>
+            {
+                (friends.length > 3) ? (
+                    <Row className="pb-3">
+                        <Col className="start-chat-search-name">
+                            <InputGroup className="mb-3 mt-2 mx-auto">
+                                <FormControl
+                                    placeholder="Search friends"
+                                    aria-label="Search friends"
+                                    aria-describedby="basic-addon1"
+                                    onChange={ e => setSearchBar(e.target.value) }
+                                    className={ (errorSearch) ? "mx-auto lead form-control-red placeholder-search select-friend-search" : "mx-auto lead form-control-custom placeholder-search select-friend-search"}
+                                    value={searchBar}
+                                    autoComplete="new-password"
+                                    />
+                                <Button onClick={() => { filterList() }} variant="dark" className="search-friends"><span className="text-primary text-lg-center"><SearchOutlined className="search-friends-icon"></SearchOutlined></span></Button>
+                            </InputGroup>
+                        </Col>
+                    </Row>
+                ) : ""
+            }
             <Row className="mt-4">
                 <Col>
                     <Container fluid className="checked-friends-list-container">
@@ -125,6 +129,6 @@ SelectFriendsListView.propTypes = {
     setSelectedFriends: PropTypes.func, 
     setErrorSearch: PropTypes.func,
     setError: PropTypes.func,
-    errorMsgs: PropTypes.array,
+    errorMsgs: PropTypes.any,
     setButtonsDisabled: PropTypes.func
 }

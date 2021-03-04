@@ -42,11 +42,6 @@ export default function PasswordModalBody({ handleSetConvPassword }) {
                         <EnhancedEncryptionIcon className="encryption-icon-pw-reset"></EnhancedEncryptionIcon>
                     </Col>
                 </Row>
-                <Row>
-                    <Col className="mx-auto text-center pt-1 pb-3">
-                        <h5>Set Password</h5>
-                    </Col>
-                </Row>
                 <Row className="pt-2 pb-2">
                     <Col className="mx-auto text-center set-pw-col" xs="10">
                         <InputGroup className="mb-3 mt-2 mx-auto">

@@ -11,7 +11,7 @@ const GuardedRoute = ({ component: Component, auth, ...rest }) => (
 )
 
 GuardedRoute.propTypes = {
-    component: PropTypes.object, 
+    component: PropTypes.func, 
     auth: PropTypes.bool,
     rest: PropTypes.object
 }   

@@ -120,11 +120,11 @@ export default function Settings(){
                         </Row>
                         <Row className="pt-2 account-button-row">
                             <Col>
-                                <Button onClick={() => resetPassword()} className="p-3 m-2 account-button text-success" variant="dark">Reset Password  <LockIcon></LockIcon></Button>
-                                <Button onClick={() => changeTagname()} className="p-3 m-2 account-button text-info" variant="dark">Change Tagname <TransferWithinAStationIcon></TransferWithinAStationIcon></Button>
-                                <Button onClick={() => deleteAccount()} className="p-3 m-2 account-button text-danger" variant="dark">Delete Account <DeleteForeverIcon></DeleteForeverIcon></Button>
-                                <Button onClick={() => aboutPage()} className="p-3 m-2 account-button text-primary" variant="dark">About <InfoIcon></InfoIcon></Button>
-                                <Button onClick={() => privacyDisclaimer()} className="p-3 m-2 account-button text-warning" variant="dark">Privacy / Security Disclaimer <SecurityIcon></SecurityIcon></Button>
+                                <Button onClick={() => resetPassword()} className="p-3 m-2 account-button text-success" variant="dark"> <LockIcon className="settings-screen-button"></LockIcon> Reset Password</Button>
+                                <Button onClick={() => changeTagname()} className="p-3 m-2 account-button text-info" variant="dark"><TransferWithinAStationIcon className="settings-screen-button"></TransferWithinAStationIcon> Change Tagname</Button>
+                                <Button onClick={() => deleteAccount()} className="p-3 m-2 account-button text-danger" variant="dark"><DeleteForeverIcon className="settings-screen-button"></DeleteForeverIcon> Delete Account</Button>
+                                <Button onClick={() => aboutPage()} className="p-3 m-2 account-button text-primary" variant="dark"><InfoIcon className="settings-screen-button"></InfoIcon> About</Button>
+                                <Button onClick={() => privacyDisclaimer()} className="p-3 m-2 account-button text-warning" variant="dark"><SecurityIcon className="settings-screen-button"></SecurityIcon> Privacy/Security Disclaimer</Button>
                             </Col> 
                         </Row>
                     </Container>
