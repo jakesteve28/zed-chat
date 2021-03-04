@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 export default function Recaptcha({ recaptchaChanged, recaptchaError, recaptchaExpired }){
     return (
         <ReCAPTCHA
-            sitekey={`6LfVsGYaAAAAAIyGhfP9vq0NrvHEpSvHrI3WspyP`}
+            sitekey={}
             onChange={() => recaptchaChanged(true)}
             onErrored={() => recaptchaError(true) }
             onExpired={() => recaptchaExpired(true) }
