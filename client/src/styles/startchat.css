@@ -59,19 +59,19 @@
     opacity: 0.8;
     min-height: 50px;
     border: none; 
-    background-color: #191919;
+    /* background-color: #191919; */
     outline: none;
 }
 .select-friend-search:hover,
 .select-friend-search:active,
 .select-friend-search:focus,
 .select-friend-search:focus-visible {
-    background-color: #191919;
+    /* background-color: #191919; */
     color: cornflowerblue !important;
 }
 .search-friends {
     display: block; 
-    background-color: #191919; 
+    /* background-color: #191919;  */
     border: none;
     outline: none;
 }
@@ -84,7 +84,7 @@
 .checked-friends-list-container {
     overflow-y: scroll;
     overflow-x: hidden;
-    background-color: #191919;
+    /* background-color: #191919; */
     min-height: 200px;
     padding: 25px;
 }
@@ -94,13 +94,13 @@
     min-height: 50px;
     border: none; 
     outline: none; 
-    background-color: #191919;
+    background-color: transparent;
 }
 .enter-chat-form:active, 
 .enter-chat-form:hover,
 .enter-chat-form:focus,
 .enter-chat-form:focus-visible {
-    background-color: #191919;
+    background-color:transparent;
     color: cornflowerblue !important;
 }
 .start-chat-super-container {
@@ -109,7 +109,7 @@
 .start-column {
     opacity: 0.8;
     border-radius: 10px;
-    background-color: #191919;
+    /* background-color: #191919; */
 }
 .chat-edit-icon {
     height: 75px;

@@ -1,9 +1,9 @@
 .account-button {
-    background-color: #202020;
+    background-color: rgba(19, 19, 19, 0.5);
     border: none;
     padding: 25px !important; 
-    max-width: 400px;
-    min-width: 400px;
+    max-width: 460px;
+    min-width: 460px;
     min-height: 100px;
     max-height: 100px;
     font-size: 16pt;
@@ -15,7 +15,7 @@
     padding-left: 35px !important;
 }
 .account-button:hover {
-    background-color: #404040 !important;
+    filter: invert(.05);
     transform: scale(1.05);
 }
 .account-title-span {
@@ -27,11 +27,13 @@
 }
 .account-settings-container {
     margin: auto;
+    display: flex;
+    width: stretch;
 }
 .account-settings-button-column {
     opacity: 0.87; 
     border-radius: 10px;
-    background-color: #191919;
+    background-color: transparent;
     max-width: 550px;
     padding-top: 90px !important;
 }

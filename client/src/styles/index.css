@@ -25,7 +25,7 @@
 }
 
 html {
-  background-color:#191919;
+  background-color:#121212;
   height: 100% !important;
 }
 
@@ -36,9 +36,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: "#0c267a" !important;
   height: 100% !important;
-  background-color:#191919 !important;
+  background-color:#121212 !important;
 }
 
 code {
@@ -50,19 +49,24 @@ code {
   height: 100% !important;
   min-height: 100% !important;
   height: 100% !important;
+  transition: background-color 0.1s !important;
+  transition: background-image 0.1s !important;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-color: #191919;
 }
 
 #root {
   height: 100% !important;
-  background-color:#191919 !important;
+  background-color:#121212 !important;
 }
-
 
 ::-webkit-scrollbar {
   width: 1.2em;
 }
 ::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 15px rgba(0,0,0,0.0);
+  /* -webkit-box-shadow: inset 0 0 15px rgba(0,0,0,0.0); */
   border-radius: 10px;
   background-color: rgba(0,0,0,.1);
 }
@@ -75,10 +79,30 @@ code {
 ::-webkit-scrollbar-track-piece {
   height: 30px;
 }
-
 .dark-background {
   background-color: #191919;
 }
 ul {
   list-style: none !important;
+}
+.global-dark {
+  background-color: #191919 !important;
+}
+.global-green {
+  background-color: #02312e !important; 
+}
+.global-blue {
+  background-color: #05396e !important;
+}
+.global-red {
+  background-color: #2c0404 !important;
+}
+.global-orange {
+  background-color: #542d00 !important;
+}
+.global-magenta {
+  background-color: #330033 !important;
+}
+.global-navy {
+  background-color: #000035 !important;
 }

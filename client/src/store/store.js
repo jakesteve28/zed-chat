@@ -16,6 +16,7 @@ export const globalSlice = createSlice({
     metadata: "",
     api: "http://localhost:3000",
     refreshExpire: -1,
+    recaptchaSiteKey: ""
   },
   reducers: {
     setMetadata: (state, action) => {
@@ -23,11 +24,17 @@ export const globalSlice = createSlice({
     },
     setRefreshExpire: (state, action) => {
       state.refreshExpire = action.payload;
+    },
+    setRecaptchaSiteKey:  (state, action) => {
+      state.recaptchaSiteKey = action.payload;
+    },
+    clearRecaptchaSiteKey:  (state) => {
+      state.recaptchaSiteKey = ""
     }
   },
 });
 
-export const { setMetadata, setRefreshExpire } = globalSlice.actions;
+export const { setMetadata, setRefreshExpire, setRecaptchaSiteKey, clearRecaptchaSiteKey } = globalSlice.actions;
 
 export const selectHost = state => {
     if (process.env.NODE_ENV === "production") {

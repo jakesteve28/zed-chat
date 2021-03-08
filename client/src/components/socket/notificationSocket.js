@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import io from "socket.io-client";
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -360,6 +360,7 @@ export default function NotificationSocket(){
     const receivedInvites = useSelector(selectReceived);
     const friends = useSelector(selectFriends);
     const requests = useSelector(selectFriendRequests);
+    const [connectionError, setConnectionError] = useState(false);
 
     const teardownEventListeners = (notificationSocket) => {
         if(notificationSocket == null || !notificationSocket){
@@ -380,12 +381,19 @@ export default function NotificationSocket(){
                     }
                 }
             },
-            forceNew: true
+            forceNew: true,
+            reconnectionAttempts: 5
         }
-        if(account.loggedIn === true){
+        if(account.loggedIn === true && connectionError !== true){
             try {
                 console.log("Attemping connection to notifications socket gateway");
-                notificationSocket = io(`${host}/notifications`, notificationSocketOptions);
+                try {
+                    notificationSocket = io(`${host}/notifications`, notificationSocketOptions);
+                } catch (err) {
+                    console.error("Error: Notifications socket cannot establish polling/ws connection with the server");
+                    setConnectionError(true); 
+                    return; 
+                }
                 setupEventListeners(notificationSocket, dispatch, account, friends, requests, conversations, sentInvites, receivedInvites);
                 notificationSocket.emit('refreshNotificationSocket', { userId: account.id } );
                 console.log("Successfully setup notifications socket");

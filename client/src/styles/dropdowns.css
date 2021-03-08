@@ -36,6 +36,38 @@
     max-height: 65px; 
     background-color: #191919;
 }
+.account-settings-info {
+    margin-left: 20px;
+    color: cornflowerblue;
+    height: 35px;
+    font-weight: lighter;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 16pt;
+}
+.select-bg-img {
+    height: 100%;
+    width: 100%; 
+}
+.select-bg-square {
+    display: flex; 
+    justify-content: center;
+    width: fit-content;
+    background-color: #191919;
+    border-radius: 10px;    
+    filter: brightness(1.05);
+    cursor: pointer;
+    transition: all 0.5s;
+    box-shadow: #121212 5px 5px 2px 2px;
+    background-color: #191919;
+}
+.select-bg-square:hover,
+.select-bg-square:active,
+.select-bg-square:focus,
+.select-bg-square:focus-visible {
+    transform: scale(1.05);
+    filter: brightness(1.45);
+}
 .clearish {
     opacity: 0.87;
 }

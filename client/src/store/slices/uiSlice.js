@@ -38,10 +38,11 @@ export const uiSlice = createSlice({
   initialState: {
     sidebarState: "hidden",
     topbarMessage: "",
-    accountBackground: "",
+    accountBackground: "url(./assets/zodd.jpg)",
     backgroundColor: "#191919",
     backgroundTint: "transparent",
-    conversationBackground: "mthood"
+    conversationBackground: "mthood",
+    accent: "#222222"
   },
   reducers: {
     setSidebarState: (state, action) => {
@@ -72,17 +73,24 @@ export const uiSlice = createSlice({
     }, 
     setConversationBackground: (state, action) => {
         state.conversationBackground = action.payload;
-    }   
+    },
+    setBackground: (state, action) => {
+        state.accountBackground = action.payload;
+    }, 
+    setAccent: (state, action) => {
+        state.accentColor = action.payload;
+    }
   }
 });
 
-export const { setSidebarState, setTopbarMessage, setDefaultBackground, setColor, setTint, setConversationBackground } = uiSlice.actions;
+export const { setAccent, setSidebarState, setTopbarMessage, setDefaultBackground, setColor, setTint, setConversationBackground, setBackground } = uiSlice.actions;
 
 export const selectSidebarState = state => state.ui.sidebarState;
 export const selectTopbarMessage = state => state.ui.topbarMessage;
-export const selectAccountBackground = state => state.ui.accountBackground;
 export const selectBackgroundColor = state => state.ui.backgroundColor;
 export const selectBackgroundTint = state => state.ui.backgroundTint;
 export const selectConversationBackground = state => state.ui.conversationBackground;
+export const selectBackground = state => state.ui.accountBackground;
+export const selectAccent = state => state.ui.accent; 
 
 export default uiSlice.reducer;

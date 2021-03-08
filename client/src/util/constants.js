@@ -5,4 +5,4 @@ export const hosts = {
     devChatSocketURL: "http://localhost:3002/zed-chat-rooms",
     prodNotificationSocketURL: "",
     prodChatSocketURL: ""
-};
+}

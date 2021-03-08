@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Container, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import './settings-modal.css';
+import '../../styles/settings-modal.css';
 import { Typography } from '@material-ui/core';
 import { DeleteForever } from '@material-ui/icons';
 

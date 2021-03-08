@@ -8,7 +8,7 @@ import {
     selectCurrentConversation,
     batchAddMessages
   } from '../../store/slices/conversationsSlice';
-import './chat.css';
+import '../../styles/chat.css';
 export default function ChatContainer(){
     const defaultView = useSelector(selectView);   
     const [isTyping, setIsTyping] = useState(false);

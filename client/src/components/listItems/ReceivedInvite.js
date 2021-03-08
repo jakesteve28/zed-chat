@@ -2,8 +2,8 @@ import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { notificationSocket } from '../socket/notificationSocket';
-import './listitems.css';
-import '../topbar/topbar.css';
+import '../../styles/listitems.css';
+import '../../styles/topbar.css';
 export function ReceivedInviteListItem({ sender, inviteId, convId }) {
     const sendAccept = () => {
         if(notificationSocket){

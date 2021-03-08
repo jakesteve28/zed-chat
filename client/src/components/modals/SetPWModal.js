@@ -3,7 +3,7 @@ import { Row, Col, InputGroup, FormControl, Button, Container } from 'react-boot
 import PropTypes from 'prop-types';
 import EnhancedEncryptionIcon from '@material-ui/icons/EnhancedEncryption';
 import regex from '../../util/regex';
-import './modal.css';
+import '../../styles/modal.css';
 
 export default function PasswordModalBody({ handleSetConvPassword }) {
     const [pw, setPW] = useState("");

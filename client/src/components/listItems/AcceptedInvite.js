@@ -5,8 +5,8 @@ import { selectConversations } from '../../store/slices/conversationsSlice';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
-import './listitems.css';
-import '../topbar/topbar.css';
+import '../../styles/listitems.css';
+import '../../styles/topbar.css';
 export function AcceptedInviteListItem({ sender }){
     const conversations = useSelector(selectConversations);
     const [tag, setTag] = useState("");

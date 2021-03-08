@@ -4,8 +4,8 @@ import { ListItem, Tooltip } from '@material-ui/core';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PropTypes from 'prop-types'; 
-import './listitems.css';
-import '../topbar/topbar.css';
+import '../../styles/listitems.css';
+import '../../styles/topbar.css';
 
 export default function ChatListItem({  conversation, 
                                         selectConversation, 
@@ -13,12 +13,12 @@ export default function ChatListItem({  conversation,
                                         selected }) {
     const [showDropdown, setShowDropdown] = useState(false);                                   
     return (
-        <ListItem onClick={() => selectConversation(conversation)} key={conversation.id} className={(selected) ? "sidebar-list-item light-selected" : "sidebar-list-item light-hover"} >
-            <Container fluid className={(selected) ? "darkish light-selected" : "darkish light-hover"} >
-                <Row className={(selected) ? "darkish light-selected" : "darkish light-hover"}>
-                    <Col className={(selected) ? "conv-info light-selected" : "conv-info light-hover"}>
-                        <Container fluid className={(selected) ? "light-selected" : "light-hover"}>
-                            <Row className="font-italic text-primary sidebar-list-item-conv-name">
+        <ListItem onClick={() => selectConversation(conversation)} key={conversation.id} className={(selected) ? "sidebar-list-item selected-sidebar" : "sidebar-list-item"} >
+            <Container fluid>
+                <Row>
+                    <Col>
+                        <Container fluid>
+                            <Row className="sidebar-list-item-conv-name">
                                 {conversation.conversationName}
                             </Row>
                             <Row className="w-100 sidebar-list-item-conv-preview">
@@ -33,21 +33,21 @@ export default function ChatListItem({  conversation,
                             </Row>
                         </Container>
                     </Col>
-                    <Col className={(selected) ? "darkish hide-conv-info text-right light-selected" : "darkish hide-conv-info text-right light-hover"}>
-                        <Container className={(selected) ? "darkish light-selected" : "darkish light-hover"} fluid>
+                    <Col className={(selected) ? "hide-conv-info text-right" : "hide-conv-info text-right"}>
+                        <Container fluid>
                             <Tooltip title="Chat Actions">
                                 <Button onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         setShowDropdown(!showDropdown);
                                     }}
-                                    className="dropdown-toggle-conv-info text-white darkish delete-chat-morevert"
+                                    className="text-white delete-chat-morevert"
                                     variant="dark"
                                 >
                                     <MoreVertIcon></MoreVertIcon>
                                 </Button>
                             </Tooltip>  
-                            <Dropdown className={(selected) ? "darkish light-selected dropdown-delete-conv" : "darkish light-hover dropdown-delete-conv"} show={showDropdown}>                      
+                            <Dropdown className={(selected) ? "dropdown-delete-conv" : "dropdown-delete-conv"} show={showDropdown}>                      
                                 <Dropdown.Menu className="my-dropdown shadow text-white text-center darkish">        
                                     <Dropdown.Item  
                                         className="text-white shadow conv-dropdown p-2" 

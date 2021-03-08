@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Container, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
-import Tooltip from '@material-ui/core/Tooltip';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import useWindowSize from '../../util/windowSize';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useLocation } from 'react-router-dom'
 import ForumIcon from '@material-ui/icons/Forum';
 import {
@@ -20,13 +18,16 @@ import {
   selectView,
   selectShowConvList,
   setShowConvList,
-  setView
+  setView,
+  setCurrentConversation
 } from '../../store/slices/conversationsSlice';
 import SettingsDropdown from '../dropdowns/Settings';
 import FriendsDropdown from '../dropdowns/Friends';
 import NotificationsDropdown from '../dropdowns/Notifications';
 import { selectTopbarMessage } from '../../store/slices/uiSlice';
-import './topbar.css'
+import EditColorsDropdown from '../dropdowns/EditColors';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import '../../styles/topbar.css';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,20 +56,15 @@ const useStyles = makeStyles((theme) => ({
 function StartChatButton(){
   const view = useSelector(selectView);
   const showConvList = useSelector(selectShowConvList);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const history = useHistory();
   return (
     <div>
       <Link id="startChat" className="hidden-link" to="/newConversation"></Link>
       <Button onClick={async () => { 
-          if(showConvList){
-            dispatch(setShowConvList(false));
-            //Hides the sidebar
-          }
-          if(view){
-            dispatch(setView(false));
-            //Sets the default view to false
-          }
-          document.getElementById("startChat").click(); 
+          dispatch(setShowConvList(false));
+          dispatch(setCurrentConversation(null));
+          history.push('/newConversation')
         }} variant="primary" className="rounded-pill mx-auto my-form-control-button start-chat-button">
         <ForumIcon></ForumIcon> Start chat
       </Button>
@@ -82,9 +78,10 @@ export default function TopBar(){
     const account = useSelector(selectAccount);
     const dispatch = useDispatch();
     const screenSmall = size.width < 768;
-    const showConv = useSelector(selectShowConvList);
     const location = useLocation();
     const topbarMessage = useSelector(selectTopbarMessage);
+    const showConvList = useSelector(selectShowConvList);
+    const history = useHistory(); 
     return (
         <CssBaseline>
         <AppBar position="fixed"  className={classes.appBar}>
@@ -96,19 +93,23 @@ export default function TopBar(){
                     {
                       (account.loggedIn) ? 
                           (
-                            <Row>
+                            <Row>  
                               {
-                                (account.loggedIn && screenSmall && !showConv) ?
-                                  (
-                                    <Tooltip title="Show Chat Rooms">
-                                      <Button className="back-button-topbar" onClick={ () => {  dispatch(setShowConvList(!showConv)) }}><ArrowBackIcon></ArrowBackIcon></Button>
-                                    </Tooltip>
-                                  )
-                                : ""
-                              }   
+                                (showConvList === false && size.width <= 768 && history.location.pathname !== '/settings') ? <Button onClick={() => { 
+                                    dispatch(setShowConvList(true));
+                                    dispatch(setCurrentConversation(null));
+
+                                }} variant="dark" className="arrow-back-button"><ArrowBackIcon></ArrowBackIcon></Button> : ""
+                              }                          
                               <StartChatButton></StartChatButton>
                               <NotificationsDropdown></NotificationsDropdown>
-                              <FriendsDropdown></FriendsDropdown>              
+                              <FriendsDropdown></FriendsDropdown>     
+                              {
+                                (!screenSmall) ?
+                                (
+                                  <EditColorsDropdown></EditColorsDropdown> 
+                                ) : ""
+                              }           
                             </Row>
                           )
                       : ""

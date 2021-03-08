@@ -8,6 +8,7 @@
     background-color: #404040 !important;
     color: #EEEEEE !important;
     opacity: 0.87 !important;
+    box-shadow: 1px 1px 1px 1px #151515;
 }
 .send-message-button:hover,
 .send-message-button:active,
@@ -35,7 +36,7 @@
     color: #EEEEEE; 
     border: none;
     outline: none;
-    box-shadow: 2px 2px 5px 5px #151515;
+    box-shadow: 1px 1px 1px 1px #151515;
     margin-right: auto;
     margin-left: auto;
     padding-left: 20px !important;

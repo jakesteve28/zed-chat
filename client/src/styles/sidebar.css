@@ -23,7 +23,7 @@
     max-width: 350px;
 }
 .hide-conv-info {
-    max-width: 30px !important;
+    max-width: 40px !important;
 }
 .form-control-custom, .form-control-red {
     background-color: #404040;
@@ -120,6 +120,17 @@
 .dropdown-toggle-conv-info {
     text-align: left;
 }
+.sidebar-list-item {
+    max-width: 240px !important;
+    display: flex !important;
+}
+.sidebar-list-item:hover {
+    backdrop-filter: invert(10%);
+    cursor: pointer;
+}
+.sidebar-list-item:hover div {
+    background-color: transparent !important;
+}
 .light-hover {
     background-color: #222222 !important;
 }
@@ -132,12 +143,9 @@
 .error-icon {
     color: red !important;
 }
-.conv-dropdown {
-    background-color: #222222 !important;
-}
 .sidebar-chat-list-item {
     max-height: 140px;
-    max-width: 250px;
+    max-width: 240px;
 }
 .sidebar-search-button-append {
     max-width: 30px;
@@ -147,12 +155,58 @@
     border: none; 
     outline: none;
 }
-.sidebar-list {
-    opacity: 0.9;
-}
 .sidebar-search-form {
     text-align: center;
 }
 .sidebar-search-icon {
     color: #EEEEEE;
+}
+
+.alpha-sidebar {
+    opacity: 0.87;
+    z-index: 1200 !important;
+    position: relative;
+}
+
+.alpha-sidebar * {
+    transition: all 0.5s;
+}
+
+.MuiDrawer-paper {
+    overflow: hidden !important;
+}
+
+.full-sidebar .MuiPaper-root  {
+    width: 100% !important;
+    max-width: 100% !important;
+    transition: all 0.5s !important;
+}
+
+.full-sidebar .sidebar-list-item {
+    max-width: 100% !important;
+    transition: all 0.5s !important;
+}
+
+.selected-sidebar {
+    backdrop-filter: invert(10%);
+}
+
+@media only screen and (max-width: 768px) {
+    .alpha-sidebar .MuiPaper-root {
+        background-color: #222222;
+        width: 0px;
+    }
+}
+@media only screen and (min-width: 769px) {
+    .alpha-sidebar {
+        min-width: 240px;
+        max-width: 240px;
+        background-color: #222222 !important;
+        transition: all 0.5s !important;
+    }
+    .alpha-sidebar .MuiPaper-root {
+        background-color: #222222;
+        max-width: 240px;
+        transition: all 0.5s !important;
+    }
 }

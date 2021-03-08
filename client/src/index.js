@@ -1,25 +1,52 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './styles/index.css';
 import App from './App';
 import store from './store/store'
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import TopBar from './components/topbar/TopBar';
 import NotificationSocket from './components/socket/notificationSocket';
+import { selectBackground } from './store/slices/uiSlice';
+import Zodd from './assets/zodd.jpg';
+
+const Wrapper = () => {
+  return (
+      <React.StrictMode>
+        <Provider store={store}>
+          <AppWrapper></AppWrapper>
+        </Provider>
+      </React.StrictMode>
+  );
+}
+
+const AppWrapper = () => {
+  const globalBackground = useSelector(selectBackground);
+  const [style, setStyle] = useState({});
+  useEffect(() => {
+    if(globalBackground.charAt(0) !== '#'){
+      setStyle({ backgroundImage: `url("${globalBackground}")`, backgroundColor: "#191919" })
+    } else {
+      setStyle({ backgroundColor: globalBackground });
+    }
+  },[globalBackground])
+  useEffect(() => {
+    setStyle({ backgroundImage: `url(${Zodd})`});
+  }, [])
+  return (
+    <div className="base-div" style={style}>
+      <Router basename='/client/'>
+        <Suspense fallback={null}>
+          <TopBar />
+          <NotificationSocket />
+          <App />
+        </Suspense>
+      </Router>
+    </div>
+  )
+}
+
 ReactDOM.render(
-  <div className="base-div dark-background">
-    <React.StrictMode>
-      <Provider store={store}>
-        <Router basename='/client/'>
-          <Suspense fallback={null}>
-            <TopBar></TopBar>
-            <NotificationSocket></NotificationSocket>
-            <App />
-          </Suspense>
-        </Router>
-      </Provider>
-    </React.StrictMode>
-  </div>,
+  <Wrapper></Wrapper>,
   document.getElementById('root')
 );

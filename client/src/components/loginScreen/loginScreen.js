@@ -26,7 +26,7 @@ import {
   setRefreshExpire
 } from '../../store/store';
 import regex from '../../util/regex';
-import './loginscreen.css';
+import '../../styles/loginscreen.css';
 
 const loginServer = async (username, password) => {
   try {
@@ -40,7 +40,7 @@ const loginServer = async (username, password) => {
       method: "POST"
     });
     const body = await response.json();
-    const { statusCode, id, user, invites, refreshToken } = body; 
+    const { statusCode, id, user, invites, refreshToken, recaptchaSiteKey } = body; 
     if(statusCode === 401 || statusCode === 400){
         console.log("Error: Unauthorized, invalid credentials");
         return false;
@@ -163,7 +163,7 @@ function LoginScreen() {
         setErrorMsgs(["Invalid Credentials", ...errorMsgs]);
         return;
     }
-    const  { id, user, invites, refreshToken } = result;
+    const  { id, user, invites, refreshToken, recaptchaSiteKey } = result;
     if(refreshToken === true) dispatch(setRefreshExpire(Date.now() + 875000)); 
     if(false === validateAccountDetails(id, user, invites)){
           setError(true);
@@ -210,8 +210,8 @@ function LoginScreen() {
     <Container className="h-100 w-100" fluid>
       <Row className="p-3 mt-5 text-white lead text-center">
         <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow login-screen-column"> 
-          <h2 className="text-white welcome-text" >Welcome to <span className="text-danger">Project Zed</span></h2>
-          <h6 className="text-muted font-italic welcome-subtext">Secured by you, for you</h6>
+          <h2 className="text-white welcome-text" >Welcome to <span className="text-danger">Project Zodd</span></h2>
+          <h6 className="text-muted welcome-subtext">Powered by demons and monsters >:)</h6>
             {
               (loggingInCookie) 
                 ? (

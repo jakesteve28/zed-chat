@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
-import './settings-modal.css';
+import '../../styles/settings-modal.css';
 import { Typography } from '@material-ui/core';
 
 export default function PrivacySecurityDisclaimer() {

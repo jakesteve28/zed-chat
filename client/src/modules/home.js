@@ -10,8 +10,7 @@ import Sidebar from '../components/sidebar/Sidebar';
 
 export default function Home(){ 
     const showConvList = useSelector(selectShowConvList)
-    return (showConvList) ? (<Sidebar></Sidebar>) :
-    (
+    return (
       <div className="w-100 h-100">
         <ChatSocket></ChatSocket>
         <Sidebar></Sidebar>

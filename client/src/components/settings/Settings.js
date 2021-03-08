@@ -22,7 +22,7 @@ import { clearInvites } from '../../store/slices/inviteSlice';
 import { clearFriends } from '../../store/slices/friendsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
-import './settings.css';
+import '../../styles/settings.css';
 export default function Settings(){
     const account = useSelector(selectAccount);
     const dispatch = useDispatch();
@@ -63,7 +63,6 @@ export default function Settings(){
     }, []);
     return (
         <Container className="h-100 w-100 account-settings-container" fluid>
-            <Row className="pt-3">
                 <Modal
                     open={aboutOpened}
                     onClose={() => setAboutOpened(false)}
@@ -104,8 +103,6 @@ export default function Settings(){
                 >
                     <ResetPW logoutAccount={logoutAccount}></ResetPW>
                 </Modal>
-            </Row>
-            <Row>
                 <Col className="mx-auto p-5 account-settings-button-column" xs="8">
                     <Container fluid className="account-settings-button-container mt-3">       
                         <Row className="mb-2">
@@ -129,7 +126,6 @@ export default function Settings(){
                         </Row>
                     </Container>
                 </Col>
-            </Row>
         </Container>
       )   
 }

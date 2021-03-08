@@ -68,6 +68,7 @@
     box-shadow: #151515 2px 2px 5px 5px;
     text-align: left;
     padding-left: 5px;
+    background-color: rgba(19, 19, 19, 0.3);
 }
 .friend-button:hover,
 .friend-button-checked:hover {
@@ -100,11 +101,13 @@
     border-radius: 18px 18px 18px 5px;
     display: block;
     background-color: #1E3D64;
+    box-shadow: 1px 1px 1px 1px #303030;
 }
 .message-from-me {
     border-radius: 18px 18px 5px 18px;
     display: block; 
     background-color: #3266a8;
+    box-shadow: 1px 1px 1px 1px #303030;
 }
 .schedule-icon {
     color: #AAAAAA;
@@ -138,48 +141,40 @@
     background-color: #191919;
     opacity: 0.87;
 }
-.sidebar-list-item {
-    min-width: 240px !important;
-    padding-top: 20px !important;
-    background-color: #222222; 
-    cursor: pointer !important; 
-    transition: width 0.5s !important;
-}
-.sidebar-list-item:hover {
-    background-color: #404040;
-}
+.hide-conv-info {
+    max-width: 30px !important;
+    transition: display 0.25s;
+} 
 .sidebar-list-item .hide-conv-info {
     display: none;
 }
 .sidebar-list-item:hover .hide-conv-info {
     display: block !important;
     padding: 0px !important;
-    margin: auto;
+    margin-right: auto;
     background-color: #404040;
 }
-.sidebar-list-item:hover .delete-chat-morevert {
-    background-color: #404040 !important;
-}
-.sidebar-list-item:hover .dropdown-toggle {
-    background-color: #404040 !important;
-}
-.sidebar-list-item {
-    background-color: #404040 !important;
-}
 .darkish {
-    background-color: #222222;
+    background-color: transparent !important;
 }
 .clearish {
     opacity: 0.87;
 }
 .sidebar-list-item-conv-name {
     font-size: 11pt;
+    color: #0275d8 !important;
+    min-width: 200px;
 }
 .sidebar-list-item-conv-preview {
+    margin-top: 10px;
     font-size: 9pt;
+    color: #AAAAAA;
+    min-width: 200px;
 }
 .sidebar-list-item-conv-date {
     font-size: 8pt;
+    color: #AAAAAA;
+    min-width: 200px;
 }
 .dropdown-delete-conv {
     margin-left: -15px;
@@ -188,7 +183,7 @@
     border: none !important; 
     outline: none !important;
     box-shadow: none !important; 
-    background-color: #222222;
+    background-color: transparent;
     margin-right: auto;
     margin-left: -15px;
 }
@@ -199,6 +194,7 @@
     border:none !important; 
     outline: none !important;
     box-shadow: none !important; 
+    background-color: transparent;
 }
 .friend-button-icon,
 .friend-button-icon {
@@ -264,11 +260,12 @@
     .sidebar-list-item {
         min-width: 240px !important;
         width: 240px;
+        max-width: 240px;
     }
 }
 .light-hover:hover {
     background-color: #404040 !important;
 }
 .conv-info {
-    max-width: 150px !important;
+    max-width: 180px !important;
 }

@@ -20,8 +20,8 @@ import {
 } from '../../store/slices/friendsSlice';
 import regex from '../../util/regex'
 import { notificationSocket } from '../socket/notificationSocket';
-import '../topbar/topbar.css';
-import './dropdowns.css';
+import '../../styles/topbar.css';
+import '../../styles/dropdowns.css';
 export default function FriendsDropdown(){
     const dispatch = useDispatch();
     const history = useHistory();
@@ -36,7 +36,6 @@ export default function FriendsDropdown(){
     const [addError, setAddError] = useState(false);
     const errorMsgs = useRef([]);
     const currentConversation = useSelector(selectCurrentConversation);
-    
     const checkInput = () => {
       let passing = true;
       errorMsgs.current = []
@@ -115,7 +114,7 @@ export default function FriendsDropdown(){
             <PeopleAltIcon></PeopleAltIcon>
         </Dropdown.Toggle>
       </Tooltip>
-      <Dropdown.Menu className="topbar-dropdown-menu dark-background dropdown-menu-custom-bg">
+      <Dropdown.Menu className="topbar-dropdown-menu dark-background dropdown-menu-custom-bg dropdown-shadow">
       <Dropdown.ItemText className="text-center font-weight-bold lead mb-1 dark-background friends-title-menu" ><GroupIcon></GroupIcon>&nbsp;&nbsp;Friends</Dropdown.ItemText>
         <Container fluid className="h-100 pt-2 w-100">
           <Row className="m-1">

@@ -59,8 +59,8 @@ export class AuthService {
           user: user,
           invites: await this.inviteService.getInvitesByUser(user.id),
           refreshToken: await this.newRefreshToken(user),
-          id: user.id
-      }
+          id: user.id      
+        }
   }
 
   async getUserForTokenLogin(user: any) {

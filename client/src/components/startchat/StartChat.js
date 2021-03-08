@@ -15,7 +15,7 @@ import PasswordModalBody from '../modals/SetPWModal';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
 import SelectFriendsListView from './SelectFriendsListView';
 import { toast } from 'react-toastify'; 
-import './startchat.css';
+import '../../styles/startchat.css';
 
 export function EnterChatName({ setConversationName, errorName }){
     const enterChatRef = useRef(null);
@@ -148,7 +148,6 @@ export default function StartChat(){
 
     return (
         <Container className="h-100 w-100 start-chat-super-container" fluid>
-            <Row>
                 <Col className="start-column">
                     <Container fluid className="start-chat-container">       
                         <Row className="mt-2 mb-2 pb-2 start-chat-selection">
@@ -181,7 +180,8 @@ export default function StartChat(){
                             >
                             {modal}
                             </Modal>
-                            <Col xs="6" className="mx-auto">
+                            <Col xs="1"></Col>
+                            <Col xs="5" className="mx-auto">
                                 <Button 
                                     onClick={ () => setPasswordOpened(true) } 
                                     disabled={buttonsDisabled} 
@@ -192,7 +192,7 @@ export default function StartChat(){
                                     Set&nbsp;Password&nbsp;<EnhancedEncryptionIcon className="chat-edit-icon"></EnhancedEncryptionIcon>
                                 </Button>
                             </Col>
-                            <Col xs="6" className="mx-auto">
+                            <Col xs="5" className="mx-auto">
                                 <Button 
                                     onClick={ () => submit()} 
                                     disabled={buttonsDisabled} 
@@ -200,9 +200,10 @@ export default function StartChat(){
                                     variant="outline-success" 
                                     size="lg"
                                     >
-                                    Invite&nbsp;<SmsIcon className="chat-edit-icon"></SmsIcon>
+                                    Send Invites&nbsp;<SmsIcon className="chat-edit-icon"></SmsIcon>
                                 </Button>
                             </Col>
+                            <Col xs="1"></Col>
                         </Row>
                         <Row className="pt-2 mt-2">
                             <Col>
@@ -214,7 +215,6 @@ export default function StartChat(){
                         </Row>
                     </Container>
                 </Col>
-            </Row>
         </Container>)
 }
 

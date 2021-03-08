@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
@@ -22,98 +22,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { chatSocket } from '../socket/chatSocket';
 import ChatListItem from '../listItems/Chat'; 
 import regex from '../../util/regex';
-import "./sidebar.css";
-
-const getMinWidthListItem = (narrowScreen, deleted, showConvList) => {
-    if((narrowScreen || deleted) && showConvList){
-        //Only show conversation list, aka sidebar
-        return "450px";
-    } else if(narrowScreen && !showConvList) {
-        //Only show current conversation, hide sidebar  
-        return "0px";
-    } else if(!narrowScreen && !showConvList) {
-        //Narrow sidebar for wider screens
-        return "200px";
-    } else {
-        return "200px";
-    } 
-}
-
-const getButtonMargin = (narrowScreen, showConvList) => {
-    if(narrowScreen && showConvList){
-        //Only show conversation list, aka sidebar
-        return "150px";
-    } else if(narrowScreen && !showConvList) {
-        //Only show current conversation, hide sidebar  
-        return "0px";
-    } else if(!narrowScreen && !showConvList) {
-        //Narrow sidebar for wider screens
-        return "-5px";
-    } else {
-        return "-5px";
-    } 
-}
-
-const useStyles = makeStyles(() => ({
-    animate_in: {
-        width: 0,
-        visibility: "invisible",
-        flexShrink: 0,
-        animationName: "fadeout",
-        animationDuration: "1s"
-    },
-    animate_out: {
-        width: "200px",
-        flexShrink: 0,
-        animationName: "fadeout",
-        animationDuration: "1s"
-    },
-    '@keyframes fadeout': {
-        '0%': {
-            width: "25%"
-        },
-        '100%': {
-            width: 0,
-            display: "none",
-            opacity: 1
-        },
-    },
-    '@keyframes fadein': {
-        '0%': {
-            width: 0,
-            opacity: 0
-        },
-        '100%': {
-            width: "25%",
-            opacity: 1
-        }
-    },
-    narrowPaper: {
-        minWidth: "240px",
-        maxWidth: "240px",
-        backgroundColor: "#222222",
-        opacity: 0.8
-      },
-    hidePaper: {
-        backgroundColor: "#222222",
-        width: "0%",
-    },
-    fullDrawerPaper: {
-        width: "100%",
-        backgroundColor: "#222222"
-    },
-    drawerContainer: {
-      backgroundColor: "#222222",
-      color: "white",
-      paddingRight: "20px",
-      overflowX: "hide"
-    },
-}));
+import "../../styles/sidebar.css";
 
 export default function Sidebar(){
     const size = useWindowSize();
-    const classes = useStyles();
-    const narrowScreen = size.width < 768;
     let conversations = useSelector(selectConversations);
     let [filteredConversations, setFilteredConversations] = useState([]);
     const dispatch = useDispatch();
@@ -126,21 +38,6 @@ export default function Sidebar(){
     const [searchScreen, setSearchScreen] = useState(false);
     const [error, setError] = useState(false);
     const [deleted, setDeleted] = useState(false);
-
-    const getPaper = () => {
-        if((narrowScreen || deleted) && showConvList){
-            //Only show conversation list, aka sidebar
-            return classes.fullDrawerPaper;
-        } else if(narrowScreen && !showConvList) {
-            //Only show current conversation, hide sidebar  
-            return classes.hidePaper;
-        } else if(!narrowScreen && !showConvList) {
-            //Narrow sidebar for wider screens
-            return classes.narrowPaper;
-        } else {
-            return classes.narrowPaper;
-        }  
-    }
 
     const searchChatNames = () => {
         setError(false);
@@ -211,18 +108,36 @@ export default function Sidebar(){
             return self.indexOf(value) === index;
         })
     }
-    
-    const listItemMinWidth = getMinWidthListItem(narrowScreen, deleted, showConvList);
-    const buttonMargin = getButtonMargin(narrowScreen, showConvList);
+
+    useEffect(() => {
+        if(size.width <= 768 && !showConvList && currentConversation.id === 0) {
+            if(history.location.pathname === '/newConversation'){
+                console.log(history.location.pathname)
+                return;
+            }
+            dispatch(setShowConvList(true)); 
+            dispatch(setTopbarMessage(""));
+            return;
+        } 
+        if(size.width <= 768 && showConvList && currentConversation.id !== 0) {
+            dispatch(setShowConvList(false)); 
+            return;
+        }
+        if(size.width > 768 && showConvList === true) {
+            dispatch(setShowConvList(false));
+            return;
+        }
+    }, [size.width])
+
     return (
         <Drawer
-            variant="permanent"
-            classes={{
-                paper: getPaper()
-            }}
+            variant="persistent"
+            open={true}
+            className={(deleted || showConvList) ? "alpha-sidebar full-sidebar" : "alpha-sidebar"}
+            transitionDuration={1000}
         >
             <Toolbar />
-            <div className={classes.drawerContainer}>
+            <div>
                 <List className="sidebar-list">
                     <ListItem className="text-small text-center mx-auto sidebar-chat-list-item" selected={false} key='sidebar-search'>
                         <Container fluid>
@@ -246,7 +161,6 @@ export default function Sidebar(){
                                                 </Tooltip>
                                                 : ""
                                             }
-                                            
                                         </InputGroup.Append>      
                                 </InputGroup>
                         </Container>
@@ -261,9 +175,7 @@ export default function Sidebar(){
                                         conversation={conversation}
                                         selectConversation={selectConversation}
                                         deleteConversation={deleteConversation}
-                                        buttonMargin={buttonMargin} 
                                         selected={currentConversation.conversationName === conversation.conversationName} 
-                                        minWidth={listItemMinWidth}
                                         key={conversation.id}
                                     />) })
                     :
@@ -272,13 +184,11 @@ export default function Sidebar(){
                                 return ""
                             }
                             return ( <ChatListItem
-                                conversation={conversation}
-                                selectConversation={selectConversation}
-                                deleteConversation={deleteConversation}
-                                buttonMargin={buttonMargin} 
-                                selected={currentConversation.conversationName === conversation.conversationName} 
-                                minWidth={listItemMinWidth}
-                                key={conversation.id}
+                                        conversation={conversation}
+                                        selectConversation={selectConversation}
+                                        deleteConversation={deleteConversation}
+                                        selected={currentConversation.conversationName === conversation.conversationName} 
+                                        key={conversation.id}
                             />) })
                     }
                 </List>

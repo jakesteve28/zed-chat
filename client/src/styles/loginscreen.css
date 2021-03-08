@@ -79,7 +79,12 @@ input:focus {
     /* style={{ opacity: 0.8, maxWidth: '200px', marginTop: "20px" }} */
     opacity: 0.8; 
     max-width: 200px;
-    margin-top: 20px;
+    margin-top: 10px;
+    outline: none;
+    border: none;
+    font-size: 20pt;
+    padding: 25px;
+
 }
 .logging-in-spinner {
     height: 60px;

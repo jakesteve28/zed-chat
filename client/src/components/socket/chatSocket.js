@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import io from "socket.io-client";
 import { selectAccount } from '../../store/slices/accountSettingsSlice';
 import { useSelector, useDispatch } from 'react-redux';
@@ -55,6 +55,7 @@ export default function ChatSocket(){
     const dispatch = useDispatch();
     const host = useSelector(selectHost);
     const friends = useSelector(selectFriends);
+    const [connectionError, setConnectionError] = useState(false);
     const listenAllRooms = (chatSocket) => {
         console.log("Listening to all rooms", conversations)
         if(conversations && Array.isArray(conversations)){
@@ -80,7 +81,7 @@ export default function ChatSocket(){
     // }
 
     useEffect(() => {
-        if(currentConversation && currentConversation.id && account && currentConversation.id !== "0"){
+        if(currentConversation && currentConversation.id && account && currentConversation.id !== "0" && connectionError !== true){
             const socketOptions = {
                 transportOptions: {
                     polling: {
@@ -89,10 +90,16 @@ export default function ChatSocket(){
                         }
                     }
                 },
-                forceNew: true
+                reconnectionAttempts: 5
             }
             console.log("Setting up chat socket");
-            chatSocket = io(`${host}/chat`, socketOptions);
+            try {
+                chatSocket = io(`${host}/chat`, socketOptions);
+            } catch (err) {
+                console.error("Cannot establish polling/ws connection with the server");
+                setConnectionError(true);
+                return;
+            }
             console.log("Setting up chat socket event listeners and listening to rooms");
             console.log("Setting up listeners");
             chatSocket.on(socketEvents.received.listening, (msg) => {

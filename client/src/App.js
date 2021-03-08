@@ -19,8 +19,9 @@ import { clearInvites } from './store/slices/inviteSlice';
 import { clearFriends } from './store/slices/friendsSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-pro-sidebar/dist/css/styles.css';
-import './App.css';
-import './index.css';
+import { AnimatedSwitch } from 'react-router-transition';
+import './styles/App.css';
+import './styles/index.css';
 
 export default function App() {
   const account = useSelector(selectAccount);
@@ -85,7 +86,12 @@ export default function App() {
   }
 
   return (
-    <Switch>
+    <AnimatedSwitch
+      atEnter={{ opacity: 0 }}
+      atLeave={{ opacity: 0 }}
+      atActive={{ opacity: 1 }}
+      className="switch-wrapper"
+    >
       <Route path="/login" component={LoginComponent}></Route>
       <Route path="/forgotPassword" component={ForgotPW}></Route>
       <Route path="/createAccount" component={CreateAcc}></Route>
@@ -93,6 +99,6 @@ export default function App() {
       <GuardedRoute path="/newConversation" component={StartChatScreen} auth={account.loggedIn}></GuardedRoute>
       <GuardedRoute path="/settings" component={SettingScr} auth={account.loggedIn}></GuardedRoute>
       <GuardedRoute path="/" component={Home} auth={account.loggedIn}></GuardedRoute>
-    </Switch>
+    </AnimatedSwitch>
   )
 }

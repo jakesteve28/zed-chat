@@ -27,6 +27,10 @@ export const conversationsSlice = createSlice({
         state.conversations = state.conversations.filter((conv) => { return conv.id !== action.payload.id});
     },
     setCurrentConversation: (state, action) => {
+        if(!action.payload){
+            state.currentConversation = { messages: [], joined: false, typing: false, id: 0 };
+            return;
+        } 
         if(state.conversations.filter(conv => conv.id === action.payload.conversation.id).length < 1) {
             console.log("Error: cannot set current conversation to a conversation that doesn't exist in the store");
             return;

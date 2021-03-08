@@ -3,8 +3,8 @@ import {  Button, InputGroup, FormControl, Container, Row, Col } from 'react-boo
 import { useDispatch } from 'react-redux';
 import regex from '../../util/regex';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
-import './createaccount.css';
-import './forgotpassword.css';
+import '../../styles/createaccount.css';
+import '../../styles/forgotpassword.css';
 export default function ForgotPassword(){
     const [email, setEmail] = useState("");
     const [tagname, setTagname] = useState("");

@@ -10,8 +10,8 @@ import { setTopbarMessage } from '../../store/slices/uiSlice';
 import { chatSocket } from '../socket/chatSocket';
 import useWindowSize from '../../util/windowSize';
 import ForumIcon from '@material-ui/icons/Forum';
-import './listitems.css';
-import '../topbar/topbar.css';
+import '../../styles/listitems.css';
+import '../../styles/topbar.css';
 
 export default function FriendListItem({ 
         account, 

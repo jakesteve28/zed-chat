@@ -55,3 +55,15 @@
     opacity: 0;
   }
 }
+
+.switch-wrapper {
+  position: relative;
+  width: 100% !important; 
+  height: 100% !important;
+}
+
+.switch-wrapper > div {
+  position: fixed;
+  width: 100% !important; 
+  height: 100% !important;
+}

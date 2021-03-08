@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Row, Col, Container, InputGroup, FormControl, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import regex from '../../util/regex';
-import './settings-modal.css';
-import './change-tagname.css';
+import '../../styles/settings-modal.css';
+import '../../styles/change-tagname.css';
 export default function ChangeTagname({ logoutAccount }) {
     const [newTagname, setNewTagname] = useState("");
     const [tagNameError, setTagnameError] = useState(false);

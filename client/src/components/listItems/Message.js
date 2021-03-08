@@ -8,8 +8,8 @@ import ScheduleIcon from '@material-ui/icons/Schedule';
 import { selectAccount } from '../../store/slices/accountSettingsSlice';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import Tooltip from '@material-ui/core/Tooltip';
-import './listitems.css';
-import '../topbar/topbar.css';
+import '../../styles/listitems.css';
+import '../../styles/topbar.css';
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 // returns: 
 // {

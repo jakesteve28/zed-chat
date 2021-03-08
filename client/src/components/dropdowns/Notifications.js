@@ -14,7 +14,7 @@ import { AcceptedInviteListItem } from '../listItems/AcceptedInvite';
 import { ReceivedInviteListItem } from '../listItems/ReceivedInvite';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import Tooltip from '@material-ui/core/Tooltip';
-import '../topbar/topbar.css'
+import '../../styles/topbar.css'
 
 export default function NotificationsDropdown() {
     const receivedInvites = useSelector(selectReceived);

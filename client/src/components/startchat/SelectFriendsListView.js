@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import regex from '../../util/regex.js';
 import { SearchOutlined } from '@material-ui/icons';
 import FriendListItemCheckBox from '../listItems/FriendCheckBox';
-import './startchat.css';
+import '../../styles/startchat.css';
 
 export default function SelectFriendsListView({ 
         errorSearch, 

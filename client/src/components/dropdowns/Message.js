@@ -3,7 +3,7 @@ import { Button, Dropdown } from 'react-bootstrap';
 import PropTypes from 'prop-types'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import '../topbar/topbar.css';
+import '../../styles/topbar.css';
 export default function MessageDropdown({ sentByMe, deleteMessage, pinMessage }){
     return (
     <Dropdown className={(sentByMe) ? "msg-dropdown message-dropdown-sender light-hover" : "msg-dropdown message-dropdown-received light-hover"}  drop={(sentByMe) ? "left" : "right"} >              

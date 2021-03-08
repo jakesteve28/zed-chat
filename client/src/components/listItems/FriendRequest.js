@@ -7,8 +7,8 @@ import NotInterestedOutlinedIcon from '@material-ui/icons/NotInterestedOutlined'
 import Tooltip from '@material-ui/core/Tooltip';
 import { selectAccount } from '../../store/slices/accountSettingsSlice';
 import { notificationSocket } from '../socket/notificationSocket';
-import './listitems.css';
-import '../topbar/topbar.css';
+import '../../styles/listitems.css';
+import '../../styles/topbar.css';
 
 export function FriendRequestListItem({ requestId, tagName }){
     const account = useSelector(selectAccount);

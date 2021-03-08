@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux'
 import { chatSocket } from '../socket/chatSocket';
 import regex from '../../util/regex';
 import PropTypes from 'prop-types';
-import './chat.css';
+import '../../styles/chat.css';
 let searchTimeout;
 
 export default function ChatBox({ isTyping, isLazyLoading }){

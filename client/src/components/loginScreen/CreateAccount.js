@@ -3,7 +3,7 @@ import { Button, InputGroup, FormControl, Container, Row, Col } from 'react-boot
 import { Redirect, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setTopbarMessage } from '../../store/slices/uiSlice';
-import './createaccount.css';
+import '../../styles/createaccount.css';
 import regex from '../../util/regex';
 import Recaptcha from '../recaptcha/Recaptcha';
 function CreateAccount(){

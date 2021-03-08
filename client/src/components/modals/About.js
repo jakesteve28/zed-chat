@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 import { Typography } from '@material-ui/core';
-import './settings-modal.css';
+import '../../styles/settings-modal.css';
 
 export default function About() {
     return (
