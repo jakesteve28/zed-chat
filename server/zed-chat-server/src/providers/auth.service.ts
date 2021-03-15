@@ -35,37 +35,38 @@ export class AuthService {
   //Called from LocalAuthGuard
   async validateUser(tagName: string, pass: string): Promise<any> {
     try {
-      const user =  await this.userService.findByTagName(tagName);
       const userPW = await this.userService.getPW(tagName);
-      if(true === this.enforceSingleClientConnection(user)){
-        const passwordMatching = await bcrypt.compare(
-          pass,
-          userPW
-        )
-        if (passwordMatching === true) {
+      const passwordMatching = await bcrypt.compare(
+        pass,
+        userPW
+      )
+      if (passwordMatching === true) {
           console.log(`Logging in User: ${tagName}`);
-          await this.userService.markLoggedIn(user.id);
-          const loggedInUser = await this.userService.fetchMessages(user.id);
-          return loggedInUser;
-        }
-      } else throw 'No User With Given Username';
+          const user =  await this.userService.findByTagName(tagName);
+          if(true === this.enforceSingleClientConnection(user)){
+            await this.userService.markLoggedIn(user.id);
+            return user;
+          } else 
+            return null;
+      } else return 
     } catch(err){
       throw new HttpException('Wrong credentials provided ' + err, HttpStatus.BAD_REQUEST);
     }
   }
   //Called from Auth Controller
-  async login(user: any){
+  async getNewToken(user: any){
       return {
-          user: user,
-          invites: await this.inviteService.getInvitesByUser(user.id),
-          refreshToken: await this.newRefreshToken(user),
-          id: user.id      
-        }
+          refreshToken: await this.newRefreshToken(user)   
+      }
+  }
+
+  async getInvites(userId: string) {
+    return this.inviteService.getInvitesByUser(userId);
   }
 
   async getUserForTokenLogin(user: any) {
     await this.userService.markLoggedIn(user.id);
-    const loggedInUser = await this.userService.fetchMessages(user.id);
+    const loggedInUser = await this.userService.findOne(user.id);
       return {
         user: loggedInUser,
         invites: await this.inviteService.getInvitesByUser(user.id),

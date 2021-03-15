@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import '../../styles/topbar.css';
-export default function MessageDropdown({ sentByMe, deleteMessage, pinMessage }){
+export default function MessageDropdown({ sentByMe, deleteMessage }){
     return (
     <Dropdown className={(sentByMe) ? "msg-dropdown message-dropdown-sender light-hover" : "msg-dropdown message-dropdown-received light-hover"}  drop={(sentByMe) ? "left" : "right"} >              
       <Dropdown.Toggle 
@@ -30,6 +30,5 @@ export default function MessageDropdown({ sentByMe, deleteMessage, pinMessage })
 }
 MessageDropdown.propTypes = {
     sentByMe: PropTypes.bool, 
-    deleteMessage: PropTypes.func,
-    pinMessage: PropTypes.func
+    deleteMessage: PropTypes.func
 }

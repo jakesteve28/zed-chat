@@ -101,7 +101,6 @@ export class ChatGateway  {
             return null;
         }
     }
-
     /**
      * Handler for chatToServer, sent from the message sender.
      * Creates a message, adds it to the conversation, and emits the 'delivered' event to 
@@ -122,9 +121,8 @@ export class ChatGateway  {
                         console.log("Emitting delivered event to all users of conversation with ID " + room);
                         for(const user of conversation.users){
                             if(user.chatSocketId !== "disconnected"){
-                                this.wss.to(user.chatSocketId).emit('delivered', { message: message, from: user.tagName }, () => {
-                                    console.log(`Delivered event sent to user @${user.tagName}`)
-                                });
+                                this.wss.to(user.chatSocketId).emit('delivered', { message: message, from: user.tagName });
+                                console.log(`Delivered event sent to user @${user.tagName}`);
                             }
                         }
                     }
@@ -344,7 +342,7 @@ export class ChatGateway  {
     }
 
     @UseGuards(ChatGuard)
-    @SubscribeMessage('pinMessage')
+    @SubscribeMessage('saveMessage')
     async handlePinMsg(@ConnectedSocket() client: Socket, @MessageBody() data ) {
         try {
             //const socketId = client.id;
@@ -355,7 +353,7 @@ export class ChatGateway  {
                 if(Array.isArray(users)) {
                     for(const user of users) {
                         if(user.chatSocketId !== "disconnected") {
-                            this.wss.to(user.chatSocketId).emit("messagePinned", { message: message });
+                            this.wss.to(user.chatSocketId).emit("messageSaved", { message: message });
                             console.log("Successfully emitted messagePinned to all chat users"); 
                         }
                     }
@@ -368,6 +366,34 @@ export class ChatGateway  {
             const errorMsg = `Error: "messagePinned" event not sent | ${err} | with socket ${socketId}`;
             this.wss.to(socketId).emit("error", { msg: errorMsg });
             console.log(errorMsg);
+        } 
+    }
+    
+    @UseGuards(ChatGuard)
+    @SubscribeMessage('deleteMessage')
+    async handleDeleteMessage(@ConnectedSocket() client: Socket, @MessageBody() data ) {
+        try {
+            const user = await this.userService.findByChatSocketId(client.id);
+            if(!user) return false;
+            const message = await this.messageService.remove(data.messageId); 
+            if(message) {
+                const users = message.conversation.users; 
+                if(Array.isArray(users)) {
+                    for(const user of users) {
+                        if(user.chatSocketId !== "disconnected") {
+                            this.wss.to(user.chatSocketId).emit("messageDeleted", { message: message });
+                            console.log("Successfully emitted messageDeleted to all chat users"); 
+                        }
+                    }
+                }
+            } else {
+                throw "Delete message unknown server error";  
+            }
+        } catch(err) {
+            const socketId = client.id;
+            const errorMsg = `Error: "messageDeleted" event not sent | ${err} | with socket ${socketId}`;
+            this.wss.to(socketId).emit("error", { msg: errorMsg });
+            console.error(errorMsg);
         } 
     }
 }

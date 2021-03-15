@@ -8,6 +8,7 @@ import ScheduleIcon from '@material-ui/icons/Schedule';
 import { selectAccount } from '../../store/slices/accountSettingsSlice';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import Tooltip from '@material-ui/core/Tooltip';
+import { chatSocket } from '../socket/chatSocket';
 import '../../styles/listitems.css';
 import '../../styles/topbar.css';
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -33,12 +34,33 @@ export const getDateMetaData = (createdAt) => {
 export function MessageMe({ message, isBottom }) {
     const date = getDateMetaData(message.createdAt); 
     const [showMenu, setShowMenu] = useState(false);
-    const size = useWindowSize();
-    const pinMessage = () => {
-        alert('message pinned');
+    const [savingMessage, setSavingMessage] = useState(false);
+    const [deletingMessage, setDeletingMessage] = useState(false);
+    const saveMessage = () => {
+        if(savingMessage) { return; }
+        if(message.pinned === true) {
+            setSavingMessage(true);
+            console.log("Unsaving message...");
+            chatSocket.emit('saveMessage', { messageId: message.id }, () => console.log("Message unsave notification sent successfully"));
+            setSavingMessage(false);
+            dispatch();
+            return;
+        } else {
+            setSavingMessage(true);
+            console.log("Saving message...");
+            chatSocket.emit('saveMessage', { messageId: message.id }, () => console.log("Message save notification sent successfully"));
+            setSavingMessage(false);
+            dispatch();
+            return;
+        }
     }
     const deleteMessage = () => {
-        alert('message del');
+        if(deletingMessage) { return; }
+        setDeletingMessage(true);
+        console.log("Unsaving message...");
+        chatSocket.emit('unsaveMessage', { id: message.id }, () => console.log("Message unsave notification sent successfully"));
+        setDeletingMessage(false);
+        dispatch(removeMessage({ conversationId: message.conversation.id, messageId: message.id }));
     }
     return (
         <Container key={`${message.id}`} className="mt-2 mb-2 msg-me-container" fluid>
@@ -51,10 +73,10 @@ export function MessageMe({ message, isBottom }) {
                                     (showMenu) ? (
                                         <div className="message-tooltips">
                                             <Tooltip title="Delete Message">
-                                                <DeleteOutlineIcon className="delete-icon" onClick={() => alert("Deleting")}></DeleteOutlineIcon>
+                                                <DeleteOutlineIcon className="delete-icon" onClick={deleteMessage}></DeleteOutlineIcon>
                                             </Tooltip>                                
                                             <Tooltip title="Save Message (Max 10)">
-                                                <ScheduleIcon className="schedule-icon" onClick={() => alert("Pinning")}></ScheduleIcon>
+                                                <ScheduleIcon className="schedule-icon" onClick={saveMessage}></ScheduleIcon>
                                             </Tooltip>
                                         </div>
                                     ) : ``
@@ -89,30 +111,28 @@ export function MessageMe({ message, isBottom }) {
     ) 
 }
 
-//Component for a message from someone else
+//Component for a message from someone else...
+
+//Leftover pin message code... 
+// {
+//     (showMenu) ? (
+//         <div className="message-tooltips">                             
+//             <Tooltip title="Save Message (Max 10)">
+//                 <ScheduleIcon className="schedule-icon" onClick={() => saveMessage("Pinning")}></ScheduleIcon>
+//             </Tooltip>
+//         </div>
+//     ) : ``
+// }
 export function MessageOther({ message }) {
     const date = getDateMetaData(message.createdAt); 
-    const [showMenu, setShowMenu] = useState(false);
-    const pinMessage = () => {
-        alert('message pinned');
-    }
     return (
         <Container key={`${message.id}`} className="mt-2 mb-2 p-1 msg-otro-container" fluid>
-            <Row onMouseLeave={() => setShowMenu(false) }>
+            <Row>
                 <Col xs="12">
                     <Container fluid>
                         <Row className="text-left">
                             <span className="message-span-other">
-                                <Typography onMouseEnter={() => setShowMenu(true)} className="p-2 m-1 text-white text-left message-from-other message-column">{message.body}</Typography>
-                                {
-                                    (showMenu) ? (
-                                        <div className="message-tooltips">                             
-                                            <Tooltip title="Save Message (Max 10)">
-                                                <ScheduleIcon className="schedule-icon" onClick={() => pinMessage("Pinning")}></ScheduleIcon>
-                                            </Tooltip>
-                                        </div>
-                                    ) : ``
-                                }
+                                <Typography className="p-2 m-1 text-white text-left message-from-other message-column">{message.body}</Typography>
                             </span>
                         </Row>
                     </Container>

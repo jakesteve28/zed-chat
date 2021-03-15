@@ -22,7 +22,6 @@ import 'react-pro-sidebar/dist/css/styles.css';
 import { AnimatedSwitch } from 'react-router-transition';
 import './styles/App.css';
 import './styles/index.css';
-
 export default function App() {
   const account = useSelector(selectAccount);
   const dispatch = useDispatch(); 

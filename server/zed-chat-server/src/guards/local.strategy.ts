@@ -10,7 +10,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       usernameField: 'tagName'
     });
   }
-
+  /**
+   * This guard is only called when login is called. 
+   * It fetches everything the user needs (friend requests, invites, all),
+   * and attaches it to the req.user object
+   * @param tagName The tagname of the user trying to login
+   * @param password The pw of the user
+   */
   async validate(tagName: string, password: string): Promise<any> {
     const user = await this.authService.validateUser(tagName, password);
     if (!user) {

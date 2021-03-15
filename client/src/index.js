@@ -9,6 +9,7 @@ import TopBar from './components/topbar/TopBar';
 import NotificationSocket from './components/socket/notificationSocket';
 import { selectBackground } from './store/slices/uiSlice';
 import Zodd from './assets/zodd.jpg';
+import { ToastContainer } from 'react-toastify';
 
 const Wrapper = () => {
   return (
@@ -35,6 +36,7 @@ const AppWrapper = () => {
   }, [])
   return (
     <div className="base-div" style={style}>
+    <ToastContainer />
       <Router basename='/client/'>
         <Suspense fallback={null}>
           <TopBar />

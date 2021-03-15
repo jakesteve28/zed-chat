@@ -13,7 +13,7 @@ export default function FriendCheckBoxListItem({ tagName, onCheck }){
         onCheck(tagName, checked);
     }, [checked]);
     return (
-        <Row className="p-2" onClick={() => check()} className={(checked) ? "friend-button-checked" : "friend-button"}>
+        <Row onClick={() => check()} className={(checked) ? "p-2 friend-button-checked" : "p-2 friend-button"}>
             <Col className="checkbox-column">
                 <DoneIcon className={(checked) ? "friend-button-icon-checked" : "friend-button-icon"}></DoneIcon>
             </Col>

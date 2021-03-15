@@ -1,19 +1,24 @@
 
-import { User } from './user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne  } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn  } from 'typeorm';
 
 @Entity()  
 export class FriendRequest {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToOne(type => User, sender => sender.friendRequests, { eager: true })
-  sender: User
+  @Column()
+  senderTagname: string;
+
+  @Column()
+  recipientTagname: string;
+
+  @Column()
+  senderId: string;
 
   @Column()
   recipientId: string;
 
-  @Column({ default: false})
+  @Column({ default: false })
   accepted: boolean;
 
   @Column({ default: false })
@@ -21,7 +26,4 @@ export class FriendRequest {
 
   @CreateDateColumn()
   createdAt: string;
-
-  @Column()
-  recipientTagname: string;
 }

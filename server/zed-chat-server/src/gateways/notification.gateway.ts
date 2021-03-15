@@ -150,9 +150,83 @@ export class NotificationsGateway  {
             return false;
         }
     }
+    
+    /**
+     * Responsible for marking an invite as declined and dispatching the declined invite to the sender and recipient
+     * @param client 
+     * @param data { inviteId: string }
+     */
+    @UseGuards(NotificationGuard)
+    @SubscribeMessage('declineInvite')
+    async handleDeclineInvite(@ConnectedSocket() client: Socket, @MessageBody() data) {
+        try {
+            const socketId = client.id; 
+            const { inviteId } = data;
+            const [invite, sender, recipient] = await this.inviteService.cancelInvite(inviteId); 
+            console.log("Successfully marked invite as cancelled with ID", inviteId); 
+            if(invite.cancelled) {
+                if(sender.notificationSocketId === socketId) {
+                    if(recipient.notificationSocketId !== 'disconnected') {
+                        console.log("Emitting inviteDeclined event to invite recipient user @" + recipient.tagName); 
+                        this.wss.to(recipient.notificationSocketId).emit('inviteDeclined', { inviteId: inviteId }); 
+                    } 
+                    console.log("Emitting inviteDeclined event to invite sender user @" + sender.tagName); 
+                    this.wss.to(socketId).emit('inviteDeclined', { inviteId: inviteId });
+                } else if(recipient.notificationSocketId === socketId) {
+                    if(sender.notificationSocketId !== 'disconnected') {
+                        console.log("Emitting inviteDeclined event to invite sender user @" + sender.tagName); 
+                        this.wss.to(sender.notificationSocketId).emit('inviteDeclined', { inviteId: inviteId }); 
+                    }
+                    console.log("Emitting inviteDeclined event to invite recipient user @" + recipient.tagName); 
+                    this.wss.to(socketId).emit('inviteDeclined', { inviteId: inviteId });
+                }
+            }
+        } catch(err) {
+            console.error("Error: Cannot mark invite as declined. ", err);
+            return null;
+        }
+    }
 
     /**
-     * This function handles the accept invite event emitted from a client, particularly the recipient of an
+     * Responsible for deleting an invite and letting the client know it's been deleted
+     * @param client 
+     * @param data { inviteId: string }
+     */
+     @UseGuards(NotificationGuard)
+     @SubscribeMessage('deleteInvite')
+     async handleDeleteInvite(@ConnectedSocket() client: Socket, @MessageBody() data) {
+         try {
+             const socketId = client.id; 
+             const { inviteId } = data;
+             if(await this.inviteService.deleteInvite(inviteId) === true) {
+                console.log("Successfully marked invite as cancelled with ID", inviteId); 
+                this.wss.to(socketId).emit('inviteDeleted', { inviteId: inviteId }); 
+                return true;
+             } else { 
+                 console.error("Error while deleting invite");
+                 return null;
+             }
+         } catch(err) {
+             console.error("Error: Cannot mark invite as declined. ", err);
+             return null;
+         }
+     }
+
+    @UseGuards(NotificationGuard)
+    @SubscribeMessage('deleteConversation')
+    async handleDeleteConversation(@ConnectedSocket() client: Socket, @MessageBody() data) {
+        const { conversationId } = data; 
+        console.log("Deleting conversation with ID " + conversationId); 
+        try {
+            const truth = await this.conversationService.remove(conversationId); 
+            return truth; 
+        } catch(err) {
+            console.error(`Error while deleting conversation with id ${conversationId} | ${err}`);
+            return false;
+        }
+    }
+    /**
+     * This function handles the accept invite event emitted from a client, partiDElarly the recipient of an
      * invite request who sends this notification to let his their friend know that they're accepted
      * @param client 
      * @param data { inviteId: string, conversationId: string }
@@ -216,12 +290,14 @@ export class NotificationsGateway  {
             const recipient = await this.userService.findByTagName(msg.recipientId);
             if(!sender) throw "Sender does not exist"; 
             if(!recipient) throw "Recipient does not exist";
-            const friendRequest = await this.friendRequestService.create(sender.id, recipient.id);
+            const friendRequest = await this.friendRequestService.create(sender, recipient);
             if(friendRequest) {  
-                if(recipient.notificationSocketId !== 'disconnected')
-                    this.wss.to(recipient.notificationSocketId).emit('friendRequestSent', { friendRequest: friendRequest });                       
+                if(recipient.notificationSocketId !== 'disconnected'){
+                    this.wss.to(recipient.notificationSocketId).emit('friendRequestSent', { friendRequest: friendRequest }); 
+                    console.log(`Emmitted friend request sent to @${recipient.tagName} successfully`);
+                }                      
                 this.wss.to(socketId).emit('friendRequestSent', { friendRequest: friendRequest });                       
-                console.log(`Emmitted friend request to @${recipient.tagName} successfully`);
+                console.log(`Emmitted friend request sent to @${sender.tagName} successfully`);
                 return `Emmitted friend request to @${recipient.tagName} successfully`;
             }
             throw "Cannot send friend request server error";
@@ -246,7 +322,7 @@ export class NotificationsGateway  {
             const socketId = client.id;
             const { friendRequestId } = data;
             const friendRequest = await this.friendRequestService.declineFriendRequest(friendRequestId);
-            const sender = await this.userService.findOne(friendRequest.sender.id);
+            const sender = await this.userService.findOne(friendRequest.senderId);
             const recipient = await this.userService.findOne(friendRequest.recipientId);
             if(friendRequest && friendRequest.cancelled === true){     
                 if(sender.notificationSocketId !== 'disconnected'){
@@ -280,13 +356,13 @@ export class NotificationsGateway  {
             const socketId = client.id;
             const friendRequest = await this.friendRequestService.acceptFriendRequest(friendRequestId);
             const acceptorProfile = await this.userService.findOne(friendRequest.recipientId);
-            const sender = await this.userService.findByTagName(friendRequest.sender.tagName);
+            const sender = await this.userService.findOne(friendRequest.senderId);
             if(friendRequest){   
                 if(sender.notificationSocketId !== 'disconnected'){
-                    this.wss.to(sender.notificationSocketId).emit('friendAdded', { friendRequest: friendRequest, acceptor: acceptorProfile });
+                    this.wss.to(sender.notificationSocketId).emit('friendAdded', { friendRequest: friendRequest, acceptor: acceptorProfile, sender: sender });
                     console.log("Emitted friend added event to friend request ID | " + friendRequest.recipientId + " | sender successfully");
                 }         
-                this.wss.to(socketId).emit('friendAdded', { friendRequest: friendRequest, acceptor: acceptorProfile} );
+                this.wss.to(socketId).emit('friendAdded', { friendRequest: friendRequest, acceptor: acceptorProfile, sender: sender} );
                 console.log("Emitted friend added event to friend request ID | " + friendRequest.recipientId + " | recipient successfully");
             }
         } catch(err) {
@@ -307,8 +383,8 @@ export class NotificationsGateway  {
     @SubscribeMessage("removeFriend")
     async handleRemoveFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() data): Promise<string | boolean> {
         try {
-            const { userId, exFriendId } = data;
-            const [user, exFriend] = await this.userService.removeFriends(userId, exFriendId);
+            const { senderId, tagName } = data;
+            const [user, exFriend] = await this.userService.removeFriends(senderId, tagName);
             const socketId = client.id;
             if(user && exFriend && user.friends && exFriend.friends){
                 if(exFriend.notificationSocketId !== 'disconnected'){

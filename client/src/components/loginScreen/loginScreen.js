@@ -20,12 +20,14 @@ import { addFriend,
   addFriendRequest 
 } from '../../store/slices/friendsSlice';
 import {
-  setTopbarMessage
+  setTopbarMessage,
+  setBackground
 } from '../../store/slices/uiSlice';
 import {
   setRefreshExpire
 } from '../../store/store';
 import regex from '../../util/regex';
+import zodd from '../../assets/zodd.jpg';
 import '../../styles/loginscreen.css';
 
 const loginServer = async (username, password) => {
@@ -52,8 +54,8 @@ const loginServer = async (username, password) => {
     if(refreshToken === true) {
        console.log("Refresh token successfully set and will timeout in 15 mins or " + Date.now() + 900000);
     }
-    console.log("Successfully logging in user", user.tagName); 
-    return { user, id, invites, refreshToken };
+    console.log("Successfully logging in user", user.user.tagName); 
+    return { user: user.user, id, invites, refreshToken };
   } catch(err) {
     console.log("Error: Unable to login. Please refresh.", err);
     return false;
@@ -95,7 +97,6 @@ function LoginScreen() {
   useEffect(async () => {
     try {
       if(loggingInCookie === false){
-        setLoggingInCookie(true);
         const refreshResult = await fetch("http://localhost:3000/api/auth/refreshAccount", {
           credentials: "include"
         });
@@ -105,9 +106,10 @@ function LoginScreen() {
            // console.log(res);
             console.log("No valid refresh token. User must login");
             setAllowLogin(true);
-            setSpinning(false); 
-            setLoggingInCookie(false);
-          } 
+            // setSpinning(false); 
+            // setLoggingInCookie(false);
+          }         
+          setLoggingInCookie(true);
           const  { id, user, invites, refreshToken } = res;
           if(refreshToken === true) dispatch(setRefreshExpire(Date.now() + 875000)); 
           if(false === validateAccountDetails(id, user, invites)){
@@ -145,6 +147,7 @@ function LoginScreen() {
 
   useEffect(() => {
       dispatch(setTopbarMessage(""));
+      dispatch(setBackground(zodd));
   }, []);
 
   const submit = async () => {
@@ -191,9 +194,7 @@ function LoginScreen() {
     }); 
     if(user.friendRequests && Array.isArray(user?.friendRequests)){   
       for(let request of user?.friendRequests){
-        if(request?.recipientId === user?.id){   
-          dispatch(addFriendRequest(request))
-        } 
+          dispatch(addFriendRequest(request));
       }
     }
     if(invites && Array.isArray(invites)){
@@ -211,7 +212,7 @@ function LoginScreen() {
       <Row className="p-3 mt-5 text-white lead text-center">
         <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow login-screen-column"> 
           <h2 className="text-white welcome-text" >Welcome to <span className="text-danger">Project Zodd</span></h2>
-          <h6 className="text-muted welcome-subtext">Powered by demons and monsters >:)</h6>
+          <h6 className="text-muted welcome-subtext">Protected and powered by daemons</h6>
             {
               (loggingInCookie) 
                 ? (

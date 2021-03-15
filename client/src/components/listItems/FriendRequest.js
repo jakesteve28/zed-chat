@@ -1,5 +1,5 @@
-import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Row, Col, Button, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import GroupAddOutlinedIcon from '@material-ui/icons/GroupAddOutlined';
@@ -12,14 +12,42 @@ import '../../styles/topbar.css';
 
 export function FriendRequestListItem({ requestId, tagName }){
     const account = useSelector(selectAccount);
+    const [spinning, setSpinning] = useState(false); 
+    const [deleteSpinning, setDeleteSpinning] = useState(false); 
     const acceptFriendRequest = () => {
-        if(notificationSocket){
-            console.log("Emitted acceptFriendRequest");
-            notificationSocket.emit("acceptFriendRequest", {
-                friendRequestId: requestId 
-            }, () => {
-                console.log("Successfully emitted accept friend request");
-            });
+        try {
+            if(spinning) return; 
+            setSpinning(true);
+            if(notificationSocket){
+                console.log("Emitting acceptFriendRequest notification");
+                notificationSocket.emit("acceptFriendRequest", {
+                    friendRequestId: requestId 
+                }, () => {
+                    console.log("Successfully emitted accept friend request.");
+                });
+            }
+            setSpinning(false);
+        } catch (err) {
+            console.error(`Error while sending accept friend request notification to server | ${err.message}`);
+            setSpinning(false);
+        }
+    }
+    const declineFriendRequest = () => {
+        try {
+            if(deleteSpinning) return; 
+            setDeleteSpinning(true);
+            if(notificationSocket){
+                console.log("Emitting declineFriendRequest notification");
+                notificationSocket.emit("declineFriendRequest", {
+                    friendRequestId: requestId 
+                }, () => {
+                    console.log("Successfully emitted decline friend request.");
+                });
+            }
+            setDeleteSpinning(false);
+        } catch (err) {
+            console.error(`Error while sending decline friend request notification to server | ${err.message}`);
+            setDeleteSpinning(false);
         }
     }
     return (tagName === account.tagName) ? "" : (
@@ -28,16 +56,30 @@ export function FriendRequestListItem({ requestId, tagName }){
                 Friend request from @{tagName}
             </Col>
             <Col xs="5" className="text-center p-2 opaque">
-                <Button className="button-bg mb-1 rounded-pill friend-request-button clearish" onClick={() => { acceptFriendRequest() }}>
-                    <Tooltip title="Accept">
-                        <GroupAddOutlinedIcon></GroupAddOutlinedIcon>
-                    </Tooltip>
-                </Button> 
-                <Button className="button-bg rounded-pill friend-request-button text-danger clearish" onClick={() => alert("Decline friend request")}>
-                    <Tooltip title="Decline">
-                        <NotInterestedOutlinedIcon></NotInterestedOutlinedIcon>
-                    </Tooltip>
-                </Button>
+            {
+                (spinning) ? 
+                    <Spinner variant="success" size="sm" animation="border"></Spinner>
+                : 
+                (  
+                    <Button className="button-bg mb-1 rounded-pill friend-request-button clearish" onClick={() => acceptFriendRequest()}>
+                        <Tooltip title="Accept">
+                            <GroupAddOutlinedIcon></GroupAddOutlinedIcon>
+                        </Tooltip>
+                    </Button> 
+                )
+            }
+            {
+                (deleteSpinning) ? 
+                    <Spinner variant="danger" size="sm" animation="border"></Spinner>
+                : 
+                (
+                    <Button className="button-bg rounded-pill friend-request-button text-danger clearish" onClick={() => declineFriendRequest()}>
+                        <Tooltip title="Decline">
+                            <NotInterestedOutlinedIcon></NotInterestedOutlinedIcon>
+                        </Tooltip>
+                    </Button>
+                )
+            }         
             </Col> 
         </Row>
     )

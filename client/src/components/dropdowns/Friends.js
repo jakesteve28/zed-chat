@@ -62,6 +62,10 @@ export default function FriendsDropdown(){
         passing = false;
         errorMsgs.current.push("Friend already exists");
       }
+      if(account.tagName === addFriendInput) {
+        passing = false; 
+        errorMsgs.current.push("Cannot add self");
+      }
       if(!passing) setError(true);
       return passing;
     }

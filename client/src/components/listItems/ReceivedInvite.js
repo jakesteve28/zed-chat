@@ -1,33 +1,64 @@
-import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Row, Col, Button, Spinner } from 'react-bootstrap'; 
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Tooltip } from '@material-ui/core';
+import InsertCommentIcon from '@material-ui/icons/InsertComment';
+import NotInterestedIcon from '@material-ui/icons/NotInterested';
+import { removeReceivedInvite } from '../../store/slices/inviteSlice';
 import { notificationSocket } from '../socket/notificationSocket';
 import '../../styles/listitems.css';
 import '../../styles/topbar.css';
-export function ReceivedInviteListItem({ sender, inviteId, convId }) {
+
+export function ReceivedInviteListItem({ senderTagname, inviteId, convId }) {
+    const [accepting, setAccepting] = useState(false); 
+    const [declining, setDeclining] = useState(false);
+    const dispatch = useDispatch(); 
     const sendAccept = () => {
+        setDeclining(true);
+        setAccepting(true); 
         if(notificationSocket){
             console.log(`Attempting to emit acceptInvite event to server for invite with id ${inviteId}`)
-            notificationSocket.emit('acceptInvite', { inviteId: inviteId, conversationId: convId}, () => {
+            notificationSocket.emit('acceptInvite', { inviteId: inviteId, conversationId: convId }, () => {
                 console.log(`Successfully emitted acceptInvite event to server for invite with id ${inviteId}`)
             });
         }
+        setAccepting(false);
+    }
+    const declineInvite = () => {
+        setDeclining(true);
+        setAccepting(true); 
+        console.log("Declining invite with ID", inviteId);
+        if(notificationSocket) {
+            console.log(`Attempting to emit declineInvite event to server for invite with id ${inviteId}`);
+            notificationSocket.emit('declineInvite', { inviteId: inviteId }, () => {
+                console.log("Successfully emitted decline invite event to server"); 
+                dispatch(removeReceivedInvite(inviteId)); 
+            }); 
+        }
     }
     return (
-        <Row className="p-3 invite-hover">
-            <Col className="text-small text-muted text-center my-auto opaque">
-                Chat with {`${sender}`.length > 10 ? `${sender}`.substring(0,7) + '...' : `${sender}` }
+        <Row className="p-3 accepted-list-item">
+            <Col className="text-small text-center my-auto opaque">
+                Invite to chat from @{`${senderTagname}`}
             </Col>
-
-            <Col xs="5" className="text-center opaque">
-                <Button  className="btn-sm mb-1 rounded-pill received-invite-button" onClick={() => { sendAccept() }}>Accept</Button> 
-                <Button className="btn-sm rounded-pill received-invite-button-decline">Decline</Button>
+            <Col xs="5" className="text-center pr-2 opaque">
+                <Tooltip title="Accept Invite">
+                    {
+                        (accepting) ? <Spinner size="sm" variant="secondary" /> : <Button  className="received-invite-button" onClick={() => { sendAccept() }}><InsertCommentIcon /></Button> 
+                    }
+                </Tooltip>
+                <Tooltip title="Decline Invite">
+                    {
+                        (declining) ? <Spinner size="sm" variant="danger" /> : <Button onClick={() => declineInvite()} className="btn-sm mb-1 rounded-pill button-bg delete-invite-button"><NotInterestedIcon /></Button> 
+                    }
+                </Tooltip>
             </Col>  
         </Row>
     )
 }
 ReceivedInviteListItem.propTypes = {
-    sender: PropTypes.string, 
+    senderTagname: PropTypes.string,
     inviteId: PropTypes.string, 
     convId: PropTypes.string
 }

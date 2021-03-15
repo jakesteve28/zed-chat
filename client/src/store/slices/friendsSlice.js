@@ -19,16 +19,16 @@ export const friendsSlice = createSlice({
         state.friends = [...state.friends, action.payload]
     },
     removeFriend: (state, action) => {
-        state.friends = state.friends.filter(el => el.id !== action.payload)
+        state.friends = state.friends.filter(el => el.id !== action.payload);
     },
     addFriendRequest: (state, action) => {
         if(state.friendRequests.filter(req => req.id === action.payload.id).length > 0){
           return;
         }
-        state.friendRequests = [...state.friendRequests, action.payload]
+        state.friendRequests = [...state.friendRequests, action.payload];
     },
     removeFriendRequest: (state, action) => {
-        state.friendRequests = state.friendRequests.filter(el => el.id !== action.payload)
+        state.friendRequests = state.friendRequests.filter(el => el.id !== action.payload);
     },
     declineRequest: (state, action) => {
       const request = state.friendRequests.filter(el => el.id === action.payload)[0];
@@ -36,14 +36,21 @@ export const friendsSlice = createSlice({
         request.cancelled = true;
     },
     acceptRequest: (state, action) => {
-      const request = state.friendRequests.filter(el => el.id === action.payload)[0];
-      if(request)
-        request.accepted = true;
+      const index = state.friendRequests.findIndex(frreq => frreq.id === action.payload);
+      if(index !== -1) {
+        state.friendRequests[index].accepted = true;
+      }
+    },
+    updateFriend: (state, action) => {
+      const index = state.friends.findIndex(fr => fr.id === action.payload.friend.id); 
+      if(index !== -1) {
+        state.friends[index] = action.payload.friend;
+      }
     }
   }
 });
 
-export const { clearFriends, addFriend, removeFriend, addFriendRequest, removeFriendRequest, declineRequest, acceptRequest } = friendsSlice.actions;
+export const { updateFriend, clearFriends, addFriend, removeFriend, addFriendRequest, removeFriendRequest, declineRequest, acceptRequest } = friendsSlice.actions;
 
 // // The function below is called a thunk and allows us to perform async logic. It
 // // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This

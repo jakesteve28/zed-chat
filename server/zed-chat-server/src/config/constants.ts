@@ -1,3 +1,9 @@
+/*
+    2021 Jacob Stevens 
+    I'm keeping some of my configuration options here for development purposes. 
+    I will be using .dev.env and .prod.env after a config service integration, rendering this file obsolete soon. 
+*/
+
 import { TypeOrmModuleOptions } from "@nestjs/typeorm"
 
 export const jwtConstants = {

@@ -46,11 +46,13 @@
 .set-pw-button {
     max-width: 300px;
     width: stretch;
-    min-width: 200px;
+    min-width: 300px;
     min-height: 100px;
     outline: none !important;
     border: none !important;
-    font-size: 19pt;
+    font-size: 22pt;
+    font-weight: bold;
+    display: inline; 
 }
 .select-friend-search {
     text-align: left;
@@ -112,8 +114,8 @@
     /* background-color: #191919; */
 }
 .chat-edit-icon {
-    height: 75px;
-    width: 75px;
+    height: 30px !important;
+    width: 30px !important;
 }
 .edit-chat-row {
 }

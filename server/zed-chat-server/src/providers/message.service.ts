@@ -21,9 +21,10 @@ export class MessageService {
         message.conversation = await this.conversationService.incrementNumberMessages(conversation.id);
         return this.messageRepository.save(message);
     }
-    async remove(messageId: string): Promise<string> {
+    async remove(messageId: string): Promise<Message> {
+        const msg = await this.messageRepository.findOne(messageId);
         await this.messageRepository.delete(messageId);
-        return `Message removed successfully ID: ${messageId}`
+        return msg;
     }
     async setRead(messageId: string): Promise<Message> {
         const message = await this.messageRepository.findOne(messageId);

@@ -1,37 +1,28 @@
-import React, {useEffect, useState } from 'react';
+import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import { selectConversations } from '../../store/slices/conversationsSlice';
+import { useDispatch } from 'react-redux'; 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
+import { notificationSocket } from '../socket/notificationSocket';
 import '../../styles/listitems.css';
 import '../../styles/topbar.css';
-export function AcceptedInviteListItem({ sender }){
-    const conversations = useSelector(selectConversations);
-    const [tag, setTag] = useState("");
-    useEffect(() => {
-        let friend;
-        if(conversations && Array.isArray(conversations)) {
-            for(let conv of conversations){
-                for(let user of conv.users){
-                    if(user.id === sender){
-                        friend = JSON.parse(JSON.stringify(user));
-                        break;
-                    }
-                }
-            }
-        }
-        if(friend.tagName)
-            setTag(friend.tagName);
-    }, []);
+import { removeAcceptedInvite } from '../../store/slices/inviteSlice';
+export function AcceptedInviteListItem({ senderTagname, inviteId }){
+    const dispatch = useDispatch();
     const deleteItem = () => {
-        alert("Todo")
+        if(notificationSocket) {
+            console.log(`Emitting delete accepted invite to server for invite with ID ${inviteId}`);
+            notificationSocket.emit('deleteInvite', { inviteId: inviteId }, () => {
+                console.log("Successfully emitted deleteInvite event to server. Now deleting invite from store.");
+                dispatch(removeAcceptedInvite(inviteId)); 
+            });
+        }
     }
     return (
         <Row className="p-3 accepted-list-item">
             <Col className="text-small text-center my-auto opaque">
-                Chat with {`${tag}`.length > 10 ? `${tag}`.substring(0,7) + "..." : `${tag}`}
+                Invite to chat from @{`${senderTagname}`}
             </Col>
             <Col xs="5" className="text-center pr-2 opaque">
                 <Button onClick={() => deleteItem()} className="btn-sm mb-1 rounded-pill button-bg delete-invite-button">
@@ -44,5 +35,6 @@ export function AcceptedInviteListItem({ sender }){
     )
 }
 AcceptedInviteListItem.propTypes = {
-    sender: PropTypes.string
+    senderTagname: PropTypes.string,
+    inviteId: PropTypes.string
 }

@@ -51,9 +51,8 @@ export default function ChangeTagname({ logoutAccount }) {
                             placeholder="Enter desired Tagname"
                             aria-label="Enter desired Tagname"
                             aria-describedby="basic-addon1"
-                            className={(tagNameError) ? "change-tagname-input error-placeholder" : "change-tagname-input"}
+                            className={(tagNameError) ? "change-tagname-input error-placeholder change-tagname-form" : "change-tagname-input change-tagname-form"}
                             onChange={(e) => { setNewTagname(e.target.value) }}
-                            className="change-tagname-form"
                           />
                         </InputGroup>
                     </Col>

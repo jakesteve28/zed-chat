@@ -9,10 +9,11 @@ import {
     selectCurrentConversation,
     setTyping,
     setRead,
-    pinMessage
+    saveMessage
 } from '../../store/slices/conversationsSlice';
 import {
-    selectFriends
+    selectFriends,
+    updateFriend
 } from '../../store/slices/friendsSlice';
 import {  toast } from 'react-toastify';
 let chatSocket = null;
@@ -32,8 +33,7 @@ const socketEvents = {
         setCurrentConversationError: "setCurrentConversationError",
         refreshSuccess: "refreshSuccess",
         refreshError: "refreshError",
-        messagePinned: "messagePinned",
-        messagePinnedError: "messagePinnedError"
+        messageSaved: "messageSaved",
     },
     sent: {
         connect: "connect",
@@ -44,7 +44,7 @@ const socketEvents = {
         listen: "listen",
         unlisten: "unlisten",
         setCurrentConversation: "setCurrentConversation",
-        pinMessage: "pinMessage"
+        saveMessage: "saveMessage"
     }
 }
 
@@ -157,11 +157,15 @@ export default function ChatSocket(){
             chatSocket.on(socketEvents.received.currentConversationUpdate, (msg) => {
                 console.log(`Handle current conversation update event for user | ${msg.user.tagName}`);
                 if(msg.user){
-                    let friend = friends.filter(el => el.id === msg.user.id)[0];
-                    if(friend){
+                    const index = friends.findIndex(fr => fr.id === msg.user.id); 
+                    if(index !== -1) {
+                        friend = friends[index];
                         console.log(`Handle set current conversation for friend @${msg.user.tagName}`);
-                        friend = msg.user;
+                        dispatch(updateFriend({ friend }));
                     }
+                    else { 
+                        console.error("Error while updating current conversation for friend"); 
+                    }               
                 }
             });
             chatSocket.on(socketEvents.received.setCurrentConversationError, (msg) => {
@@ -173,12 +177,13 @@ export default function ChatSocket(){
             chatSocket.on(socketEvents.received.refreshError, (msg) => {
                 console.log(`Handle error for refresh socket client ID with server error ${msg.msg}`);
             });
-            chatSocket.on(socketEvents.received.messagePinned, data => {
-                console.log("Handle message pinned from server", data); 
-                dispatch(pinMessage(data.message)); 
+            chatSocket.on(socketEvents.received.messageSaved, data => {
+                console.log("Handle message saved from server", data); 
+                dispatch(saveMessage(data.message)); 
             });
-            chatSocket.on(socketEvents.received.messagePinnedError, data => {
-                console.log("Handle message pinned error from server", data); 
+            chatSocket.on(socketEvents.received.messageDeleted, data => {
+                console.log("Handle message deleted from server", data); 
+                dispatch(removeMessage({ conversationId: data.message.conversation.id, messageId: data.message.id })); 
             });
             listenAllRooms(chatSocket);
             chatSocket.emit('refresh', { userId: account.id, refresh: true });

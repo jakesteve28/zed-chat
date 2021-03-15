@@ -23,9 +23,9 @@ export class Conversation {
   @CreateDateColumn()
     createdAt: string;
 
-  @ManyToMany(type => User, user => user.conversations, { eager: true })
+  @ManyToMany(type => User, user => user.conversations, { eager: true, onDelete: 'SET NULL' })
     users: User[];
 
-  @OneToMany(type  => Message, message => message.conversation)
+  @OneToMany(type  => Message, message => message.conversation, { onDelete: 'CASCADE' })
     messages: Message[];
 }

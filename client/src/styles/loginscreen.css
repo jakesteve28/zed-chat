@@ -33,8 +33,13 @@ input:-webkit-autofill:active {
 input:focus {
     box-shadow: #101010 5px 5px !important;
 }
-.button-outline-black:active {
-    border: none !important;
+.button-outline-black:active,
+.button-outline-black:hover,
+.button-outline-black:focus,
+.button-outline-black:focus-visible {
+    border: none;
+    outline: none; 
+    background-color: #191919;
 }
 .button-outline-black {
     color: #EEEEEE;
@@ -71,18 +76,31 @@ input:focus {
     outline: none; 
     background-color: #404040;
 }
+.login-screen-form:hover, 
+.login-screen-form:active, 
+.login-screen-form:focus,
+.login-screen-form:focus-visible {
+    background-color: #454545;
+    color: #EEEEEE;
+}
 .login-link-button {
     text-decoration: none;
     color: #EEEEEE;
 }
+.login-link-button:hover,
+.login-link-button:active,
+.login-link-button:focus,
+.login-link-button:focus-visible {
+    text-decoration: none;
+    color: #AAAAAA;
+}
 .login-button {
-    /* style={{ opacity: 0.8, maxWidth: '200px', marginTop: "20px" }} */
     opacity: 0.8; 
     max-width: 200px;
     margin-top: 10px;
     outline: none;
     border: none;
-    font-size: 20pt;
+    font-size: 35pt;
     padding: 25px;
 
 }

@@ -2,7 +2,6 @@
   border-radius: 20px !important;
   background-color: #191919 !important; 
   border: 1px solid #191919 !important;
-  box-shadow: 3px 3px 2px 2px black !important;
   min-width: 325px;
   padding: 20px !important;
 }
@@ -164,6 +163,7 @@
 .start-chat-button {
   opacity: 0.8;
   box-shadow: 2px 2px 5px 5px #121212;
+  font-weight: bold;
 }
 .back-button-topbar {
   background-color: #191919; 

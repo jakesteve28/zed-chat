@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
-import { makeStyles } from '@material-ui/core/styles';
 import useWindowSize from '../../util/windowSize'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -22,6 +21,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { chatSocket } from '../socket/chatSocket';
 import ChatListItem from '../listItems/Chat'; 
 import regex from '../../util/regex';
+import { notificationSocket } from '../socket/notificationSocket';
 import "../../styles/sidebar.css";
 
 export default function Sidebar(){
@@ -95,10 +95,14 @@ export default function Sidebar(){
 
     const deleteConversation = (convId) => {
         console.log("Deleting Conversation " + convId);
+        if(notificationSocket) {
+            notificationSocket.emit('deleteConversation', { conversationId: convId }, () => {
+                console.log("Successfully emitted deleteConversation event with ID " + convId);
+            }); 
+        }
         if(currentConversation && (currentConversation.id === convId)){
+            history.push('/newConversation'); 
             dispatch(setShowConvList(true)); 
-            dispatch(setTopbarMessage(""));
-            setDeleted(true);
         }
         dispatch(removeConversation({ id: convId }));
     }

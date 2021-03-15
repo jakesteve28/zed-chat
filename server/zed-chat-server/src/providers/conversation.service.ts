@@ -9,6 +9,7 @@ import { User } from '../entities/user.entity';
 
 @Injectable()
 export class ConversationService {
+    
     constructor(
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
@@ -46,15 +47,15 @@ export class ConversationService {
     }
     async remove(id: string): Promise<string> {
         await this.conversationRepository.delete(id);
-        return `Conversation removed successfully ID: ${id}`
+        return `Conversation removed successfully ID: ${id}`;
+    }
+    async cancel(conversationId: string) {
+        return this.conversationRepository.delete(conversationId); 
     }
     async addUser(conversationId: string, userTagName: string): Promise<Conversation>{
         const conversation = await this.conversationRepository.findOne(conversationId, { relations: ["users", "messages"] });
         const user = await this.userService.findByTagName(userTagName);
         conversation.users = [...conversation.users, user];
-        let str = ``
-        for(const user of conversation.users) str += `@${user.tagName} `
-        conversation.conversationName = `Chat with ${str}`
         return this.conversationRepository.save(conversation);
     }
     async removeUser(conversationId: string, userTagName: string): Promise<Conversation>{
@@ -77,12 +78,15 @@ export class ConversationService {
         }
         return conv.users;
     }
-    async getMessagesTruncated(conversationId: string): Promise<Message[]> {
+    async getMessagesTruncated(userId: string, conversationId: string): Promise<Message[]> {
         const conversation = await this.conversationRepository.findOne({ where: {
             id: conversationId
         }, relations: ["messages"]});
         if(!conversation) {
             return [];
+        }
+        if(!conversation.users.some(user => user.id === userId)){
+            return null;
         }
         if(conversation.messages.length > 1){
             conversation.messages.sort((a, b) =>  Date.parse(b.createdAt) - Date.parse(a.createdAt));

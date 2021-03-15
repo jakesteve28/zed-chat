@@ -48,6 +48,15 @@ export const conversationsSlice = createSlice({
                     if(conv.numberOfMessages < conv.messages.length) {
                         conv.numberOfMessages = conv.messages.length;
                     }
+                    if(conv.id === state.currentConversation.id) {
+                        if(!Array.isArray(state.currentConversation.messages) || !state.currentConversation.messages) {
+                            state.currentConversation.messages = []
+                        } 
+                        state.currentConversation.messages.push(action.payload.message);
+                        if(state.currentConversation.numberOfMessages <  state.currentConversation.messages.length) {
+                            state.currentConversation.numberOfMessages =  state.currentConversation.messages.length;
+                        }
+                    }
                     break; 
                 }
                 if(conv.messages.filter(msg => msg.id === action.payload.message.id).length > 0) {
@@ -111,7 +120,7 @@ export const conversationsSlice = createSlice({
         if(state.currentConversation.messages.length > 1) 
             state.currentConversation.messages.sort((a, b) =>  Date.parse(a.createdAt) - Date.parse(b.createdAt));
     },
-    pinMessage: (state, action) => {
+    saveMessage: (state, action) => {
         for(let conv of state.conversations) {
             if(action.payload.conversation.id === conv.id) {
                 for(let msg of conv.messages) {
@@ -137,7 +146,7 @@ export const conversationsSlice = createSlice({
   }
 });
 
-export const { batchAddMessages, removeMessage, sortMessages, setShowConvList, clearConversations, setView, setTyping, setRead, setJoined, addMessage, setCurrentConversation, addConversation, removeConversation, pinMessage } = conversationsSlice.actions;
+export const { batchAddMessages, removeMessage, sortMessages, setShowConvList, clearConversations, setView, setTyping, setRead, setJoined, addMessage, setCurrentConversation, addConversation, removeConversation, saveMessage } = conversationsSlice.actions;
 
 export const selectConversations = state => state.conversations.conversations;
 export const selectCurrentConversation = state => state.conversations.currentConversation;

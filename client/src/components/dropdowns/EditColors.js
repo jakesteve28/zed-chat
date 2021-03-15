@@ -10,6 +10,10 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import rainier from '../../assets/rainier.jpg';
 import hood from '../../assets/hood.jpg';
 import helens from '../../assets/sthelens.jpg';
+import zodd from '../../assets/zodd.jpg';
+import moon from '../../assets/moon.jpg';
+import orion from '../../assets/orion.jpg';
+import eclipse from '../../assets/eclipse.jpg';
 import '../../styles/topbar.css';
 import '../../styles/index.css';
 export default function EditColorsDropdown() {
@@ -69,14 +73,42 @@ export default function EditColorsDropdown() {
                         <Accordion.Collapse eventKey="2">
                             <Card.Body className="card-body-select-bg">
                                 <Row className="select-picture-row">
-                                    <div className="select-bg-square hood mx-auto" key="mthood" onClick={() => setBGPic(hood)}>\
-                                        <img src={hood} className="select-bg-img" alt="Mt Hood"></img>
-                                    </div>
-                                    <div className="select-bg-square rainier mx-auto" key="mtrainier" onClick={() => setBGPic(rainier)}>
-                                        <img src={rainier} className="select-bg-img" alt="Mt Rainier"></img>
-                                    </div>
-                                    <div className="select-bg-square sthelens mx-auto" key="mtsthelens" onClick={() => setBGPic(helens)}>
-                                        <img src={helens} className="select-bg-img" alt="Mt St Helens"></img>
+                                    <div className="scroll-select-default-pics">
+                                        <Tooltip title="Mt. Hood">
+                                            <div className="select-bg-square hood mx-auto" key="mthood" onClick={() => setBGPic(hood)}>\
+                                                <img src={hood} className="select-bg-img" alt="Mt Hood"></img>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip title="Mt. Rainier">
+                                            <div className="select-bg-square rainier mx-auto" key="mtrainier" onClick={() => setBGPic(rainier)}>
+                                                <img src={rainier} className="select-bg-img" alt="Mt Rainier"></img>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip title="Mt. St. Helens">
+                                            <div className="select-bg-square sthelens mx-auto" key="mtsthelens" onClick={() => setBGPic(helens)}>
+                                                <img src={helens} className="select-bg-img" alt="Mt St Helens"></img>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip title="Orion">                                      
+                                            <div className="select-bg-square orion mx-auto" key="orion" onClick={() => setBGPic(orion)}>
+                                                <img src={orion} className="select-bg-img" alt="Orion Nebula"></img>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip title="Eclipse">
+                                            <div className="select-bg-square eclipse mx-auto" key="5thEclipse" onClick={() => setBGPic(eclipse)}>
+                                                <img src={eclipse} className="select-bg-img" alt="5th Eclipse"></img>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip title="Moon">
+                                            <div className="select-bg-square moon mx-auto" key="moon" onClick={() => setBGPic(moon)}>
+                                                <img src={moon} className="select-bg-img" alt="Moon"></img>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip title="Zodd (Monster)">
+                                            <div className="select-bg-square zodd mx-auto" key="zodd" onClick={() => setBGPic(zodd)}>
+                                                <img src={zodd} className="select-bg-img" alt="Nosferatu Zodd"></img>
+                                            </div>
+                                        </Tooltip>                         
                                     </div>
                                     <Tooltip title="Click/Drag to Upload">
                                         <Button className="upload-bg-button my-auto mx-auto" onClick={handleUpload}>

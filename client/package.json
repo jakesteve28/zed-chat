@@ -84,7 +84,7 @@
     "test": "node scripts/test.js",
     "lint": "npx eslint src",
     "test-vulnerabilities": "snyk test",
-    "build-serve": "npm run build && Copy-Item ./build/ ../server/zed-chat-server/client/ -Recurse"
+    "build-serve": "npm run build; Remove-Item ..\\server\\zed-chat-server\\static\\client\\* -Recurse; Copy-Item .\\build\\* ..\\server\\zed-chat-server\\static\\client\\ -Recurse;"
   },
   "browserslist": {
     "production": [

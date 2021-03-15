@@ -1,8 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from './user.service';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { FriendRequest } from '../entities/friendrequest.entity';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class FriendRequestService {
@@ -14,56 +15,48 @@ export class FriendRequestService {
         ) {}
 
     async getFriendRequest(id: string): Promise<FriendRequest> {
-        return this.friendRequestRepository.findOne(id, { relations: ["sender"] });
+        return this.friendRequestRepository.findOne(id);
     }
-    async getFriendRequestsReceivedByUser(userId: string): Promise<FriendRequest[]> {
-        return this.friendRequestRepository.find({where: { recipientId: userId }, relations: ["sender"] });
+    async getFriendRequests(user: User): Promise<FriendRequest[]> {
+        return this.friendRequestRepository.find({ where: { recipientId: user.id, cancelled: false, accepted: false }}); 
     }
-    async getSentFriendRequestsSentByUser(userId: string): Promise<FriendRequest[]> {
-        return this.userService.getFriendRequests(userId);
-    }
-    async create(userId: string, recipientId: string): Promise<FriendRequest> {
-        const sender = await this.userService.findOne(userId);
-        const recipient = await this.userService.findOne(recipientId);
-        if(sender && recipient && recipient.id){
-            // if(sender.friendRequests.filter(el => el.recipientId === recipient.id ).length > 0){
-            //     throw "Cannot send more than 1 friend request to this user"
-            // }
-                const friendRequest = new FriendRequest();
-                friendRequest.recipientId = recipient.id;
-                friendRequest.sender = sender
-                const ret = await this.friendRequestRepository.save(friendRequest);
-                return this.friendRequestRepository.findOne(ret.id, { relations: ['sender']})
+    async create(sender: User, recipient: User): Promise<FriendRequest> {
+        if(recipient.id === sender.id || recipient.tagName === sender.tagName) {
+            return null;
         }
-        if(!recipient || !recipient.id) throw "User does not exist"
-        if(!sender) throw "Sender does not exist"
+        const friendRequest = new FriendRequest();
+        friendRequest.recipientId = recipient.id;
+        friendRequest.recipientTagname = recipient.tagName;
+        friendRequest.senderId = sender.id;
+        friendRequest.senderTagname = sender.tagName;
+        return this.friendRequestRepository.save(friendRequest);
     }
     async acceptFriendRequest(id: string): Promise<FriendRequest> {
-        const friendRequest =  await this.friendRequestRepository.findOne(id, { relations: ["sender"]}); 
+        const friendRequest =  await this.friendRequestRepository.findOne(id); 
         const newFriend = await this.userService.findOne(friendRequest.recipientId)
-        if(friendRequest.sender.id && newFriend.id){
+        if(friendRequest.senderId && newFriend.id){
             try {
-                const [_sender, _newFriend] = await this.userService.addFriends(friendRequest.sender.id, newFriend.id);
+                const [_sender, _newFriend] = await this.userService.addFriends(friendRequest.senderId, newFriend.id);
                 if(_sender && _newFriend && _sender.friends && _newFriend.friends){
-                    friendRequest.accepted = true 
-                    const _friendRequest = await this.friendRequestRepository.save(friendRequest)
+                    friendRequest.accepted = true;
+                    const _friendRequest = await this.friendRequestRepository.save(friendRequest);
                     if(_friendRequest){
-                        console.log(_friendRequest)
-                        return _friendRequest
+                        console.log(_friendRequest);
+                        return _friendRequest;
                     }
                 }
             }  catch(err) {
-                console.log("Cannot accept friend request and add friends", err)
+                console.log("Cannot accept friend request and add friends", err);
                 return null;
             }
         } else {
-            console.log("Cannot accept friend request and add friends")
+            console.log("Cannot accept friend request and add friends");
         }
     }
     async declineFriendRequest(id: string): Promise<FriendRequest> {
-        const friendRequest =  await this.friendRequestRepository.findOne(id, { relations: ["sender"]}); 
+        const friendRequest =  await this.friendRequestRepository.findOne(id); 
         const newFriend = await this.userService.findOne(friendRequest.recipientId)
-        if(friendRequest.sender.id && newFriend.id){
+        if(friendRequest.senderId && newFriend.id){
             friendRequest.cancelled = true
             return this.friendRequestRepository.save(friendRequest); 
         } else {

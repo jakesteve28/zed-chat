@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from '../controllers/app.controller';
-import { AppService } from '../providers/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { UserModule } from './user.module';
 import { AuthModule } from './auth.module'
@@ -32,9 +30,7 @@ import { options } from '../config/constants';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'static')
     })
-  ],
-  controllers: [AppController],
-  providers: [AppService]
+  ]
 })
 export class AppModule {
 }

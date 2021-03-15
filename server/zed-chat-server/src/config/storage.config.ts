@@ -1,3 +1,10 @@
+/*
+    2021 Jacob Stevens 
+    A few util functions for uploading files and images. Used by the storage controller. 
+    Most the code here is self explanatory. 
+    I use multer and local disk storage for the images, and limit how many uploads allowed per user.  
+*/
+
 import { diskStorage } from "multer";
 import { extname } from "path";
 import { v4 as uuid } from 'uuid';

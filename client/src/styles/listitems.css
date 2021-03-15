@@ -1,5 +1,6 @@
 .friend-list-item-row {
     background-color: #222222;
+    max-width: 200px;
 }
 .friend-list-item-row:hover {
     background-color: #303030;
@@ -7,7 +8,7 @@
 .hidden-dropdown-friend-list-item {
     display: none !important;
     background-color: #303030;
-    max-width: 50px;
+    max-width: 30px;
     border: none !important; 
     outline: none !important;
 }
@@ -23,8 +24,7 @@
 
 .friend-list-item-row:hover .hidden-dropdown-friend-list-item {
     display: inline !important;
-    margin-right: 85%;
-    width: 50px !important;
+    width: 30px !important;
 }
 .accepted-list-item {
     background-color: #202020;
@@ -32,22 +32,17 @@
     padding-top: 15px !important;
 }
 .accepted-list-item:hover {
-    background-color: #303030;
+    background-color: #121212;
     cursor:pointer;
 }
-.accepted-list-item:hover > .button-bg {
-    background-color: #303030;
-}
-.accepted-list-item:hover .button-bg {
-    background-color: #303030 !important;
-}
-.accepted-list-item .button-bg {
-    background-color: #202020 !important;
+.accepted-list-item:hover * {
+    background-color: #121212;
 }
 .friend-request-list-item {
-    background-color: #202020;
+    background-color: #191919;
     color: white !important;
     padding-top: 15px !important;
+    cursor: pointer;
 }
 .friend-request-list-item:hover {
     background-color: #303030 !important;
@@ -60,7 +55,7 @@
     min-width: fit-content !important;
     width: stretch;
     font-size: 24pt;
-    padding: 25px;
+    padding: 35px !important;
     border-radius: 5px;
     margin-right: auto;
     color: #AAAAAA;
@@ -236,14 +231,32 @@
     font-size: 10pt;
 }
 .received-invite-button,
-.received-invite-button-decline {
+.delete-invite-button{
     border: none; 
     outline: none; 
-    color: #97fa93;
-    background-color: #191919;
+    background-color: transparent;
+    box-shadow: none;
+    cursor: pointer;
 }
-.received-invite-button-decline {
-    background-color: #bf2700;
+.received-invite-button:hover,
+.delete-invite-button:hover,
+.received-invite-button:focus,
+.delete-invite-button:focus,
+.received-invite-button:focus-visible,
+.delete-invite-button:focus-visible,
+.received-invite-button:active,
+.delete-invite-button:active {
+    border: none; 
+    outline: none; 
+    box-shadow: none;
+    background-color: #121212;
+    color: cornflowerblue;
+}
+.delete-invite-button:hover,
+.delete-invite-button:focus,
+.delete-invite-button:active,
+.delete-invite-button:focus-visible {
+    color: darkred;
 }
 .checkbox-column {
     max-width: 55px;
@@ -268,4 +281,22 @@
 }
 .conv-info {
     max-width: 180px !important;
+}
+.delete-conv-dropdown-menu {
+    background-color: #191919; 
+    color: #DDDDDD;
+}
+.delete-conv-dropdown-button {
+    background-color: #191919;
+    color: #DDDDDD;
+    cursor: pointer;
+}
+.delete-conv-dropdown-button:active,
+.delete-conv-dropdown-button:focus,
+.delete-conv-dropdown-button:focus-visible {
+    background-color: #303030;
+    color: #DDDDDD;
+}
+.delete-conv-dropdown-button:hover {
+    color: darkred;
 }

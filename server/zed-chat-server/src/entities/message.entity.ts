@@ -25,7 +25,7 @@ export class Message {
   user: User
 
   @ManyToOne(type => Conversation, conversation => conversation.messages, {
-    eager: true
+    eager: true, onDelete: 'SET NULL'
   })
   conversation: Conversation
 }

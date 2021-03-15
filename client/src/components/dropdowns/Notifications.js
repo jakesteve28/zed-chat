@@ -6,7 +6,9 @@ import {
   selectAccount
 } from '../../store/slices/accountSettingsSlice';
 import {
-  selectFriendRequests
+  friendsSlice,
+  selectFriendRequests,
+  selectFriends
 } from '../../store/slices/friendsSlice';
 import { selectReceived, acceptedInvites } from '../../store/slices/inviteSlice';
 import { FriendRequestListItem } from '../listItems/FriendRequest';
@@ -20,6 +22,7 @@ export default function NotificationsDropdown() {
     const receivedInvites = useSelector(selectReceived);
     const friendRequests = useSelector(selectFriendRequests);
     const _acceptedInvites = useSelector(acceptedInvites);
+    const friends = useSelector(selectFriends);
     const account = useSelector(selectAccount);
     return (
       <Dropdown className="ml-3 p-1 topbar-dropdown" >
@@ -42,23 +45,31 @@ export default function NotificationsDropdown() {
               <Tabs className="tabs-notifications" defaultActiveKey="received" id="uncontrolled-tab-example">
                 <Tab className="tab-notifications" eventKey="received" title="Received">
                   {friendRequests.filter(map => map.recipientId === account.id).map((el) => {
-                    if(el && el.accepted === false && el.cancelled === false && el.sender.id !== account.id){
+                    if(el && el.accepted === false && el.cancelled === false && el.sender && el.sender.id !== account.id){
                       return (
-                        <FriendRequestListItem requestId={el.id} recipientId={el.recipientId} sender={el.sender} tagName={el.sender.tagName} key={`${el.id}`}></FriendRequestListItem>
+                        <FriendRequestListItem requestId={el.id} recipientId={el.recipientId} tagName={el.senderTagname} key={`${el.id}`}></FriendRequestListItem>
                       )
                     } else return null;                         
                   })}
                   {receivedInvites.map((el) => {
-                    return (
-                      <ReceivedInviteListItem sender={(el.sender) ? el.sender : `${el.senderId}`} key={`${Math.random()}`} convId={`${el.conversationId}`} inviteId={`${el.id}`}></ReceivedInviteListItem>
-                    )
+                    const index = friends.findIndex(fr => fr.id === el.senderId); 
+                      if(index !== -1) {
+                        return (
+                          <ReceivedInviteListItem senderTagname={friends[index]?.tagName} key={el.id} convId={el.conversationId} inviteId={el.id}></ReceivedInviteListItem>
+                          )} else {
+                        return null; 
+                      }
                   })}
                 </Tab>
                 <Tab eventKey="accepted" title="Accepted">
                   {_acceptedInvites.map((el) => {
-                      return (
-                        <AcceptedInviteListItem sender={`${el.senderId}`} key={`${Math.random()}`} convId={`${el.conversationId}`} inviteId={`${el.id}`}></AcceptedInviteListItem>
-                      )
+                    const index = friends.findIndex(fr => fr.id === el.senderId); 
+                      if(index !== -1) {
+                        return (
+                        <AcceptedInviteListItem inviteId={el.id} senderTagname={friends[index]?.tagName} key={el.id}></AcceptedInviteListItem>
+                      )} else {
+                        return null; 
+                      }
                     })
                   }
                 </Tab>

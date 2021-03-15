@@ -42,7 +42,7 @@ export class User {
   @CreateDateColumn()
   createdAt: string;
   
-  @ManyToMany(type => Conversation, conversation => conversation.users)
+  @ManyToMany(type => Conversation, conversation => conversation.users, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinTable()
   conversations: Conversation[]
 
@@ -52,9 +52,6 @@ export class User {
   @ManyToMany(type => User, user => user.friends)
   @JoinTable()
   friends: User[];
-
-  @OneToMany(type => FriendRequest, friendRequest => friendRequest.sender)
-  friendRequests: FriendRequest[]
 
   @Column({ default: false })
   loggedIn: boolean; 
@@ -74,4 +71,5 @@ export class User {
   @Column({ default: "" })
   backgroundPicture: string;
 
+  friendRequests: FriendRequest[];
 }

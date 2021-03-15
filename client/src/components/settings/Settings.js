@@ -31,10 +31,7 @@ export default function Settings(){
     const [privacyOpened, setPrivacyOpened] = useState(false);
     const [resetPWOpened, setResetPWOpened] = useState(false);
     const [changeTagnameOpened, setChangeTagnameOpened] = useState(false);
-    const logoutAccount = async () => {
-        await fetch("http://localhost:3000/api/auth/logout", {
-            credentials: "include"
-        });
+    const logoutClient = ()  => {
         dispatch(logout());
         dispatch(clearAccount());
         dispatch(clearAuth());
@@ -42,6 +39,18 @@ export default function Settings(){
         dispatch(clearInvites());
         dispatch(clearFriends());
         console.log("Successfully logged out");
+    }
+    const logoutAccount = async () => {
+        try {
+            await fetch("http://localhost:3000/api/auth/logout", {
+                credentials: "include"
+            });
+            logoutClient();
+        } catch(err) {
+            console.error("Error: Request to server for logout failed. Logging out account, clearing cookies, and navigating to login page"); 
+            logoutClient();
+        }
+   
     }
     const resetPassword = () => {
         setResetPWOpened(true);

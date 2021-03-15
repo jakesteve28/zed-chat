@@ -41,11 +41,12 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<User> {
-      const user = await this.usersRepository.findOne(id, { relations: ["conversations", "friends", "friendRequests"] });
+      const user = await this.usersRepository.findOne(id, { relations: ["conversations", "friends"] });
       for(const conv of user.conversations){
-        conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
+        conv.messages = await this.conversationService.getMessagesTruncated(user.id, conv.id);
         conv.users = await this.conversationService.getUsers(conv.id);
       }
+      user.friendRequests = await this.getFriendRequests(user);
       delete user.password; 
       delete user.refreshToken;
       return user;
@@ -61,7 +62,12 @@ export class UserService {
   }
 
   async findByTagName(tagName: string): Promise<User> {
-    const user = await  this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends", "friendRequests"]});
+    const user = await  this.usersRepository.findOne({ where: {tagName: `${tagName}`}, relations: ["conversations", "friends"]});
+    for(const conv of user.conversations){
+      conv.messages = await this.conversationService.getMessagesTruncated(user.id, conv.id);
+      conv.users = await this.conversationService.getUsers(conv.id);
+    }
+    user.friendRequests = await this.getFriendRequests(user);
     delete user.password; 
     delete user.refreshToken;
     return user;
@@ -92,11 +98,10 @@ export class UserService {
     return this.usersRepository.save(user); 
   }
 
-  async getFriendRequests(userId: string): Promise<FriendRequest[]> {
-    const user = await this.findOne(userId);
-    const received = await this.friendRequestService.getFriendRequestsReceivedByUser(userId);
-    if(user && user.friendRequests){
-      return [...user.friendRequests, ...received]
+  async getFriendRequests(user: User): Promise<FriendRequest[]> {
+    const received = await this.friendRequestService.getFriendRequests(user);
+    if(user){
+      return received;
     } else console.log("Error: Cannot find user or friend requests for user ")
     return []
   }
@@ -128,9 +133,9 @@ export class UserService {
     }
   }
 
-  async removeFriends(userId: string, exFriendId: string): Promise<[User, User]> {
+  async removeFriends(userId: string, exFriendTagname: string): Promise<[User, User]> {
     const user = await this.findOne(userId);
-    const exFriend = await this.findOne(exFriendId);
+    const exFriend = await this.findByTagName(exFriendTagname);
     if(user && Array.isArray(user.friends) && 
         exFriend && Array.isArray(exFriend.friends)) {
       if(!user.friends.some(fr => fr.id === exFriend.id)){
@@ -232,23 +237,10 @@ export class UserService {
   }
 
   async markLoggedIn(userId: string) {
-    await this.usersRepository.update(userId, {
+    this.usersRepository.update(userId, {
       loggedIn: true, 
       isOnline: true
     });
-  }
-
-  async fetchMessages(userId: string): Promise<User> {
-    const user = await this.findOne(userId);
-    if(Array.isArray(user?.conversations)){
-      for(const conv of user.conversations){
-        conv.messages = await this.conversationService.getMessagesTruncated(conv.id);
-        if(conv.numberOfMessages < conv.messages.length) {
-            conv.numberOfMessages = conv.messages.length;
-        }
-      }
-      return user;
-    } else return null;
   }
 
   async checkHashedRefreshTokenMatch(userTagname: string, refreshToken: string): Promise<boolean> {
