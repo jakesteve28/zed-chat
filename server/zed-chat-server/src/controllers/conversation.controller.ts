@@ -12,11 +12,7 @@ import { ConversationService } from '../providers/conversation.service';
 import { Conversation } from '../entities/conversation.entity';
 import { Message } from '../entities/message.entity';
 import JwtRefreshGuard from '../guards/jwt-refresh-guard';
-import { Request } from 'express';
 
-/**
- * Note that every method 
- */
 @Controller('conversation')
 export class ConversationController {
   constructor(private conversationService: ConversationService) {}

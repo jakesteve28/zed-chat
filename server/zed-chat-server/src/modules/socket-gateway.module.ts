@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * Message Module
+ * Pretty self explanatory. Read auth.module notes for forwardRef imports
+ */
+
 import { ConversationModule } from './conversation.module';
 import { ChatGateway } from '../gateways/chat.gateway';
 import { UserModule } from './user.module';

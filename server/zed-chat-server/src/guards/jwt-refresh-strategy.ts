@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * Strategy for extracting a JWT from the request cookie, and validating the request using the saved
+ * hashed token in the database 
+ */
+
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
@@ -23,6 +29,12 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
  
+  /**
+   * Method that performs the validation of the extracted refresh token 
+   * @param request the request, exposing its cookies 
+   * @param payload the JWT payload
+   * @returns true if a match, false otherwise.
+   */
   async validate(request: Request, payload: any) {
     const refreshToken = request.cookies?.Refresh;
     if(await this.userService.checkHashedRefreshTokenMatch(payload.username, refreshToken)){

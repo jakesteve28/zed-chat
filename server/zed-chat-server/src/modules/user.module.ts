@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * User Module 
+ * Pretty self explanatory. Read auth.module notes for forwardRef imports
+ */
+
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from '../providers/user.service';

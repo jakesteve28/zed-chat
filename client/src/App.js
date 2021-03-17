@@ -22,6 +22,7 @@ import 'react-pro-sidebar/dist/css/styles.css';
 import { AnimatedSwitch } from 'react-router-transition';
 import './styles/App.css';
 import './styles/index.css';
+import Info from './modules/info';
 export default function App() {
   const account = useSelector(selectAccount);
   const dispatch = useDispatch(); 
@@ -94,6 +95,7 @@ export default function App() {
       <Route path="/login" component={LoginComponent}></Route>
       <Route path="/forgotPassword" component={ForgotPW}></Route>
       <Route path="/createAccount" component={CreateAcc}></Route>
+      <Route path="/info" component={Info}></Route>
       <GuardedRoute path="/home" component={Home} auth={account.loggedIn}></GuardedRoute>
       <GuardedRoute path="/newConversation" component={StartChatScreen} auth={account.loggedIn}></GuardedRoute>
       <GuardedRoute path="/settings" component={SettingScr} auth={account.loggedIn}></GuardedRoute>

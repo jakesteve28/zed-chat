@@ -1,7 +1,12 @@
+/**
+ * 2021 Jacob Stevens
+ * Message service
+ * This provider contains methods for common CRUD ops on a message entity 
+ */
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConversationService } from './conversation.service';
-import { UserService } from './user.service';
 import { Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { User } from '../entities/user.entity';
@@ -10,10 +15,18 @@ import { Conversation } from '../entities/conversation.entity';
 @Injectable()
 export class MessageService {
     constructor(private conversationService: ConversationService,
-        private userService: UserService,
         @InjectRepository(Message)
         private messageRepository: Repository<Message>){
     }
+
+    /**
+     * Creates a message given a user, the body, and the conversation/chatroom 
+     * Input validation should occur in the controller
+     * @param messageBody Body of message. Max 240 chars
+     * @param user the sender
+     * @param conversation the chatroom 
+     * @returns a new message entity
+     */
     async create(messageBody: string, user: User, conversation: Conversation): Promise<Message> {
         const message = new Message();
         message.body = messageBody;
@@ -21,16 +34,35 @@ export class MessageService {
         message.conversation = await this.conversationService.incrementNumberMessages(conversation.id);
         return this.messageRepository.save(message);
     }
-    async remove(messageId: string): Promise<Message> {
-        const msg = await this.messageRepository.findOne(messageId);
+
+    /**
+     * Removes a message by ID
+     * @param messageId 
+     * @returns true 
+     */
+    async remove(messageId: string): Promise<boolean> {
         await this.messageRepository.delete(messageId);
-        return msg;
+        return true;
     }
+
+    /**
+     * Marks a message as "seen" or "read" in the database
+     * @param messageId 
+     * @returns the read message
+     */
     async setRead(messageId: string): Promise<Message> {
         const message = await this.messageRepository.findOne(messageId);
         message.read = true;
         return this.messageRepository.save(message);
     }
+
+    /**
+     * Sets all the messages in a chatroom as read/seen
+     * Useful for when a user opens up a chatroom, marks all of em as seen 
+     * @param conversationId 
+     * @param userId 
+     * @returns an array of messages
+     */
     async setAllRead(conversationId: string, userId: string):  Promise<Message[]> {
         const messages = await this.conversationService.getAllMessages(conversationId);
         for(const msg of messages){
@@ -41,6 +73,14 @@ export class MessageService {
         }
         return messages;
     }
+
+    /**
+     * Saves a message. Chatrooms are only allowed to have 25 messages at a time.
+     * Saved ones stay. Max 10 per person per room
+     * If both save 10, 20 different colored messages will be in the "saved" section
+     * @param messageId 
+     * @returns the saved message
+     */
     async pinMessage(messageId: string): Promise<Message> {
         const msg = await this.messageRepository.findOne(messageId); 
         if(msg.pinned === false){

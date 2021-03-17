@@ -1,3 +1,10 @@
+/**
+ * 2021 Jacob Stevens
+ * Invite Service
+ * Responsible for CRUD operations associated with the invite entity
+ * When invites are accepted, also responsible for the user/conv associated CRUD operations
+ */
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConversationService } from './conversation.service';
@@ -14,12 +21,29 @@ export class InviteService {
                 private readonly inviteRepository: Repository<Invite>
         ) {}
 
+    /**
+     * Returns an invite by its uuidv4
+     * @param inviteId 
+     * @returns invite
+     */
     async getInvite(inviteId: string): Promise<Invite> {
         return this.inviteRepository.findOne(inviteId);
     }
+
+    /**
+     * Returns a list of invites where the recipient ID is the given user uuidv4
+     * @param userId 
+     * @returns list of invites received
+     */
     async getInvitesByUser(userId: string): Promise<Invite[]> {
         return this.inviteRepository.find({where: { recipientId: userId }});
     }
+
+    /**
+     * Returns a list of sent invites, where the senderID is the given user uuidv4
+     * @param userId 
+     * @returns list of invites sent
+     */
     async getSentInvitesByUser(userId: string): Promise<Invite[]> {
         return this.inviteRepository.find({where: { senderId: userId }});
     }
@@ -35,7 +59,7 @@ export class InviteService {
             const invite = await this.inviteRepository.findOne(inviteId);
             if(!invite) throw "Cannot cancel invite: invite does not exist";
             invite.cancelled = true;
-            this.conversationService.cancel(invite.conversationId); 
+            this.conversationService.remove(invite.conversationId); 
             const sender = await this.userService.findOne(invite.senderId); 
             if(!sender) throw "Cannot cancel invite: invite's sender does not exist in the database"; 
             const recipient = await this.userService.findOne(invite.recipientId);
@@ -48,6 +72,11 @@ export class InviteService {
             return null;
         }
     }
+    /**
+     * Deletes an invite and returns true, or null if it can't be deleted, given the invite's uuidv4
+     * @param inviteId 
+     * @returns true if successful, null if not
+     */
     async deleteInvite(inviteId: any) {
         const invite = await this.inviteRepository.findOne(inviteId); 
         if(invite.accepted !== true) {
@@ -58,11 +87,28 @@ export class InviteService {
             return true; 
         }
     }
+
+    /**
+     * Returns the invites associated with a conversation, mainl emeployed to prevent a conversation from 
+     * having a million invites
+     * @param _conversationId 
+     * @returns a list of invites
+     */
     async getConversationInvites(_conversationId: string): Promise<Invite[]> {
         return this.inviteRepository.find({ where: {
             conversationId: _conversationId
         }})
     }
+
+    /**
+     * Responsible for the valid creation of a new invite 
+     * TODO: plenty of validation occurnig here to determine if the invite is allowed to be sent/created.
+     * TODO: Move validation to the controllers/gateways which call this method
+     * @param userId the sender's uuidv4
+     * @param recipientId the recipients uuidv4
+     * @param conversationId the conv's uuidv4
+     * @returns a new invite
+     */
     async create(userId: string, recipientId: string, conversationId: string): Promise<Invite> {
         const sender = await this.userService.findOne(userId);
         const recipient = await this.userService.findOne(recipientId);
@@ -89,6 +135,13 @@ export class InviteService {
         invite.senderId = sender.id
         return this.inviteRepository.save(invite);
     }
+
+    /**
+     * Marks the invite accepted and then adds the accepting user to the associated conversation. 
+     * Saves the invite, user, and conversation. 
+     * @param inviteId uuidv4 of the invite
+     * @returns The accepted invite
+     */
     async acceptInvite(inviteId: string): Promise<Invite> {
         const invite = await this.inviteRepository.findOne(inviteId);
         const newUser = await this.userService.findOne(invite.recipientId);

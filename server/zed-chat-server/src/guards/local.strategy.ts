@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * Local strategy uses the auth providers validation method to see if the user's given pw matches the db's hash 
+ * Then it exposes the user to methods further down the request middleware chain if successful...
+ */
+
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';

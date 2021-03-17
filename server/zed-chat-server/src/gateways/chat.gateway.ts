@@ -1,3 +1,11 @@
+/**
+ * 2021 Jacob Stevens
+ * This gateway is for the chat socket, using socket.io on the /chat namespace. 
+ * It has a host of events that it listens for. 
+ * Provided the user has logged in and is using their JWT token wrapped in a refresh cookie, 
+ * the handlers will perform the business logic and dispatch any server events with success or failure messages.
+ */
+
 import {
     WebSocketGateway,
     SubscribeMessage,
@@ -13,6 +21,7 @@ import { ChatGuard } from '../guards/chat.gateway.auth-guard';
 import { Request, Response } from "express"
 import { MessageService } from '../providers/message.service';
 
+//Socket.io configuration. Allows for cookies on the server for our JWT Chat Guard. 
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -341,6 +350,12 @@ export class ChatGateway  {
         } 
     }
 
+    /**
+     * Handler for saving a message in a conversation, to avoid it being deleted in the 25 message limit. 
+     * Max amount of messages pinned by a user in a chat room is 10. 
+     * @param client client's socket 
+     * @param data { messageId: string }
+     */
     @UseGuards(ChatGuard)
     @SubscribeMessage('saveMessage')
     async handlePinMsg(@ConnectedSocket() client: Socket, @MessageBody() data ) {
@@ -355,6 +370,7 @@ export class ChatGateway  {
                         if(user.chatSocketId !== "disconnected") {
                             this.wss.to(user.chatSocketId).emit("messageSaved", { message: message });
                             console.log("Successfully emitted messagePinned to all chat users"); 
+                            return true;
                         }
                     }
                 }
@@ -369,6 +385,12 @@ export class ChatGateway  {
         } 
     }
     
+    /**
+     * Handler for deleting messages. Only the sender of a message can delete a message.
+     * @param client The client's socket
+     * @param data { messageId: string }
+     * @returns true if deleted, false otherwise
+     */
     @UseGuards(ChatGuard)
     @SubscribeMessage('deleteMessage')
     async handleDeleteMessage(@ConnectedSocket() client: Socket, @MessageBody() data ) {
@@ -383,6 +405,7 @@ export class ChatGateway  {
                         if(user.chatSocketId !== "disconnected") {
                             this.wss.to(user.chatSocketId).emit("messageDeleted", { message: message });
                             console.log("Successfully emitted messageDeleted to all chat users"); 
+                            return true; 
                         }
                     }
                 }
@@ -394,6 +417,7 @@ export class ChatGateway  {
             const errorMsg = `Error: "messageDeleted" event not sent | ${err} | with socket ${socketId}`;
             this.wss.to(socketId).emit("error", { msg: errorMsg });
             console.error(errorMsg);
+            return false;
         } 
     }
 }

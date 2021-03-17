@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Container, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import useWindowSize from '../../util/windowSize';
@@ -18,7 +17,6 @@ import {
   selectView,
   selectShowConvList,
   setShowConvList,
-  setView,
   setCurrentConversation
 } from '../../store/slices/conversationsSlice';
 import SettingsDropdown from '../dropdowns/Settings';
@@ -27,6 +25,7 @@ import NotificationsDropdown from '../dropdowns/Notifications';
 import { selectTopbarMessage } from '../../store/slices/uiSlice';
 import EditColorsDropdown from '../dropdowns/EditColors';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import HomeIcon from '@material-ui/icons/Home';
 import '../../styles/topbar.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -54,8 +53,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function StartChatButton(){
-  const view = useSelector(selectView);
-  const showConvList = useSelector(selectShowConvList);
   const dispatch = useDispatch();
   const history = useHistory();
   return (
@@ -82,12 +79,15 @@ export default function TopBar(){
     const topbarMessage = useSelector(selectTopbarMessage);
     const showConvList = useSelector(selectShowConvList);
     const history = useHistory(); 
+    const navigateBannerPage = () => {
+      if(location.pathname === '/info') {
+        return;
+      } else history.push('/info')
+    }
     return (
         <CssBaseline>
         <AppBar position="fixed"  className={classes.appBar}>
-            <Toolbar>
-            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            </IconButton>
+            <Toolbar>           
             <Typography component={'span'} className={classes.title}>
                <Container fluid>                   
                     {
@@ -112,7 +112,7 @@ export default function TopBar(){
                               }           
                             </Row>
                           )
-                      : ""
+                      : (<Row>{(location.pathname === '/login') ? (<Button className="banner-button" onClick={() => navigateBannerPage()}><HomeIcon></HomeIcon></Button>) : ""}</Row>)
                     }
                </Container>
             </Typography>
@@ -125,10 +125,14 @@ export default function TopBar(){
                 </Typography> 
                 :  ""
             }
-            
-            
             {
-              (account.loggedIn === false && location.pathname !== "/login") ? (<Link className="rounded-pill btn btn-outline-primary mr-5 rounded-pill topbar-text-span" renderas={Button} to="/login">
+               (account.loggedIn === false && (location.pathname === '/login' || location.pathname === '/info')) ? (<Button variant="dark" className="mx-auto button-outline-black" onClick={() => document.getElementById("link-create-account").click() }><Link id="link-create-account" className="login-link-button" to="/createAccount">Sign&nbsp;Up</Link></Button>) : ""
+            }
+            {            
+               (account.loggedIn === false && location.pathname==='/login') ? <Button  variant="dark" className="mx-auto button-outline-black " onClick={() => document.getElementById("link-forgot-password").click() }><Link id="link-forgot-password" className="login-link-button" to="/forgotPassword">Forgot&nbsp;Password?</Link></Button> : ""          
+            }
+            {
+              (account.loggedIn === false && location.pathname !== "/login") ? (<Link className="mr-5 topbar-text-span link-login" renderas={Button} to="/login">
               Login
             </Link>) : ""
             }

@@ -1,4 +1,10 @@
 
+/**
+ * 2021 Jacob Stevens
+ * Friend request entity. Users must be friends to chat, and this object facilitates in creation of friend connections. 
+ * Self explanatory column names and types.
+ */
+
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn  } from 'typeorm';
 
 @Entity()  

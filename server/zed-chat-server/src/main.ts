@@ -1,3 +1,11 @@
+/**
+ * 2021 Jacob Stevens
+ * The main file of Zodd, where the server is setup. 
+ * The global prefix is 'api'
+ * The app uses cors, compression, and cookie parser middlewares globally.
+ * TODO: add helmet, csurf protection, https
+ */
+
 import { NestFactory } from '@nestjs/core';
 import 'reflect-metadata';
 import { AppModule } from './modules/app.module';
@@ -5,6 +13,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 //import open from 'open'; 
+/**
+ * Private and public keys for https/TLS 
+ */
 const httpsOptions = {
  // key: fs.readFileSync('../keys/key.pem'),
  // cert: fs.readFileSync('../secrets/public.pem'),

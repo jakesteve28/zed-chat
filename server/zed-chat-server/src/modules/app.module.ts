@@ -1,3 +1,10 @@
+/**
+ * 2021 Jacob Stevens
+ * The main wrapper for the application. 
+ * It imports all the other modules.
+ * Also sets up TypeOrm, ServeStatic, and the ConfigModule with custom configuration
+ */
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { UserModule } from './user.module';

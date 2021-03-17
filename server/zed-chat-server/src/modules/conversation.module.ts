@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * Conversation Module
+ * Pretty self explanatory. Read auth.module notes for forwardRef imports
+ */
+
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConversationService } from '../providers/conversation.service';

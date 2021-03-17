@@ -87,6 +87,7 @@ function LoginScreen() {
   const account = useSelector(selectAccount);
   const [spinning, setSpinning] = useState(false);
   const [loggingInCookie, setLoggingInCookie] = useState(false); 
+  const [backgroundAttemptLogin, setBackgroundAttemptLogin] = useState(false); 
   const focusRef = useRef(null);
   useEffect(() => {
     if(focusRef.current) {
@@ -97,6 +98,7 @@ function LoginScreen() {
   useEffect(async () => {
     try {
       if(loggingInCookie === false){
+        setBackgroundAttemptLogin(true);
         const refreshResult = await fetch("http://localhost:3000/api/auth/refreshAccount", {
           credentials: "include"
         });
@@ -114,6 +116,7 @@ function LoginScreen() {
           if(refreshToken === true) dispatch(setRefreshExpire(Date.now() + 875000)); 
           if(false === validateAccountDetails(id, user, invites)){
             setSpinning(false); 
+            setBackgroundAttemptLogin(false);
             setLoggingInCookie(false);
             return;
           }
@@ -121,6 +124,7 @@ function LoginScreen() {
           dispatch(login());
           console.log("Successfully logged in user " + user?.tagName);
           setSpinning(false);
+          setBackgroundAttemptLogin(false);
           setLoggingInCookie(false);
        }
       }
@@ -128,6 +132,7 @@ function LoginScreen() {
       console.log("No valid refresh token. User must login", err);
       setAllowLogin(true); 
       setLoggingInCookie(false);
+      setBackgroundAttemptLogin(false);
     }  
   }, [])
 
@@ -212,7 +217,9 @@ function LoginScreen() {
       <Row className="p-3 mt-5 text-white lead text-center">
         <Col className="p-3 text-center, mx-auto pt-5 mt-5 shadow login-screen-column"> 
           <h2 className="text-white welcome-text" >Welcome to <span className="text-danger">Project Zodd</span></h2>
-          <h6 className="text-muted welcome-subtext">Protected and powered by daemons</h6>
+          {
+            (backgroundAttemptLogin) ? (<span className="text-muted welcome-subtext">Attempting to log back in! <Spinner animation="border" size="sm" variant="secondary" /></span>) :  <h6 className="text-muted welcome-subtext">Protected and powered by daemons</h6>
+          }
             {
               (loggingInCookie) 
                 ? (
@@ -258,16 +265,6 @@ function LoginScreen() {
                         />
                       </InputGroup>
                       <Container fluid className="border-top border-dark pt-2">   
-                        <Row className="mt-3">
-                          <Col>               
-                            <Button variant="dark" className="mx-auto button-outline-black" onClick={() => document.getElementById("link-create-account").click() }><Link id="link-create-account" className="login-link-button" to="/createAccount">Create&nbsp;Account</Link></Button>
-                          </Col>
-                        </Row>
-                        <Row className="mt-3">
-                          <Col>
-                              <Button  variant="dark" className="mx-auto button-outline-black " onClick={() => document.getElementById("link-forgot-password").click() }><Link id="link-forgot-password" className="login-link-button" to="/forgotPassword">Forgot&nbsp;Password?</Link></Button>
-                          </Col>
-                        </Row>
                         <Row className="mt-3 mb-2">
                           <Col>
                             {

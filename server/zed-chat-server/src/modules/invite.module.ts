@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * Invite Module
+ * Pretty self explanatory. Read auth.module notes for forwardRef imports
+ */
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConversationModule } from './conversation.module';

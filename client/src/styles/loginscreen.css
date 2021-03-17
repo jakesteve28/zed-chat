@@ -102,7 +102,14 @@ input:focus {
     border: none;
     font-size: 35pt;
     padding: 25px;
-
+}
+.login-button:focus-visible,
+.login-button:focus,
+.login-button:active,
+.login-button:hover {
+    background: transparent;
+    outline: none; 
+    border: none; 
 }
 .logging-in-spinner {
     height: 60px;

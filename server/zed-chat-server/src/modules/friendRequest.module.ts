@@ -1,3 +1,9 @@
+/**
+ * 2021 Jacob Stevens
+ * FriendRequest Module
+ * Pretty self explanatory. Read auth.module notes for forwardRef imports
+ */
+
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user.module';

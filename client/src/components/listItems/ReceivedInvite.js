@@ -20,10 +20,11 @@ export function ReceivedInviteListItem({ senderTagname, inviteId, convId }) {
         if(notificationSocket){
             console.log(`Attempting to emit acceptInvite event to server for invite with id ${inviteId}`)
             notificationSocket.emit('acceptInvite', { inviteId: inviteId, conversationId: convId }, () => {
-                console.log(`Successfully emitted acceptInvite event to server for invite with id ${inviteId}`)
+                console.log(`Successfully emitted acceptInvite event to server for invite with id ${inviteId}`);
+                setAccepting(false);
+                setDeclining(false);
             });
         }
-        setAccepting(false);
     }
     const declineInvite = () => {
         setDeclining(true);
@@ -34,6 +35,8 @@ export function ReceivedInviteListItem({ senderTagname, inviteId, convId }) {
             notificationSocket.emit('declineInvite', { inviteId: inviteId }, () => {
                 console.log("Successfully emitted decline invite event to server"); 
                 dispatch(removeReceivedInvite(inviteId)); 
+                setAccepting(false);
+                setDeclining(false);
             }); 
         }
     }

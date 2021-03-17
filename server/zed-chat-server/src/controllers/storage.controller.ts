@@ -1,3 +1,13 @@
+/** 
+    2021 Jacob Stevens 
+
+    My storage controller. It's for handling conversation, user, and profile picture asset storage. 
+    Conversations can have messages that point to a link the conversation's users can request, as verified by their access cookie. 
+    They can play sounds files, view images, small videos, all inside the chat room. These assets have a lifespan set by the user, up to 24 hours, before deleted.  
+    Users can upload a background image and profile image, (profile image is permenently saveable, always public)
+    This controller facilitates uploading, storing, organizing and linking the user's profile/conversations to those assets using HTTP POST requests.
+*/
+
 import {
     Controller,
     Post,
@@ -45,6 +55,11 @@ export class StorageController {
       });
     }
     
+    /**
+     * Deletes a user's profile picture
+     * @param userId user's ID as a string
+     * @param oldPicName the picture's filename as a string, typically a uuidv4
+     */
     private deleteOldPic = (userId, oldPicName) => {
       fs.stat(`./profile-pics/${userId}/${oldPicName}`, (err, stats) => {
         if(err) {
@@ -62,29 +77,56 @@ export class StorageController {
       });
     }
 
+    /**
+     * Checks for an existing temporary file. If it can't find it, fails. 
+     * If it can find it, generates a new file name with uuidv4 library, copies the file to 
+     * /profile-pics/{their userId}/{new_filename}
+     * @param userId Their user ID
+     * @param file The file
+     */
     private newProfilePic = (userId: string, file: any) => {
-      fs.readFile(`./tmp/${file.filename}`, 
-        { encoding: 'base64' }, 
-        async (err, data) => {
-          if(err) throw err;
-          const ext = extname(`${file.filename}`); 
-          const fileName = `profile-pic-${uuid()}${ext}`;
-          const fullPath = `./profile-pics/${userId}/${fileName}`;
-          const user = await this.userService.findOne(userId);
-          const _user = await this.userService.setProfilePic(userId, fileName);  
-          if(!fs.existsSync(`./profile-pics/${userId}/`)){
-            fs.mkdir(`./profile-pics/${userId}/`, {}, (err) => {
-              if(err) throw err; 
-              this.write(fullPath, data, _user, `./tmp/${file.filename}`); 
-            });
-          } else {
-            console.log("Checking for old profile picture with name ", user.profilePicture);
-            this.deleteOldPic(_user.id, user.profilePicture);
-            this.write(fullPath, data, _user, `./tmp/${file.filename}`); 
-          }
-      });    
+      try {
+          fs.readFile(`./tmp/${file.filename}`, 
+          { encoding: 'base64' }, 
+          async (err, data) => {
+            try {
+              if(err) throw err;
+              const ext = extname(`${file.filename}`); 
+              const fileName = `profile-pic-${uuid()}${ext}`;
+              const fullPath = `./profile-pics/${userId}/${fileName}`;
+              const user = await this.userService.findOne(userId);
+              const _user = await this.userService.setProfilePic(userId, fileName);  
+              if(!fs.existsSync(`./profile-pics/${userId}/`)){
+                fs.mkdir(`./profile-pics/${userId}/`, {}, (err) => {
+                  try {
+                    if(err) throw err; 
+                    this.write(fullPath, data, _user, `./tmp/${file.filename}`); 
+                  } catch(err) {
+                    console.error("Error while creating new directory for new profile picture", userId, err); 
+                    return -1;
+                  }              
+                });
+              } else {
+                console.log("Checking for old profile picture with name ", user.profilePicture);
+                this.deleteOldPic(_user.id, user.profilePicture);
+                this.write(fullPath, data, _user, `./tmp/${file.filename}`); 
+              }
+            } catch (err) {
+              console.error("Error while checking for temp profile picture", userId, err); 
+              return -1;
+            }           
+        });   
+      } catch(err) {
+        console.error("Error while uploading a new profile picture for user with ID ", userId, err); 
+        return -1;
+      }  
     }
 
+     /**
+     * Same procedure as above, but for background pictures and the background-pic asset storage directory
+     * @param userId Their user ID
+     * @param file The file
+     */
     private newBackgroundPicture = (userId: string, file: any) => {
       fs.readFile(`./tmp/${file.filename}`, 
         { encoding: 'base64' }, 
@@ -108,6 +150,14 @@ export class StorageController {
       }); 
     }
 
+    /**
+     * Post to route included with a multipart-formdata body and file in the "file" field, then this method will 
+     * store the file as a temp file with Multer middleware, use the methods above to save it permanently and set the
+     * new asset's path to the user's profile in the database.
+     * @param file The file, which is a buffer (I believe... saved with base64 in private methods above)
+     * @param userId The user's ID
+     * @returns a string that indicates whether the operation was successful
+     */
     @Post("/:userId/uploadProfilePicture")
     @UseGuards(JwtRefreshGuard)
     @UseInterceptors(
@@ -128,6 +178,12 @@ export class StorageController {
         }
     }
 
+    /**
+     * Same procedure as above, but for background images
+     * @param file 
+     * @param userId 
+     * @returns 
+     */
     @Post("/:userId/uploadBackgroundPicture")
     @UseGuards(JwtRefreshGuard)
     @UseInterceptors(

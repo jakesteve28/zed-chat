@@ -1,3 +1,12 @@
+/**
+ * 2021 Jacob Stevens 
+ * This guard intercepts every request from the client to the chat namespace. 
+ * In order to pass the guard, the request's context data must pass a series of validation steps 
+ * Most being arbitrary 
+ * This needs to be refactored to simply check for the token, fail if not. 
+ * TODO: The validation for differing types of requests should be left to the business logic of the gateway's handlers, not here. 
+ */
+
 import { CanActivate, Injectable } from "@nestjs/common";
 import { UserService } from "../providers/user.service";
 import { JwtService } from '@nestjs/jwt'
@@ -12,6 +21,12 @@ export class ChatGuard implements CanActivate {
               private jwtService: JwtService,
               private conversationService: ConversationService
   ) { }
+
+  /**
+   * The determining method of whether a user's request is allowed to pass the guard.
+   * @param context The request's context, containing all arguments
+   * @returns true if passed validation, false otherwise
+   */
   async canActivate(context: any): Promise<any> {
     if(!context || context.contextType !== 'ws') throw `Context type of ${context.contextType} not allowed`;
     try {
@@ -29,6 +44,13 @@ export class ChatGuard implements CanActivate {
       return false;
     } 
   }
+
+  /**
+   * This method extracts the request's cookie using an arbitrary utility method. 
+   * The Refresh cookie's contained JWT is then validated. If the signature is a match, the request is allowed. 
+   * @param context 
+   * @returns 
+   */
   verifyJwt(context: any): Promise<User> {
     const refreshToken = extractRefreshTokenFromCookie(context.args[0]?.handshake?.headers?.cookie);
     if(!refreshToken) {
@@ -44,6 +66,12 @@ export class ChatGuard implements CanActivate {
     const user = this.userService.findByTagName(decoded?.username);
     return user;
   }
+
+  /**
+   * Verifies that the user isn't disabled or flagged. Any request from such a user will fail.
+   * @param user The user in question
+   * @returns true if user is valid, false if flagged/disabled.
+   */
   checkUser(user: User): Boolean {
     if(user.flagged === true) {
       console.error(`Error: User @${user.tagName} failed ChatGuard. User is marked as flagged for suspicious activity`); 
@@ -56,6 +84,13 @@ export class ChatGuard implements CanActivate {
     return true;
   }
 
+  /**
+   * Arbitrary method for classifying what the context arguments consist of, and whether to allow it.
+   * TODO: move validation of arguments to controller/interceptor, not here 
+   * @param context 
+   * @param user 
+   * @returns 
+   */
   async classify(context: any, user: User): Promise<Boolean> {
     // { 
     //    sender: string (tagName) 

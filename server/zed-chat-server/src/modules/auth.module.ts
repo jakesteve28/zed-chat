@@ -1,3 +1,11 @@
+/**
+ * 2021 Jacob Stevens
+ * The authentication module.
+ * Exposes APIs related to authentication. 
+ * Controller employs strategies for giving/verifying cookies.
+ * Needs passport and a forwardRef to the UserModule (UserModule also imports the AuthModule)
+ */
+
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from '../providers/auth.service';
 import { UserModule } from './user.module';

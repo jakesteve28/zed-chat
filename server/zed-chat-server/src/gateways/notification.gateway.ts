@@ -1,3 +1,8 @@
+/**
+ * 2021 Jacob Stevens
+ * Notification gateway used by logged in users. Allows them to receive and send invites, friend requests, and other notifications. 
+ */
+
 import {
     WebSocketGateway,
     SubscribeMessage,
@@ -14,10 +19,13 @@ import { InviteService } from '../providers/invite.service';
 import { NotificationGuard } from '../guards/notification.gateway.auth-guard';
 import { FriendRequestService } from '../providers/friendRequest.service';
 
+/**
+ * Same preflight check as the chat room. Allows for JWT Refresh cookie to be included with the request. 
+ */
 const preflightCheck = (req: Request, res: Response) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": "localhost:3000", //process.env.PROD_CLIENT_HOST || "http://localhost:3003",
+        "Access-Control-Allow-Origin": "localhost:3000", 
         "Access-Control-Allow-Credentials": "true"
     };
     res.writeHead(200, headers);
@@ -212,6 +220,12 @@ export class NotificationsGateway  {
          }
      }
 
+     /**
+      * Handler for deleting a conversation. Only a user that's part of a conversation can delete a conversation. 
+      * @param client The client's socket 
+      * @param data { conversationId: string }
+      * @returns true if it worked, false otherwise
+      */
     @UseGuards(NotificationGuard)
     @SubscribeMessage('deleteConversation')
     async handleDeleteConversation(@ConnectedSocket() client: Socket, @MessageBody() data) {
@@ -225,6 +239,7 @@ export class NotificationsGateway  {
             return false;
         }
     }
+
     /**
      * This function handles the accept invite event emitted from a client, partiDElarly the recipient of an
      * invite request who sends this notification to let his their friend know that they're accepted
@@ -266,6 +281,7 @@ export class NotificationsGateway  {
             return false;
         }
     }
+    
     /**
      * Handles the event for sending a friend request from the client. If they're not already friends with the 
      * other user, other user exists, etc.. the request is sent.

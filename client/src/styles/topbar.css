@@ -292,3 +292,30 @@
 .dropdown-shadow {
   box-shadow: 2px 2px 5px 5px #121212;
 }
+.banner-button {
+  background-color: transparent;
+  border: none; 
+  outline: none;
+  color: #CCCCCC;
+}
+.banner-button:hover, 
+.banner-button:active, 
+.banner-button:focus, 
+.banner-button:focus-visible {
+  background-color: transparent;
+  border: none; 
+  outline: none;
+  color: #777777;
+}
+.link-login {
+  color: #CCCCCC; 
+  font-size: 14pt; 
+}
+.link-login:hover,
+.link-login:active,
+.link-login:focus,
+.link-login:focus-visible {
+  color: #888888;
+  font-size: 14pt;
+  text-decoration: none;
+}
